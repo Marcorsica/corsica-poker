@@ -1,0 +1,43 @@
+CORSICA POKER - ACCES DISTANCE AVEC CODE 1969
+
+1. TEST EN LOCAL
+- Ouvrir un terminal dans le dossier du projet.
+- Lancer: npm install
+- Lancer: npm start
+- Ouvrir dans le navigateur: http://localhost:3000
+- Entrer le code: 1969
+
+2. IMPORTANT POUR LES SONS LOCAUX
+- Garder les sons dans ce dossier Windows:
+  C:\Users\user\Desktop\CORSICA\CorsicaPokerAssets\audio
+- Si tu changes d'emplacement, définir la variable CORSICA_AUDIO_DIR avant de lancer le serveur.
+
+3. MISE EN LIGNE SUR RENDER
+- Créer un compte GitHub si besoin.
+- Créer un nouveau dépôt GitHub.
+- Copier tout le contenu du projet dans ce dépôt.
+- Envoyer le projet sur GitHub.
+- Créer un compte Render.
+- Dans Render: New > Web Service.
+- Connecter ton dépôt GitHub.
+- Paramètres Render:
+  Build Command: npm install
+  Start Command: npm start
+
+4. VARIABLES D'ENVIRONNEMENT SUR RENDER
+- Ajouter SESSION_SECRET = une phrase longue secrète
+- Ajouter CORSICA_ACCESS_CODE = 1969
+- En ligne, les sons externes de ton PC ne seront pas accessibles. Il faudra soit:
+  a) mettre les sons dans le projet,
+  b) ou les héberger ailleurs,
+  c) ou tester sans sons externes.
+
+5. LIEN PUBLIC
+- Une fois déployé, Render donnera une URL du type:
+  https://nom-du-service.onrender.com
+- Depuis l'autre PC, ouvrir ce lien.
+- Entrer le code 1969.
+
+6. VERROUILLER A NOUVEAU
+- Dans le jeu, cliquer sur le bouton Verrouiller.
+- Le jeu revient à l'écran de code.

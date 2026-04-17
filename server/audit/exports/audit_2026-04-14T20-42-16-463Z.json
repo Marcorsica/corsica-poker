@@ -1,0 +1,1464 @@
+{
+  "sessionId": "70b64788-cb30-47bc-9dda-f6aeb9feed08",
+  "startTime": "2026-04-14T20:39:17.392Z",
+  "version": "1.0",
+  "meta": {
+    "app": "Corsica Poker A2",
+    "port": 3000
+  },
+  "hands": [
+    {
+      "handId": "686b7d1a-8a1a-4115-9c15-924022ca9739",
+      "gameId": "2ac555ed-c8f4-4b71-a995-99bb510c39e8",
+      "playerCount": 9,
+      "startTime": "2026-04-14T20:39:26.118Z",
+      "createdAt": "2026-04-14T20:39:26.117Z",
+      "initialState": {
+        "balance": null
+      },
+      "rng": {
+        "algorithm": "sha256 deterministic shuffle",
+        "serverSeedHash": "249a31c317159d69ddba1fcbff177db812136f04cb32253622654022dd7bef09",
+        "clientSeed": "client-2ac555ed",
+        "nonce": 0,
+        "deckCommitment": "463538edcdee9369f3947e10ba323fa7dc64c9d7a43ea0253159acc00b21563d",
+        "dealtHands": [
+          [
+            "JS",
+            "8C"
+          ],
+          [
+            "6C",
+            "QC"
+          ],
+          [
+            "3H",
+            "QD"
+          ],
+          [
+            "AC",
+            "8S"
+          ],
+          [
+            "10S",
+            "4C"
+          ],
+          [
+            "7H",
+            "7S"
+          ],
+          [
+            "2H",
+            "QH"
+          ],
+          [
+            "KC",
+            "7D"
+          ],
+          [
+            "AS",
+            "8H"
+          ]
+        ]
+      },
+      "actions": [
+        {
+          "type": "hand_start",
+          "playerCount": 9,
+          "timestamp": "2026-04-14T20:39:26.121Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "pre",
+          "totalBoards": 278256,
+          "timestamp": "2026-04-14T20:39:27.575Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "flop",
+          "boardLength": 3,
+          "timestamp": "2026-04-14T20:39:43.781Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "flop",
+          "totalBoards": 465,
+          "timestamp": "2026-04-14T20:39:43.856Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "turn",
+          "boardLength": 4,
+          "timestamp": "2026-04-14T20:39:47.382Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "turn",
+          "totalBoards": 30,
+          "timestamp": "2026-04-14T20:39:47.421Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "river",
+          "boardLength": 5,
+          "timestamp": "2026-04-14T20:39:51.726Z"
+        }
+      ],
+      "streets": {
+        "flop": [
+          {
+            "r": 4,
+            "s": "S"
+          },
+          {
+            "r": 12,
+            "s": "S"
+          },
+          {
+            "r": 11,
+            "s": "D"
+          }
+        ],
+        "turn": [
+          {
+            "r": 4,
+            "s": "S"
+          },
+          {
+            "r": 12,
+            "s": "S"
+          },
+          {
+            "r": 11,
+            "s": "D"
+          },
+          {
+            "r": 3,
+            "s": "C"
+          }
+        ],
+        "river": [
+          {
+            "r": 4,
+            "s": "S"
+          },
+          {
+            "r": 12,
+            "s": "S"
+          },
+          {
+            "r": 11,
+            "s": "D"
+          },
+          {
+            "r": 3,
+            "s": "C"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          }
+        ]
+      },
+      "result": {
+        "winnerType": "single",
+        "winners": [
+          2
+        ],
+        "normalPaid": 0,
+        "handBets": [
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          }
+        ],
+        "tieBets": {
+          "pre": 0,
+          "flop": 0,
+          "turn": 0
+        },
+        "finalBoard": [
+          {
+            "r": 4,
+            "s": "S"
+          },
+          {
+            "r": 12,
+            "s": "S"
+          },
+          {
+            "r": 11,
+            "s": "D"
+          },
+          {
+            "r": 3,
+            "s": "C"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          }
+        ],
+        "fairnessRevealedAt": "2026-04-14T20:39:51.758Z",
+        "serverSeed": "6cc3862c27fc9be802c61bedc627a7ffee16ab0f16bb334a264eac839a4b18a6",
+        "serverSeedHash": "249a31c317159d69ddba1fcbff177db812136f04cb32253622654022dd7bef09",
+        "clientSeed": "client-2ac555ed",
+        "nonce": 0,
+        "deckCommitment": "463538edcdee9369f3947e10ba323fa7dc64c9d7a43ea0253159acc00b21563d",
+        "revealedDeck": [
+          "4H",
+          "9H",
+          "JH",
+          "AH",
+          "9D",
+          "2C",
+          "KD",
+          "JC",
+          "6S",
+          "KS",
+          "3S",
+          "5D",
+          "2S",
+          "5C",
+          "6H",
+          "10H",
+          "10C",
+          "6D",
+          "10D",
+          "2D",
+          "8D",
+          "9C",
+          "AD",
+          "KH",
+          "9S",
+          "7C",
+          "3D",
+          "5S",
+          "4D",
+          "5H",
+          "3C",
+          "JD",
+          "QS",
+          "4S",
+          "8H",
+          "AS",
+          "7D",
+          "KC",
+          "QH",
+          "2H",
+          "7S",
+          "7H",
+          "4C",
+          "10S",
+          "8S",
+          "AC",
+          "QD",
+          "3H",
+          "QC",
+          "6C",
+          "8C",
+          "JS"
+        ]
+      },
+      "endTime": "2026-04-14T20:39:51.758Z"
+    },
+    {
+      "handId": "70ee04b4-656d-4f1a-8abf-0d026ec2c828",
+      "gameId": "621a0cfb-d7c0-4b4e-a338-6f63f2710534",
+      "playerCount": 9,
+      "startTime": "2026-04-14T20:39:56.737Z",
+      "createdAt": "2026-04-14T20:39:56.737Z",
+      "initialState": {
+        "balance": null
+      },
+      "rng": {
+        "algorithm": "sha256 deterministic shuffle",
+        "serverSeedHash": "8e67106f0a5d2dc212e0dbbf14eb908324d471c93ff29236dcd9df70787899db",
+        "clientSeed": "client-621a0cfb",
+        "nonce": 0,
+        "deckCommitment": "8ab5fc0e418f7c75d3f6e693bbcc799b30f4a898f096bf7bacc7f5f9a52dccb5",
+        "dealtHands": [
+          [
+            "6D",
+            "2S"
+          ],
+          [
+            "QD",
+            "3S"
+          ],
+          [
+            "10D",
+            "AH"
+          ],
+          [
+            "3D",
+            "KS"
+          ],
+          [
+            "3C",
+            "5D"
+          ],
+          [
+            "2H",
+            "10C"
+          ],
+          [
+            "7D",
+            "7C"
+          ],
+          [
+            "8D",
+            "QS"
+          ],
+          [
+            "AC",
+            "JS"
+          ]
+        ]
+      },
+      "actions": [
+        {
+          "type": "hand_start",
+          "playerCount": 9,
+          "timestamp": "2026-04-14T20:39:56.739Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "pre",
+          "totalBoards": 278256,
+          "timestamp": "2026-04-14T20:39:58.112Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "flop",
+          "boardLength": 3,
+          "timestamp": "2026-04-14T20:40:11.388Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "flop",
+          "totalBoards": 465,
+          "timestamp": "2026-04-14T20:40:11.425Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "turn",
+          "boardLength": 4,
+          "timestamp": "2026-04-14T20:40:20.884Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "turn",
+          "totalBoards": 30,
+          "timestamp": "2026-04-14T20:40:20.917Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "river",
+          "boardLength": 5,
+          "timestamp": "2026-04-14T20:40:27.031Z"
+        }
+      ],
+      "streets": {
+        "flop": [
+          {
+            "r": 13,
+            "s": "D"
+          },
+          {
+            "r": 9,
+            "s": "D"
+          },
+          {
+            "r": 8,
+            "s": "H"
+          }
+        ],
+        "turn": [
+          {
+            "r": 13,
+            "s": "D"
+          },
+          {
+            "r": 9,
+            "s": "D"
+          },
+          {
+            "r": 8,
+            "s": "H"
+          },
+          {
+            "r": 9,
+            "s": "S"
+          }
+        ],
+        "river": [
+          {
+            "r": 13,
+            "s": "D"
+          },
+          {
+            "r": 9,
+            "s": "D"
+          },
+          {
+            "r": 8,
+            "s": "H"
+          },
+          {
+            "r": 9,
+            "s": "S"
+          },
+          {
+            "r": 5,
+            "s": "C"
+          }
+        ]
+      },
+      "result": {
+        "winnerType": "single",
+        "winners": [
+          3
+        ],
+        "normalPaid": 38.4,
+        "handBets": [
+          {
+            "pre": 20,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 10,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 20,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 20,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 20,
+            "flop": 0,
+            "turn": 0
+          }
+        ],
+        "tieBets": {
+          "pre": 0,
+          "flop": 0,
+          "turn": 0
+        },
+        "finalBoard": [
+          {
+            "r": 13,
+            "s": "D"
+          },
+          {
+            "r": 9,
+            "s": "D"
+          },
+          {
+            "r": 8,
+            "s": "H"
+          },
+          {
+            "r": 9,
+            "s": "S"
+          },
+          {
+            "r": 5,
+            "s": "C"
+          }
+        ],
+        "fairnessRevealedAt": "2026-04-14T20:40:27.062Z",
+        "serverSeed": "95dc432d2d7b3ad2e0af40a4e562d512987a20460fec0258820179f40c2d18f7",
+        "serverSeedHash": "8e67106f0a5d2dc212e0dbbf14eb908324d471c93ff29236dcd9df70787899db",
+        "clientSeed": "client-621a0cfb",
+        "nonce": 0,
+        "deckCommitment": "8ab5fc0e418f7c75d3f6e693bbcc799b30f4a898f096bf7bacc7f5f9a52dccb5",
+        "revealedDeck": [
+          "6C",
+          "5S",
+          "5H",
+          "10S",
+          "4S",
+          "8S",
+          "QC",
+          "2C",
+          "JC",
+          "JD",
+          "7S",
+          "JH",
+          "2D",
+          "4D",
+          "8C",
+          "9C",
+          "QH",
+          "KC",
+          "7H",
+          "AD",
+          "10H",
+          "3H",
+          "6H",
+          "4C",
+          "KH",
+          "9H",
+          "4H",
+          "6S",
+          "AS",
+          "5C",
+          "9S",
+          "8H",
+          "9D",
+          "KD",
+          "JS",
+          "AC",
+          "QS",
+          "8D",
+          "7C",
+          "7D",
+          "10C",
+          "2H",
+          "5D",
+          "3C",
+          "KS",
+          "3D",
+          "AH",
+          "10D",
+          "3S",
+          "QD",
+          "2S",
+          "6D"
+        ]
+      },
+      "endTime": "2026-04-14T20:40:27.062Z"
+    },
+    {
+      "handId": "d6d580a9-2d8c-46a7-b400-c7e34a7d82b2",
+      "gameId": "651357a3-f816-4b5d-b86e-97b28e57070e",
+      "playerCount": 9,
+      "startTime": "2026-04-14T20:40:42.492Z",
+      "createdAt": "2026-04-14T20:40:42.491Z",
+      "initialState": {
+        "balance": null
+      },
+      "rng": {
+        "algorithm": "sha256 deterministic shuffle",
+        "serverSeedHash": "5289b0ae6010888078d48d7cf3890e5032d1bf1e8ead431d3105610eef72a6e5",
+        "clientSeed": "client-651357a3",
+        "nonce": 0,
+        "deckCommitment": "bc7f96f0667aeaa634da93c4492f5fc5739ef2a3970c267b4c4e2f31de169c27",
+        "dealtHands": [
+          [
+            "AC",
+            "KH"
+          ],
+          [
+            "2D",
+            "2C"
+          ],
+          [
+            "4C",
+            "JC"
+          ],
+          [
+            "2S",
+            "QS"
+          ],
+          [
+            "JH",
+            "9D"
+          ],
+          [
+            "7H",
+            "KS"
+          ],
+          [
+            "3S",
+            "4D"
+          ],
+          [
+            "3C",
+            "JS"
+          ],
+          [
+            "3H",
+            "7C"
+          ]
+        ]
+      },
+      "actions": [
+        {
+          "type": "hand_start",
+          "playerCount": 9,
+          "timestamp": "2026-04-14T20:40:42.493Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "pre",
+          "totalBoards": 278256,
+          "timestamp": "2026-04-14T20:40:43.830Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "flop",
+          "boardLength": 3,
+          "timestamp": "2026-04-14T20:40:57.561Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "flop",
+          "totalBoards": 465,
+          "timestamp": "2026-04-14T20:40:57.601Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "turn",
+          "boardLength": 4,
+          "timestamp": "2026-04-14T20:41:05.878Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "turn",
+          "totalBoards": 30,
+          "timestamp": "2026-04-14T20:41:05.910Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "river",
+          "boardLength": 5,
+          "timestamp": "2026-04-14T20:41:23.558Z"
+        }
+      ],
+      "streets": {
+        "flop": [
+          {
+            "r": 5,
+            "s": "S"
+          },
+          {
+            "r": 11,
+            "s": "D"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          }
+        ],
+        "turn": [
+          {
+            "r": 5,
+            "s": "S"
+          },
+          {
+            "r": 11,
+            "s": "D"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          },
+          {
+            "r": 6,
+            "s": "S"
+          }
+        ],
+        "river": [
+          {
+            "r": 5,
+            "s": "S"
+          },
+          {
+            "r": 11,
+            "s": "D"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          },
+          {
+            "r": 6,
+            "s": "S"
+          },
+          {
+            "r": 4,
+            "s": "H"
+          }
+        ]
+      },
+      "result": {
+        "winnerType": "single",
+        "winners": [
+          8
+        ],
+        "normalPaid": 0,
+        "handBets": [
+          {
+            "pre": 75,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 15,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 10,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          }
+        ],
+        "tieBets": {
+          "pre": 0,
+          "flop": 0,
+          "turn": 0
+        },
+        "finalBoard": [
+          {
+            "r": 5,
+            "s": "S"
+          },
+          {
+            "r": 11,
+            "s": "D"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          },
+          {
+            "r": 6,
+            "s": "S"
+          },
+          {
+            "r": 4,
+            "s": "H"
+          }
+        ],
+        "fairnessRevealedAt": "2026-04-14T20:41:23.590Z",
+        "serverSeed": "9d1c41a3d1f83d671f504cb318809dd001a7bbf18e5eee8aaa9d35b8be645824",
+        "serverSeedHash": "5289b0ae6010888078d48d7cf3890e5032d1bf1e8ead431d3105610eef72a6e5",
+        "clientSeed": "client-651357a3",
+        "nonce": 0,
+        "deckCommitment": "bc7f96f0667aeaa634da93c4492f5fc5739ef2a3970c267b4c4e2f31de169c27",
+        "revealedDeck": [
+          "KD",
+          "10S",
+          "8H",
+          "8S",
+          "9C",
+          "8C",
+          "5C",
+          "2H",
+          "10C",
+          "6C",
+          "8D",
+          "AS",
+          "6H",
+          "7S",
+          "10D",
+          "9H",
+          "5D",
+          "3D",
+          "4S",
+          "9S",
+          "AD",
+          "7D",
+          "QC",
+          "6D",
+          "QH",
+          "KC",
+          "QD",
+          "AH",
+          "10H",
+          "4H",
+          "6S",
+          "5H",
+          "JD",
+          "5S",
+          "7C",
+          "3H",
+          "JS",
+          "3C",
+          "4D",
+          "3S",
+          "KS",
+          "7H",
+          "9D",
+          "JH",
+          "QS",
+          "2S",
+          "JC",
+          "4C",
+          "2C",
+          "2D",
+          "KH",
+          "AC"
+        ]
+      },
+      "endTime": "2026-04-14T20:41:23.590Z"
+    },
+    {
+      "handId": "21e0181a-75ee-469f-a82c-8af19a6c1a71",
+      "gameId": "bcb34e5e-96c9-4c88-bbe1-e5c5c93e30a1",
+      "playerCount": 10,
+      "startTime": "2026-04-14T20:41:31.724Z",
+      "createdAt": "2026-04-14T20:41:31.724Z",
+      "initialState": {
+        "balance": null
+      },
+      "rng": {
+        "algorithm": "sha256 deterministic shuffle",
+        "serverSeedHash": "cd71a2752f2ae4f21d9d4afa79fab9173b8e5962ebaa45fac1c2e81fe4437994",
+        "clientSeed": "client-bcb34e5e",
+        "nonce": 0,
+        "deckCommitment": "8860b3038b256ced48ea873baab1bcc08da376c584a5801c0c056683b4a26cf9",
+        "dealtHands": [
+          [
+            "5S",
+            "AD"
+          ],
+          [
+            "6D",
+            "JC"
+          ],
+          [
+            "7C",
+            "2D"
+          ],
+          [
+            "6H",
+            "KS"
+          ],
+          [
+            "10H",
+            "8S"
+          ],
+          [
+            "3S",
+            "9C"
+          ],
+          [
+            "2C",
+            "4H"
+          ],
+          [
+            "9D",
+            "2H"
+          ],
+          [
+            "10S",
+            "10C"
+          ],
+          [
+            "7H",
+            "6C"
+          ]
+        ]
+      },
+      "actions": [
+        {
+          "type": "hand_start",
+          "playerCount": 10,
+          "timestamp": "2026-04-14T20:41:31.726Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "pre",
+          "totalBoards": 201376,
+          "timestamp": "2026-04-14T20:41:32.907Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "flop",
+          "boardLength": 3,
+          "timestamp": "2026-04-14T20:41:39.872Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "flop",
+          "totalBoards": 406,
+          "timestamp": "2026-04-14T20:41:39.921Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "turn",
+          "boardLength": 4,
+          "timestamp": "2026-04-14T20:41:44.351Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "turn",
+          "totalBoards": 28,
+          "timestamp": "2026-04-14T20:41:44.388Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "river",
+          "boardLength": 5,
+          "timestamp": "2026-04-14T20:41:55.385Z"
+        }
+      ],
+      "streets": {
+        "flop": [
+          {
+            "r": 2,
+            "s": "S"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          },
+          {
+            "r": 6,
+            "s": "S"
+          }
+        ],
+        "turn": [
+          {
+            "r": 2,
+            "s": "S"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          },
+          {
+            "r": 6,
+            "s": "S"
+          },
+          {
+            "r": 12,
+            "s": "C"
+          }
+        ],
+        "river": [
+          {
+            "r": 2,
+            "s": "S"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          },
+          {
+            "r": 6,
+            "s": "S"
+          },
+          {
+            "r": 12,
+            "s": "C"
+          },
+          {
+            "r": 9,
+            "s": "H"
+          }
+        ]
+      },
+      "result": {
+        "winnerType": "single",
+        "winners": [
+          7
+        ],
+        "normalPaid": 0,
+        "handBets": [
+          {
+            "pre": 25,
+            "flop": 25,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 25
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          }
+        ],
+        "tieBets": {
+          "pre": 0,
+          "flop": 0,
+          "turn": 0
+        },
+        "finalBoard": [
+          {
+            "r": 2,
+            "s": "S"
+          },
+          {
+            "r": 5,
+            "s": "H"
+          },
+          {
+            "r": 6,
+            "s": "S"
+          },
+          {
+            "r": 12,
+            "s": "C"
+          },
+          {
+            "r": 9,
+            "s": "H"
+          }
+        ],
+        "fairnessRevealedAt": "2026-04-14T20:41:55.418Z",
+        "serverSeed": "36ab18d7bca29b31c6317bde1abc3e25250a6cbce98c95b878e1afc9afa86620",
+        "serverSeedHash": "cd71a2752f2ae4f21d9d4afa79fab9173b8e5962ebaa45fac1c2e81fe4437994",
+        "clientSeed": "client-bcb34e5e",
+        "nonce": 0,
+        "deckCommitment": "8860b3038b256ced48ea873baab1bcc08da376c584a5801c0c056683b4a26cf9",
+        "revealedDeck": [
+          "KD",
+          "JD",
+          "KC",
+          "AC",
+          "4C",
+          "7S",
+          "AS",
+          "JS",
+          "JH",
+          "AH",
+          "4D",
+          "10D",
+          "KH",
+          "3H",
+          "5C",
+          "3C",
+          "8H",
+          "8C",
+          "QS",
+          "QD",
+          "QH",
+          "7D",
+          "5D",
+          "8D",
+          "3D",
+          "9S",
+          "4S",
+          "9H",
+          "QC",
+          "6S",
+          "5H",
+          "2S",
+          "6C",
+          "7H",
+          "10C",
+          "10S",
+          "2H",
+          "9D",
+          "4H",
+          "2C",
+          "9C",
+          "3S",
+          "8S",
+          "10H",
+          "KS",
+          "6H",
+          "2D",
+          "7C",
+          "JC",
+          "6D",
+          "AD",
+          "5S"
+        ]
+      },
+      "endTime": "2026-04-14T20:41:55.418Z"
+    },
+    {
+      "handId": "40991e1c-6baf-4709-bccd-36b88bdc2591",
+      "gameId": "9a739f2f-35ac-463c-84da-b9a8f85eac16",
+      "playerCount": 5,
+      "startTime": "2026-04-14T20:42:01.255Z",
+      "createdAt": "2026-04-14T20:42:01.255Z",
+      "initialState": {
+        "balance": null
+      },
+      "rng": {
+        "algorithm": "sha256 deterministic shuffle",
+        "serverSeedHash": "bc522f6a7e205dd1d6993900cc4d67082b53939d0f6d0db0d20f8c5200fcc372",
+        "clientSeed": "client-9a739f2f",
+        "nonce": 0,
+        "deckCommitment": "7d5f78bbf675b678e65cc520b6fb021361d4c5e1dea2af2be2b4c98821628834",
+        "dealtHands": [
+          [
+            "8S",
+            "8C"
+          ],
+          [
+            "2H",
+            "JC"
+          ],
+          [
+            "7S",
+            "5D"
+          ],
+          [
+            "3H",
+            "QD"
+          ],
+          [
+            "6C",
+            "JS"
+          ]
+        ]
+      },
+      "actions": [
+        {
+          "type": "hand_start",
+          "playerCount": 5,
+          "timestamp": "2026-04-14T20:42:01.258Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "pre",
+          "totalBoards": 850668,
+          "timestamp": "2026-04-14T20:42:03.211Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "flop",
+          "boardLength": 3,
+          "timestamp": "2026-04-14T20:42:10.675Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "flop",
+          "totalBoards": 741,
+          "timestamp": "2026-04-14T20:42:10.706Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "turn",
+          "boardLength": 4,
+          "timestamp": "2026-04-14T20:42:12.792Z"
+        },
+        {
+          "type": "odds_computed",
+          "phase": "turn",
+          "totalBoards": 38,
+          "timestamp": "2026-04-14T20:42:12.817Z"
+        },
+        {
+          "type": "street_reveal",
+          "phase": "river",
+          "boardLength": 5,
+          "timestamp": "2026-04-14T20:42:16.436Z"
+        }
+      ],
+      "streets": {
+        "flop": [
+          {
+            "r": 13,
+            "s": "S"
+          },
+          {
+            "r": 3,
+            "s": "S"
+          },
+          {
+            "r": 4,
+            "s": "D"
+          }
+        ],
+        "turn": [
+          {
+            "r": 13,
+            "s": "S"
+          },
+          {
+            "r": 3,
+            "s": "S"
+          },
+          {
+            "r": 4,
+            "s": "D"
+          },
+          {
+            "r": 14,
+            "s": "S"
+          }
+        ],
+        "river": [
+          {
+            "r": 13,
+            "s": "S"
+          },
+          {
+            "r": 3,
+            "s": "S"
+          },
+          {
+            "r": 4,
+            "s": "D"
+          },
+          {
+            "r": 14,
+            "s": "S"
+          },
+          {
+            "r": 14,
+            "s": "D"
+          }
+        ]
+      },
+      "result": {
+        "winnerType": "single",
+        "winners": [
+          0
+        ],
+        "normalPaid": 45.6,
+        "handBets": [
+          {
+            "pre": 20,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          },
+          {
+            "pre": 0,
+            "flop": 0,
+            "turn": 0
+          }
+        ],
+        "tieBets": {
+          "pre": 0,
+          "flop": 0,
+          "turn": 0
+        },
+        "finalBoard": [
+          {
+            "r": 13,
+            "s": "S"
+          },
+          {
+            "r": 3,
+            "s": "S"
+          },
+          {
+            "r": 4,
+            "s": "D"
+          },
+          {
+            "r": 14,
+            "s": "S"
+          },
+          {
+            "r": 14,
+            "s": "D"
+          }
+        ],
+        "fairnessRevealedAt": "2026-04-14T20:42:16.463Z",
+        "serverSeed": "dcdbcf92928d67c9d419a3900c5d63cc74bfbf8cd3d37730ce5081e9e765c639",
+        "serverSeedHash": "bc522f6a7e205dd1d6993900cc4d67082b53939d0f6d0db0d20f8c5200fcc372",
+        "clientSeed": "client-9a739f2f",
+        "nonce": 0,
+        "deckCommitment": "7d5f78bbf675b678e65cc520b6fb021361d4c5e1dea2af2be2b4c98821628834",
+        "revealedDeck": [
+          "9S",
+          "AH",
+          "QS",
+          "9D",
+          "6H",
+          "KH",
+          "AC",
+          "3C",
+          "QH",
+          "6S",
+          "3D",
+          "10S",
+          "10D",
+          "8D",
+          "JD",
+          "7C",
+          "10H",
+          "KC",
+          "2S",
+          "2C",
+          "5C",
+          "4S",
+          "QC",
+          "4H",
+          "4C",
+          "7H",
+          "10C",
+          "9H",
+          "8H",
+          "KD",
+          "2D",
+          "5H",
+          "6D",
+          "9C",
+          "7D",
+          "5S",
+          "JH",
+          "AD",
+          "AS",
+          "4D",
+          "3S",
+          "KS",
+          "JS",
+          "6C",
+          "QD",
+          "3H",
+          "5D",
+          "7S",
+          "JC",
+          "2H",
+          "8C",
+          "8S"
+        ]
+      },
+      "endTime": "2026-04-14T20:42:16.463Z"
+    }
+  ]
+}

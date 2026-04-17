@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Corsica Poker – Accès sécurisé</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(255, 215, 0, 0.18), transparent 30%),
+        linear-gradient(180deg, #07111b 0%, #0d2232 100%);
+      color: #fff;
+    }
+    .card {
+      width: min(92vw, 380px);
+      padding: 28px;
+      border-radius: 22px;
+      background: rgba(9, 18, 30, 0.92);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+      text-align: center;
+    }
+    .logo { font-size: 42px; margin-bottom: 8px; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    p { margin: 0 0 18px; color: rgba(255,255,255,0.82); }
+    input, button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 16px;
+    }
+    input {
+      margin-bottom: 12px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      outline: none;
+    }
+    button {
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(180deg, #f7d472, #c9971f);
+      color: #1b1200;
+    }
+    .error {
+      min-height: 22px;
+      margin-top: 12px;
+      color: #ff9696;
+      font-size: 14px;
+    }
+    .hint {
+      margin-top: 10px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">♠</div>
+    <h1>Corsica Poker</h1>
+    <p>Entrez le code d'accès pour ouvrir le jeu.</p>
+    <input id="code" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Code d'accès" />
+    <button type="button" id="loginBtn">Entrer</button>
+    <div id="error" class="error"></div>
+    <div class="hint">Accès protégé par le serveur</div>
+  </div>
+
+  <script>
+    const input = document.getElementById('code');
+    const button = document.getElementById('loginBtn');
+    const error = document.getElementById('error');
+
+    async function submitCode() {
+      error.textContent = '';
+      button.disabled = true;
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: input.value })
+        });
+
+        if (!res.ok) {
+          error.textContent = 'Code incorrect';
+          button.disabled = false;
+          input.focus();
+          input.select();
+          return;
+        }
+
+        window.location.href = '/';
+      } catch (err) {
+        error.textContent = 'Connexion impossible';
+        button.disabled = false;
+      }
+    }
+
+    button.addEventListener('click', submitCode);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') submitCode();
+    });
+    input.focus();
+  </script>
+</body>
+</html>
