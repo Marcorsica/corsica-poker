@@ -8,10 +8,10 @@ const audit = require('../audit/auditLogger');
 console.log("A2 RNG SERVER LOADED");
 
 const app = express();
-const EXTERNAL_AUDIO_DIR = process.env.CORSICA_AUDIO_DIR || 'C:\\Users\\user\\Desktop\\CORSICA\\CorsicaPokerAssets\\audio';
 const ACCESS_CODE = String(process.env.CORSICA_ACCESS_CODE || '1969');
-const SESSION_SECRET = String(process.env.SESSION_SECRET || 'corsica-poker-session-1969-change-me');
+const SESSION_SECRET = process.env.SESSION_SECRET || 'corsica-poker-render-secret';
 const isProduction = process.env.NODE_ENV === 'production';
+const EXTERNAL_AUDIO_DIR = process.env.CORSICA_AUDIO_DIR || 'C:\\Users\\user\\Desktop\\CORSICA\\CorsicaPokerAssets\\audio';
 audit.startSession({ app: 'Corsica Poker A2', port: Number(process.env.PORT || 3000) });
 const PORT = Number(process.env.PORT || 3000);
 const games = Object.create(null);
@@ -153,10 +153,8 @@ function logClient(payload = {}) {
   });
 }
 
-
 app.set('trust proxy', 1);
 app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true }));
 app.use(session({
   name: 'corsica.sid',
   secret: SESSION_SECRET,
@@ -170,18 +168,19 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 12,
   },
 }));
-app.use('/external-audio', express.static(EXTERNAL_AUDIO_DIR, { fallthrough: true }));
-app.use(express.static(path.join(__dirname, '..', '..', 'public')));
 
 function isAuthenticated(req) {
-  return Boolean(req.session && req.session.corsicaAuthenticated);
+  return !!(req.session && req.session.corsicaAuthenticated);
 }
 
 function requireAuth(req, res, next) {
   if (isAuthenticated(req)) return next();
-  if (req.accepts('html')) return res.redirect('/login');
-  return res.status(401).json({ ok: false, error: 'AUTH_REQUIRED' });
+  if (req.path.startsWith('/api/')) return res.status(401).json({ ok: false, error: 'auth required' });
+  return res.redirect('/login');
 }
+
+app.use('/external-audio', express.static(EXTERNAL_AUDIO_DIR, { fallthrough: true }));
+app.use('/audio', express.static(path.join(__dirname, '..', '..', 'public', 'audio'), { fallthrough: true }));
 
 app.get('/login', (req, res) => {
   if (isAuthenticated(req)) return res.redirect('/');
@@ -195,26 +194,19 @@ app.post('/login', (req, res) => {
     return res.status(401).json({ ok: false, error: 'Code incorrect' });
   }
   req.session.regenerate((err) => {
-    if (err) {
-      logServer('auth.login.error', 'Erreur création session', { error: String(err) }, 'error');
-      return res.status(500).json({ ok: false, error: 'Session error' });
-    }
+    if (err) return res.status(500).json({ ok: false, error: 'Session error' });
     req.session.corsicaAuthenticated = true;
     req.session.save((saveErr) => {
-      if (saveErr) {
-        logServer('auth.login.save_error', 'Erreur sauvegarde session', { error: String(saveErr) }, 'error');
-        return res.status(500).json({ ok: false, error: 'Session save error' });
-      }
+      if (saveErr) return res.status(500).json({ ok: false, error: 'Session save error' });
       logServer('auth.login.success', "Code d'accès validé", { ip: req.ip });
-      return res.json({ ok: true });
+      res.json({ ok: true });
     });
   });
 });
 
-app.post('/logout', requireAuth, (req, res) => {
+app.post('/logout', (req, res) => {
   req.session.destroy(() => {
     res.clearCookie('corsica.sid');
-    logServer('auth.logout', 'Session verrouillée', { ip: req.ip });
     res.json({ ok: true });
   });
 });
@@ -235,10 +227,14 @@ app.get('/audio-health', (req, res) => {
   res.json({ ok: true, externalAudioDir: EXTERNAL_AUDIO_DIR, files });
 });
 
-app.get('/', (req, res) => {
-  if (!isAuthenticated(req)) return res.redirect('/login');
-  res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'));
+app.use((req, res, next) => {
+  if (req.path === '/login' || req.path === '/logout') return next();
+  if (req.path === '/audio-health' || req.path === '/log') return next();
+  if (req.path.startsWith('/external-audio') || req.path.startsWith('/audio')) return next();
+  return requireAuth(req, res, next);
 });
+
+app.use(express.static(path.join(__dirname, '..', '..', 'public')));
 
 app.use((req, res, next) => {
   if (req.path === '/log') return next();
@@ -258,8 +254,6 @@ app.post('/log', (req, res) => {
   });
   res.json({ ok: true });
 });
-
-app.use(['/audio-health', '/test/extreme-cases', '/start', '/next', '/fairness', '/fairness/reveal', '/rtp', '/fairness/verify', '/odds', '/result', '/settle', '/jackpots', '/jackpots/bet', '/jackpots/refund', '/jackpots/contribute', '/jackpots/claim'], requireAuth);
 
 function sha256Hex(input) {
   return crypto.createHash('sha256').update(String(input)).digest('hex');

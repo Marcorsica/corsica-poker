@@ -2,16 +2,20 @@
 // AUDIO
 // ==================================================
 
-const MAIN_AUDIO_TRACKS = {
-  0: "/external-audio/audio_1_jazz.mp3",
-  1: "/external-audio/audio_2_jazz.mp3",
-  2: "/external-audio/audio_3_beats.mp3",
-  3: "/external-audio/audio_4_rnb.mp3",
-  4: "/external-audio/audio_5_relax.mp3"
+const AUDIO_BASES = ["/audio", "/external-audio"];
+const MAIN_AUDIO_FILENAMES = {
+  0: "audio_1_jazz.mp3",
+  1: "audio_2_jazz.mp3",
+  2: "audio_3_beats.mp3",
+  3: "audio_4_rnb.mp3",
+  4: "audio_5_relax.mp3"
 };
+const CASINO_AUDIO_FILENAME = "audio_6_casino.mp3";
+const AUDIO_FALLBACK_FILENAME = "audio_1_jazz.mp3";
 
-const CASINO_AUDIO_TRACK = "/external-audio/audio_6_casino.mp3";
-const AUDIO_FALLBACK_TRACK = "/external-audio/audio_1_jazz.mp3";
+function audioCandidates(filename) {
+ return AUDIO_BASES.map((base) => `${base}/${filename}`);
+}
 
 function assetExists(url) {
  return fetch(url, { method: "HEAD", cache: "no-store" })
@@ -21,9 +25,14 @@ function assetExists(url) {
 
 async function resolvePlayableTrack(styleIndex) {
  const normalized = Number.isFinite(Number(styleIndex)) ? Number(styleIndex) : 0;
- const candidate = MAIN_AUDIO_TRACKS[normalized] || MAIN_AUDIO_TRACKS[0] || AUDIO_FALLBACK_TRACK;
- if (await assetExists(candidate)) return candidate;
- return AUDIO_FALLBACK_TRACK;
+ const filename = MAIN_AUDIO_FILENAMES[normalized] || MAIN_AUDIO_FILENAMES[0] || AUDIO_FALLBACK_FILENAME;
+ for (const candidate of audioCandidates(filename)) {
+  if (await assetExists(candidate)) return candidate;
+ }
+ for (const fallback of audioCandidates(AUDIO_FALLBACK_FILENAME)) {
+  if (await assetExists(fallback)) return fallback;
+ }
+ return `/audio/${AUDIO_FALLBACK_FILENAME}`;
 }
 
 let pendingMainTrackToken = 0;

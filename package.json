@@ -1,1 +1,13 @@
-{"name":"corsica","version":"1.0.0","scripts":{"start":"node server.js"}}
+{
+  "name": "corsica-poker-structured-base",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node ./server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.19.0"
+  },
+  "description": "Base Corsica Poker restructurée pour maintenance et évolution."
+}

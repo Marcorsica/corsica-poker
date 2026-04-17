@@ -1011,3 +1011,13 @@ window.addEventListener("load", syncHeaderTestButton);
 window.addEventListener("resize", syncHeaderTestButton);
 setTimeout(syncHeaderTestButton, 300);
 setTimeout(syncHeaderTestButton, 1200);
+
+const lockAccessBtn = el("lockAccessBtn");
+if (lockAccessBtn) {
+ lockAccessBtn.addEventListener("click", async () => {
+  try {
+   await fetch("/logout", { method: "POST", credentials: "same-origin" });
+  } catch (_) {}
+  window.location.href = "/login";
+ });
+}
