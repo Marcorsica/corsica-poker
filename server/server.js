@@ -1,2 +1,1 @@
-// Point d'entrée serveur conservé pour compatibilité.
-require('./src/app');
+console.log('Corsica Poker placeholder');

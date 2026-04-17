@@ -1,17 +1,17 @@
 const express = require('express');
-const session = require('express-session');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
+const session = require('express-session');
 const audit = require('../audit/auditLogger');
 
 console.log("A2 RNG SERVER LOADED");
 
 const app = express();
-const isProduction = process.env.NODE_ENV === 'production';
-const ACCESS_CODE = String(process.env.CORSICA_ACCESS_CODE || '1969');
-const SESSION_SECRET = process.env.SESSION_SECRET || 'corsica-poker-session-secret-1969';
 const EXTERNAL_AUDIO_DIR = process.env.CORSICA_AUDIO_DIR || 'C:\\Users\\user\\Desktop\\CORSICA\\CorsicaPokerAssets\\audio';
+const ACCESS_CODE = String(process.env.CORSICA_ACCESS_CODE || '1969');
+const SESSION_SECRET = String(process.env.SESSION_SECRET || 'corsica-poker-session-1969-change-me');
+const isProduction = process.env.NODE_ENV === 'production';
 audit.startSession({ app: 'Corsica Poker A2', port: Number(process.env.PORT || 3000) });
 const PORT = Number(process.env.PORT || 3000);
 const games = Object.create(null);
@@ -153,19 +153,25 @@ function logClient(payload = {}) {
   });
 }
 
+
 app.set('trust proxy', 1);
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
+  name: 'corsica.sid',
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  proxy: isProduction,
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
     secure: isProduction,
+    maxAge: 1000 * 60 * 60 * 12,
   },
 }));
+app.use('/external-audio', express.static(EXTERNAL_AUDIO_DIR, { fallthrough: true }));
+app.use(express.static(path.join(__dirname, '..', '..', 'public')));
 
 function isAuthenticated(req) {
   return Boolean(req.session && req.session.corsicaAuthenticated);
@@ -173,30 +179,13 @@ function isAuthenticated(req) {
 
 function requireAuth(req, res, next) {
   if (isAuthenticated(req)) return next();
-
-  const wantsJson = req.path.startsWith('/fairness')
-    || req.path.startsWith('/jackpots')
-    || req.path === '/audio-health'
-    || req.path === '/odds'
-    || req.path === '/result'
-    || req.path === '/rtp'
-    || req.path === '/start'
-    || req.path === '/next'
-    || req.path === '/settle'
-    || req.path.startsWith('/test/');
-
-  if (wantsJson) {
-    return res.status(401).json({ error: 'Access denied' });
-  }
-
-  return res.redirect('/login');
+  if (req.accepts('html')) return res.redirect('/login');
+  return res.status(401).json({ ok: false, error: 'AUTH_REQUIRED' });
 }
 
 app.get('/login', (req, res) => {
-  if (isAuthenticated(req)) {
-    return res.redirect('/');
-  }
-  return res.sendFile(path.join(__dirname, '..', '..', 'public', 'login.html'));
+  if (isAuthenticated(req)) return res.redirect('/');
+  res.sendFile(path.join(__dirname, '..', '..', 'public', 'login.html'));
 });
 
 app.post('/login', (req, res) => {
@@ -205,27 +194,32 @@ app.post('/login', (req, res) => {
     logServer('auth.login.failed', "Code d'accès refusé", { ip: req.ip }, 'warn');
     return res.status(401).json({ ok: false, error: 'Code incorrect' });
   }
-
-  req.session.corsicaAuthenticated = true;
-  req.session.save(() => {
-    logServer('auth.login.success', "Code d'accès validé", { ip: req.ip });
-    res.json({ ok: true });
+  req.session.regenerate((err) => {
+    if (err) {
+      logServer('auth.login.error', 'Erreur création session', { error: String(err) }, 'error');
+      return res.status(500).json({ ok: false, error: 'Session error' });
+    }
+    req.session.corsicaAuthenticated = true;
+    req.session.save((saveErr) => {
+      if (saveErr) {
+        logServer('auth.login.save_error', 'Erreur sauvegarde session', { error: String(saveErr) }, 'error');
+        return res.status(500).json({ ok: false, error: 'Session save error' });
+      }
+      logServer('auth.login.success', "Code d'accès validé", { ip: req.ip });
+      return res.json({ ok: true });
+    });
   });
 });
 
 app.post('/logout', requireAuth, (req, res) => {
   req.session.destroy(() => {
-    res.clearCookie('connect.sid');
+    res.clearCookie('corsica.sid');
     logServer('auth.logout', 'Session verrouillée', { ip: req.ip });
     res.json({ ok: true });
   });
 });
 
-app.use('/external-audio', requireAuth, express.static(EXTERNAL_AUDIO_DIR, { fallthrough: true }));
-app.use('/css', requireAuth, express.static(path.join(__dirname, '..', '..', 'public', 'css')));
-app.use('/js', requireAuth, express.static(path.join(__dirname, '..', '..', 'public', 'js')));
-
-app.get('/audio-health', requireAuth, (req, res) => {
+app.get('/audio-health', (req, res) => {
   const expectedFiles = [
     'audio_1_jazz.mp3',
     'audio_2_jazz.mp3',
@@ -241,7 +235,8 @@ app.get('/audio-health', requireAuth, (req, res) => {
   res.json({ ok: true, externalAudioDir: EXTERNAL_AUDIO_DIR, files });
 });
 
-app.get('/', requireAuth, (req, res) => {
+app.get('/', (req, res) => {
+  if (!isAuthenticated(req)) return res.redirect('/login');
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'));
 });
 
@@ -263,6 +258,8 @@ app.post('/log', (req, res) => {
   });
   res.json({ ok: true });
 });
+
+app.use(['/audio-health', '/test/extreme-cases', '/start', '/next', '/fairness', '/fairness/reveal', '/rtp', '/fairness/verify', '/odds', '/result', '/settle', '/jackpots', '/jackpots/bet', '/jackpots/refund', '/jackpots/contribute', '/jackpots/claim'], requireAuth);
 
 function sha256Hex(input) {
   return crypto.createHash('sha256').update(String(input)).digest('hex');
@@ -643,7 +640,7 @@ function getResult(game) {
 }
 
 
-app.get('/test/extreme-cases', requireAuth, (req, res) => {
+app.get('/test/extreme-cases', (req, res) => {
   const items = (extremeCasesLibrary || []).map((entry) => ({
     id: entry.id,
     title: entry.title,
@@ -655,7 +652,7 @@ app.get('/test/extreme-cases', requireAuth, (req, res) => {
   res.json({ cases: items });
 });
 
-app.get('/start', requireAuth, (req, res) => {
+app.get('/start', (req, res) => {
   const gameId = typeof crypto.randomUUID === 'function'
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -753,7 +750,7 @@ app.get('/start', requireAuth, (req, res) => {
   });
 });
 
-app.get('/next', requireAuth, (req, res) => {
+app.get('/next', (req, res) => {
   const gameId = String(req.query.gameId || '');
   const game = games[gameId];
   if (!game) {
@@ -782,7 +779,7 @@ app.get('/next', requireAuth, (req, res) => {
 });
 
 
-app.get('/fairness', requireAuth, (req, res) => {
+app.get('/fairness', (req, res) => {
   const gameId = String(req.query.gameId || '');
   const game = games[gameId];
   if (!game) {
@@ -793,7 +790,7 @@ app.get('/fairness', requireAuth, (req, res) => {
   res.json(buildFairnessReveal(game));
 });
 
-app.get('/fairness/reveal', requireAuth, (req, res) => {
+app.get('/fairness/reveal', (req, res) => {
   const gameId = String(req.query.gameId || '');
   const game = games[gameId];
   if (!game) {
@@ -813,11 +810,11 @@ app.get('/fairness/reveal', requireAuth, (req, res) => {
   res.json(buildFairnessReveal(game));
 });
 
-app.get('/rtp', requireAuth, (req, res) => {
+app.get('/rtp', (req, res) => {
   res.json(buildRtpSummary());
 });
 
-app.get('/fairness/verify', requireAuth, (req, res) => {
+app.get('/fairness/verify', (req, res) => {
   const gameId = String(req.query.gameId || '');
   const game = games[gameId];
   if (!game) {
@@ -858,7 +855,7 @@ app.get('/fairness/verify', requireAuth, (req, res) => {
   });
 });
 
-app.get('/odds', requireAuth, (req, res) => {
+app.get('/odds', (req, res) => {
   const gameId = String(req.query.gameId || '');
   const game = games[gameId];
   if (!game) {
@@ -883,7 +880,7 @@ app.get('/odds', requireAuth, (req, res) => {
   }
 });
 
-app.get('/result', requireAuth, (req, res) => {
+app.get('/result', (req, res) => {
   const gameId = String(req.query.gameId || '');
   const game = games[gameId];
   if (!game) {
@@ -905,7 +902,7 @@ app.get('/result', requireAuth, (req, res) => {
   }
 });
 
-app.post('/settle', requireAuth, (req, res) => {
+app.post('/settle', (req, res) => {
   const { gameId, handBets = [], tieBets = { pre: 0, flop: 0, turn: 0 } } = req.body || {};
   const game = games[String(gameId || '')];
   if (!game) {
@@ -1033,7 +1030,7 @@ app.post('/settle', requireAuth, (req, res) => {
 });
 
 
-app.get('/jackpots', requireAuth, (req, res) => {
+app.get('/jackpots', (req, res) => {
   const gameId = String(req.query.gameId || '');
   const game = gameId ? games[gameId] : null;
   res.json({
@@ -1043,7 +1040,7 @@ app.get('/jackpots', requireAuth, (req, res) => {
   });
 });
 
-app.post('/jackpots/bet', requireAuth, (req, res) => {
+app.post('/jackpots/bet', (req, res) => {
   const gameId = String(req.body?.gameId || '');
   const game = games[gameId];
   if (!game) {
@@ -1093,7 +1090,7 @@ app.post('/jackpots/bet', requireAuth, (req, res) => {
   res.json({ ok: true, snapshot, jackpots: jackpotSnapshot() });
 });
 
-app.post('/jackpots/refund', requireAuth, (req, res) => {
+app.post('/jackpots/refund', (req, res) => {
   const gameId = String(req.body?.gameId || '');
   const game = games[gameId];
   if (!game) {
@@ -1121,14 +1118,14 @@ app.post('/jackpots/refund', requireAuth, (req, res) => {
   res.json({ ok: true, removed, jackpots: jackpotSnapshot() });
 });
 
-app.post('/jackpots/contribute', requireAuth, (req, res) => {
+app.post('/jackpots/contribute', (req, res) => {
   const amount = Number(req.body?.amount || 0);
   contributeJackpots(amount);
   logServer('jackpots.contribute', 'Contribution jackpots appliquée', { amount, jackpots: jackpotSnapshot() });
   res.json({ ok: true, jackpots: jackpotSnapshot() });
 });
 
-app.post('/jackpots/claim', requireAuth, (req, res) => {
+app.post('/jackpots/claim', (req, res) => {
   const type = String(req.body?.type || '');
   const claim = claimJackpot(type);
   if (!claim) return res.status(400).json({ error: 'Invalid jackpot type' });
