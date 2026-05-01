@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Corsica Poker – Accès</title>
+  <style>
+    :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;background:radial-gradient(circle at top,#143b2f 0%,#081410 50%,#040706 100%);color:#fff}.card{width:min(92vw,380px);padding:28px;border-radius:22px;background:rgba(9,20,17,.88);border:1px solid rgba(255,255,255,.1);box-shadow:0 20px 60px rgba(0,0,0,.45);text-align:center}.logo{font-size:56px;line-height:1;margin-bottom:8px}h1{margin:0 0 8px;font-size:30px}p{margin:0 0 18px;color:#cfe7dc}input,button{width:100%;padding:14px 16px;border-radius:14px;border:none;font-size:17px}input{background:#f5f7f8;color:#111;margin-bottom:12px}button{background:#d8b15a;color:#1b1405;font-weight:700;cursor:pointer}.error{min-height:22px;margin-top:12px;color:#ffb2b2;font-size:14px}.hint{margin-top:8px;font-size:12px;color:#99b7aa}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">♠</div>
+    <h1>Corsica Poker</h1>
+    <p>Entrez le code d’accès pour ouvrir le jeu.</p>
+    <input id="code" type="password" inputmode="numeric" autocomplete="off" placeholder="Code d'accès" />
+    <button id="submitBtn" type="button">Entrer</button>
+    <div id="error" class="error"></div>
+    <div class="hint">Accès protégé</div>
+  </div>
+  <script>
+    const codeInput = document.getElementById('code');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorEl = document.getElementById('error');
+    async function submitCode(){
+      const code = String(codeInput.value || '').trim();
+      errorEl.textContent = '';
+      submitBtn.disabled = true;
+      try {
+        const res = await fetch('/login', {method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify({ code })});
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) { errorEl.textContent = 'Code incorrect'; submitBtn.disabled = false; codeInput.focus(); codeInput.select(); return; }
+        window.location.href = data.redirect || '/';
+      } catch (err) { errorEl.textContent = 'Connexion impossible'; submitBtn.disabled = false; }
+    }
+    submitBtn.addEventListener('click', submitCode);
+    codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitCode(); });
+    codeInput.focus();
+  </script>
+</body>
+</html>
