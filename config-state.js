@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="fr">
+<head>
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width,initial-scale=1" />
+ <title>Corsica Poker – Demo</title>
+ <link rel="stylesheet" href="css/style.css" />
+
+ <script>
+  // Bloque le menu navigateur avant même le chargement des modules du jeu.
+  window.__corsicaBlockContextMenu = function(event){
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  };
+  window.addEventListener('contextmenu', window.__corsicaBlockContextMenu, true);
+  document.addEventListener('contextmenu', window.__corsicaBlockContextMenu, true);
+  document.addEventListener('auxclick', window.__corsicaBlockContextMenu, true);
+  document.addEventListener('dragstart', window.__corsicaBlockContextMenu, true);
+ </script>
+</head>
+<body class="pregame-screen">
+
+<div id="splashScreen" class="splash">
+ <div class="splash-content">
+  <div class="splash-logo-wrap">
+   <div class="logo-main">♠</div>
+  </div>
+  <div class="splash-brand">Corsica Poker</div>
+  <div class="splash-tagline">Jouez la cote</div>
+  <button type="button" id="btnStart" class="btn primary splash-start">Jouer</button>
+ </div>
+</div>
+
+ <header class="topbar">
+ <div class="brand">
+ <div class="logo">♠</div>
+ <div>
+ <h1 class="title">Corsica Poker</h1>
+<div class="brand-slogan">Jouez la cote</div>
+ <div class="subtitle" id="subtitle"></div>
+ <div class="status" id="status" aria-live="polite"></div>
+ </div>
+ </div>
+
+ <div class="stats">
+ 
+ <div class="stat">
+ <div class="label" id="lblBankroll"></div>
+ <div class="value"><span id="bankroll">1000.00</span></div>
+ </div>
+ <div class="stat total-bets">
+ <div class="label" id="lblTotalBets">Mises en cours</div>
+ <div class="value"><span id="totalBets">0</span></div>
+ </div>
+ <div class="stat total-wins">
+ <div class="label" id="lblTotalWins">Gains</div>
+ <div class="value"><span id="totalWins">0.00</span></div>
+ </div>
+ <div class="stat jackpot bronze-jackpot" id="bronzeJackpotBox" style="display:none">
+ <div class="label jackpot-label" id="lblBronzeJackpot">Jackpot Bronze</div>
+ <div class="value jackpot-value"><span id="bronzeJackpotValue">200</span></div>
+ </div>
+ <div class="stat jackpot argent-jackpot" id="argentJackpotBox">
+ <div class="label jackpot-label" id="lblArgentJackpot">Jackpot Argent</div>
+ <div class="value jackpot-value"><span id="argentJackpotValue">250</span></div>
+ <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="argentHeatFill"></div></div>
+ </div>
+ <div class="stat jackpot or-jackpot" id="orJackpotBox">
+ <div class="label jackpot-label" id="lblOrJackpot">Jackpot Or</div>
+ <div class="value jackpot-value"><span id="orJackpotValue">800</span></div>
+ <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="orHeatFill"></div></div>
+ </div>
+ <div class="stat jackpot diamant-jackpot" id="diamantJackpotBox">
+ <div class="label jackpot-label" id="lblDiamantJackpot">Jackpot Diamant</div>
+ <div class="value jackpot-value"><span id="diamantJackpotValue">8000</span></div>
+ <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="diamantHeatFill"></div></div>
+ </div>
+ </div>
+
+ <div class="lang" aria-label="Language selector"></div>
+
+ 
+ <button type="button" id="toggleLogBtn" class="pill toggle-log-btn" aria-pressed="false">Journal</button>
+ <button type="button" id="settingsBtn" class="settings-btn pill" aria-label="Paramètres">⚙️</button>
+
+ <div id="settingsPanel" class="settings-panel hidden" aria-label="Paramètres">
+  <div id="settingsTitle" class="settings-title">Paramètres</div>
+
+  <div class="settings-section settings-rules-section">
+   <button type="button" id="rulesGameBtn" class="pill settings-rules-btn">Règles du jeu</button>
+  </div>
+
+  <div class="settings-section settings-inline-section settings-language-section">
+   <div id="settingsLanguageLabel" class="settings-label">Langues</div>
+   <div class="settings-lang-row">
+    <button type="button" id="settingsLangFR" class="pill active">FR</button>
+    <button type="button" id="settingsLangEN" class="pill">EN</button>
+   </div>
+  </div>
+
+  <div class="settings-section settings-sound-section">
+   <div id="settingsSoundLabel" class="settings-label">Son</div>
+   <div class="settings-volume-row">
+    <span id="settingsMutedIcon" class="settings-muted-icon" aria-hidden="true">🔇</span>
+    <input type="range" id="volumeSlider" class="volume-slider settings-volume" min="0" max="1" step="0.01" value="0.4" aria-label="Volume ambiance" />
+   </div>
+   <div class="settings-audio-row" id="settingsAudioRow">
+    <button type="button" class="pill settings-audio-btn active" data-audio-style="0">Jazz 1</button>
+    <button type="button" class="pill settings-audio-btn" data-audio-style="1">Jazz 2</button>
+    <button type="button" class="pill settings-audio-btn" data-audio-style="2">Beats</button>
+    <button type="button" class="pill settings-audio-btn" data-audio-style="3">RnB</button>
+    <button type="button" class="pill settings-audio-btn" data-audio-style="4">Relax</button>
+    <button type="button" class="pill settings-audio-btn" data-audio-style="5">Casino</button>
+   </div>
+  </div>
+
+  <div class="settings-section">
+   <div id="settingsFeltLabel" class="settings-label">Couleur du tapis</div>
+   <div id="feltColorOptions" class="felt-color-options"></div>
+  </div>
+  <div class="settings-section settings-access-section">
+   <button type="button" id="settingsLockBtn" class="pill settings-lock-btn">🔒 Verrouiller l'accès</button>
+  </div>
+
+  <div class="settings-section game-style-section">
+   <div id="settingsStyleLabel" class="settings-label">Style de jeu</div>
+   <div class="game-style-options" id="gameStyleOptions">
+    <button type="button" class="pill game-style-btn active" data-style="current" id="gameStyleClassicBtn">Classique</button>
+    <button type="button" class="pill game-style-btn" data-style="fast" id="gameStyleMetalBtn">Métal</button>
+    <button type="button" class="pill game-style-btn" data-style="pro" id="gameStylePremiumBtn">Premium</button>
+   </div>
+  </div>
+
+  </div>
+ </header>
+
+ <main class="container log-hidden">
+ <section class="table">
+ <div class="board board-center">
+ <div class="board-title" id="boardTitle"></div>
+ <div class="board-cards" id="boardCards"></div>
+ </div>
+
+ <div class="bet-panel corner top-left" id="betPanel">
+ <div class="panel-title" id="betPanelTitle"></div>
+ <div class="betbar">
+ <div class="bet-quick">
+ <div class="bet-title" id="betTitle"></div>
+ <div class="bet-buttons">
+ <button type="button" class="chip" data-amt="1">1</button>
+ <button type="button" class="chip" data-amt="2">2</button>
+ <button type="button" class="chip" data-amt="5">5</button>
+ <button type="button" class="chip" data-amt="10">10</button>
+ <button type="button" class="chip" data-amt="20">20</button>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div class="tie-box corner top-right" id="tieBox">
+
+ <div class="tie-bet-dot" id="tieBetDot"></div>
+ <div class="tie-head">
+ <div class="panel-title tie-panel-title" id="tiePanelTitle">Égalité</div>
+ <div class="tie-value" id="tieOdds">—</div>
+ </div>
+
+ <div class="tie-result-info" id="tieResultInfo"></div>
+
+ <div class="tie-details">
+ <div class="squares tie-squares" id="tieSquares">
+ <div class="tie-col">
+ <div class="sq" data-tie-phase="pre" title="Preflop"></div>
+ <div class="pot pot-tie" data-tie-pot="pre"></div>
+ </div>
+ <div class="tie-col">
+ <div class="sq" data-tie-phase="flop" title="Flop"></div>
+ <div class="pot pot-tie" data-tie-pot="flop"></div>
+ </div>
+ <div class="tie-col">
+ <div class="sq" data-tie-phase="turn" title="Turn"></div>
+ <div class="pot pot-tie" data-tie-pot="turn"></div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div class="control-panel corner bottom-left" id="controlPanel">
+ <div class="panel-title" id="actPanelTitle"></div>
+ <div class="controls table-choice-controls">
+ <button type="button" id="btnSameTable" class="btn primary"></button>
+ <button type="button" id="btnChangeTable" class="btn primary"></button>
+ <button type="button" id="btnAdvance" class="btn"></button>
+ <button type="button" id="btnAbandon" class="btn danger"></button>
+ </div>
+ </div>
+
+ <div id="chipFlightLayer" class="chip-flight-layer"></div>
+ <div id="handsLayer" class="hands-layer"></div>
+ </section>
+
+ <section class="log hidden" aria-labelledby="logTitle">
+ <div class="log-title" id="logTitle"></div>
+ <div class="log-body" id="logBody"></div>
+ </section>
+ </main>
+
+ <div class="round-setup-overlay hidden" id="roundSetupOverlay">
+ <div class="round-setup-box" role="dialog" aria-modal="true" aria-labelledby="roundSetupTitle">
+ <div class="round-setup-title" id="roundSetupTitle">Nouvelle manche</div>
+ 
+
+ <div class="round-setup-player-label" id="handsCountLabel"></div>
+ <div class="round-setup-player-row">
+ <button type="button" id="btnRandomHands" class="btn primary"></button>
+ <span class="round-setup-or" id="handsChoiceOr">ou</span>
+ <select id="handsCountSelect">
+ <option value="4">4</option>
+ <option value="5">5</option>
+ <option value="6">6</option>
+ <option value="7">7</option>
+ <option value="8">8</option>
+ <option value="9">9</option>
+ <option value="10" selected>10</option>
+ </select>
+ <button type="button" id="btnManualHands" class="btn manual-arrow-btn" aria-label="Valider">➜</button>
+ </div>
+ </div>
+ </div>
+
+ <audio id="sndDeal" preload="auto" src="/audio/snd_deal.mp3"></audio>
+ <audio id="sndCard" preload="auto" src="/audio/snd_card.mp3"></audio>
+ <audio id="sndAmbience" preload="auto" loop src="/audio/audio_1_jazz.mp3"></audio>
+ <audio id="sndCasino" preload="auto" loop src="/audio/audio_6_casino.mp3"></audio>
+
+ <div id="tableTransition" class="table-transition"></div>
+ <script src="js/core/state.js"></script>
+ <script src="js/core/config-state.js"></script>
+ <script src="js/core/runtime.js"></script>
+ <script src="js/core/actions.js"></script>
+ <script src="js/core/audio.js"></script>
+ <script src="js/game/odds.js"></script>
+ <script src="js/game/jackpot-engine.js"></script>
+ <script src="js/game/jackpots.js"></script>
+ <script src="js/game/cards-engine.js"></script>
+ <script src="js/ui/rendering.js"></script>
+ <script src="js/game/betting.js"></script>
+ <script src="js/game/round-flow.js"></script>
+ <script src="js/ui/setup-ui.js"></script>
+ <script src="js/api/server-sync.js"></script>
+ <script src="js/test-mode.js"></script>
+
+<div id="rulesModal" class="rules-modal hidden" aria-hidden="true">
+  <div class="rules-backdrop" data-close-rules="true"></div>
+  <div class="rules-dialog" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+    <button id="rulesCloseBtn" class="rules-close" type="button" aria-label="Fermer">×</button>
+
+    <div class="rules-header">
+      <div id="rulesKicker" class="rules-kicker">Corsica Poker</div>
+      <h2 id="rulesTitle">Règles du jeu</h2>
+      <div id="rulesSlogan" class="rules-slogan">Jouez la cote</div>
+    </div>
+
+    <div id="rulesBody" class="rules-body">
+      <section class="rules-section">
+        <h3>Concept</h3>
+        <p>Corsica Poker est une expérience inspirée du Texas Hold’em, avec une approche unique : vous ne jouez pas une main… vous pariez sur celles des autres.</p>
+        <p>Vous observez une table de joueurs virtuels et votre objectif est d’anticiper l’issue de la manche afin de placer vos mises au moment le plus opportun.</p>
+        <p>Chaque décision repose sur un équilibre entre l’intuition, la lecture du jeu et l’analyse des probabilités.</p>
+        <p>Plus vous prenez de risques, plus les cotes sont élevées… et plus les gains peuvent être importants.</p>
+        <p><strong>Attention :</strong> une main est déclarée victorieuse uniquement si elle gagne seule. La case <strong>Égalité</strong> permet de couvrir ce risque.</p>
+      </section>
+
+      <section class="rules-section">
+        <h3>Structure d’une manche</h3>
+        <p>Choisissez le nombre de joueurs, de 4 à 10, ou laissez faire le hasard.</p>
+        <p>Plus il y a de joueurs, plus les cotes sont généralement importantes.</p>
+        <p>Une manche se déroule en plusieurs étapes, chacune influençant les probabilités et vos décisions.</p>
+      </section>
+
+      <section class="rules-section">
+        <h3>1. Préflop — Lecture initiale</h3>
+        <p>Chaque joueur reçoit 2 cartes privatives visibles.</p>
+        <p>Vous pouvez observer les forces initiales, placer vos premières mises sur une ou plusieurs mains, ou sur l’égalité, et identifier des opportunités à forte valeur.</p>
+        <p>Miser tôt permet souvent d’obtenir les meilleures cotes.</p>
+      </section>
+
+      <section class="rules-section">
+        <h3>2. Flop — Premières tendances</h3>
+        <p>Trois cartes communes sont révélées.</p>
+        <p>Les cotes sont recalculées en temps réel.</p>
+        <p>Vous pouvez de nouveau placer vos mises.</p>
+      </section>
+
+      <section class="rules-section">
+        <h3>3. Turn — Confirmation</h3>
+        <p>Une quatrième carte commune apparaît.</p>
+        <p>À ce stade, les probabilités deviennent généralement plus faibles et les scénarios se resserrent.</p>
+        <p>C’est souvent la dernière phase stratégique pour miser efficacement : le meilleur compromis entre risque et information.</p>
+      </section>
+
+      <section class="rules-section">
+        <h3>4. River — Verdict imminent</h3>
+        <p>La cinquième et dernière carte commune est révélée.</p>
+        <p>À partir de ce moment, aucune mise supplémentaire n’est possible et toutes les mains sont définitivement formées.</p>
+      </section>
+
+      <section class="rules-section">
+        <h3>5. Résultat — Attribution des gains</h3>
+        <p>La meilleure combinaison de 5 cartes remporte la manche.</p>
+        <p>Vos gains sont calculés en fonction de vos mises et des cotes au moment exact où vous avez parié.</p>
+        <p>Deux joueurs ayant misé sur la même main peuvent donc gagner des montants différents.</p>
+      </section>
+
+      <section class="rules-section">
+        <h3>Types de mises</h3>
+        <p><strong>Une main spécifique :</strong> pariez sur un joueur précis, ou sur l’égalité, que vous pensez gagnant.</p>
+        <p><strong>Les jackpots :</strong></p>
+        <p>• <strong>Jackpot Bronze</strong> : rareté d’entrée, accessible.</p>
+        <p>• <strong>Jackpot Argent</strong> : niveau intermédiaire.</p>
+        <p>• <strong>Jackpot Or</strong> : niveau premium.</p>
+        <p>• <strong>Jackpot Diamant</strong> : niveau prestige, très rare.</p>
+        <p>Ces paris sont les plus risqués, mais extrêmement rémunérateurs.</p>
+      </section>
+
+      <section class="rules-section">
+        <h3>Comprendre les cotes</h3>
+        <p>Les cotes reflètent les probabilités de victoire.</p>
+        <p><strong>Cote élevée</strong> → faible probabilité, gain important.</p>
+        <p><strong>Cote faible</strong> → forte probabilité, gain plus modéré.</p>
+        <p>Elles évoluent en permanence en fonction des cartes révélées et de la situation de jeu.</p>
+      </section>
+
+      <section class="rules-section">
+        <h3>Approche stratégique</h3>
+        <p>Corsica Poker est un jeu d’anticipation.</p>
+        <p><strong>Prendre position tôt</strong> permet de maximiser les gains potentiels.</p>
+        <p><strong>Attendre plus d’informations</strong> réduit le risque, mais diminue les cotes.</p>
+        <p><strong>Observer les dynamiques du board</strong> est essentiel : certaines cartes changent totalement la hiérarchie des mains.</p>
+        <p><strong>Diversifier ses mises</strong> permet de sécuriser certaines situations.</p>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>
