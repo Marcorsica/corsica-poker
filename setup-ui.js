@@ -1,135 +1,102 @@
 // ==================================================
-// BETTING FLOW
+// CARDS / ODDS ENGINE
 // ==================================================
 
-function placeBetOnHand(index, ph) {
- if (!canBetOnPhase(ph)) return;
- const h = hands[index];
- if (!h) return;
-
- // Règle validée : si une mise jackpot de 1 est déjà posée sur cette case,
- // la case est verrouillée. Aucun jeton normal ne peut être ajouté dessus.
- if (hasAnyJackpotBetOnTarget("hand", index, ph)) {
-  log(lang === 'fr' ? 'Case jackpot déjà verrouillée' : 'Jackpot square already locked');
-  return;
- }
-
- const jackpotType = jackpotTypeForOddsValue(getTargetOddsValue("hand", index));
- const jackpotSuppressed = jackpotType && shouldSuppressJackpotOfferAtPhase(jackpotType, "hand", index, ph);
- if (jackpotType && ph === phase && !jackpotSuppressed) {
-  placeJackpotBet(jackpotType, "hand", index);
-  return;
- }
-
- if (h.status === "elim" || h.status === "splitOnly") {
- return;
- }
-
- if (h.oddsStr === I18N[lang].gameFinished) {
- autoFinishRoundIfLockedWinner();
- return;
- }
-
- if (isLowOddsDisplay(h.oddsStr)) {
- return;
- }
-
- if (bankroll < selectedBet) {
- log(I18N[lang].insufficient);
- return;
- }
-
- h.bets[ph] += selectedBet;
- h.betLots[ph].push({
- amt: selectedBet,
- odds: Math.max(0, Number(h.oddsStr) || 0),
- });
-
- updateBankroll(-selectedBet);
- const targetNode = document.querySelector(`.hand:nth-child(${index + 1}) .hand-inner`) || document.querySelector(`.hand[data-hand="${index}"] .hand-inner`);
- triggerBetImpactSound();
- launchChipFlight(targetNode);
- computeTotalBets();
- renderHands();
- animateBetSquare(`.sq[data-phase="${ph}"][data-hand="${index}"]`);
- log(`${I18N[lang].betPlaced}: ${selectedBet} → main ${index + 1} (${I18N[lang].phase[ph]})`);
- if (phase === "pre" && getPreflopCommittedBetTotal() > 0) advanceUnlockedForRound = true;
- refreshActionButtons();
+function makeDeck() {
+ const suits = ["S", "H", "D", "C"];
+ const ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+ const d = [];
+ for (const s of suits) for (const r of ranks) d.push({ r, s });
+ return d;
 }
 
-function placeBetOnTie(ph) {
- if (!canBetOnPhase(ph)) return;
-
- // Règle validée : si une mise jackpot de 1 est déjà posée sur cette case,
- // la case égalité est verrouillée. Aucun jeton normal ne peut être ajouté dessus.
- if (hasAnyJackpotBetOnTarget("tie", -1, ph)) {
-  log(lang === 'fr' ? 'Case jackpot déjà verrouillée' : 'Jackpot square already locked');
-  return;
+function shuffleInPlace(a) {
+ for (let i = a.length - 1; i > 0; i--) {
+ const j = (Math.random() * (i + 1)) | 0;
+ [a[i], a[j]] = [a[j], a[i]];
  }
- const jackpotType = jackpotTypeForOddsValue(getTargetOddsValue("tie", -1));
- const jackpotSuppressed = jackpotType && shouldSuppressJackpotOfferAtPhase(jackpotType, "tie", -1, ph);
- if (jackpotType && ph === phase && !jackpotSuppressed) {
-  placeJackpotBet(jackpotType, "tie", -1);
-  return;
+ return a;
+}
+
+function draw(deckArr) {
+ return deckArr.pop();
+}
+
+function cloneCard(c) {
+ return { r: c.r, s: c.s };
+}
+
+function suitPretty(s) {
+ return s === "S" ? "♠" : s === "H" ? "♥" : s === "D" ? "♦" : "♣";
+}
+
+function cardToStr(c) {
+ const map = { 11: "J", 12: "Q", 13: "K", 14: "A" };
+ const rr = map[c.r] || String(c.r);
+ return rr + suitPretty(c.s);
+}
+
+function cardImage(card) {
+ if (!card || typeof card.r === "undefined" || typeof card.s === "undefined") {
+ return CARD_BACK_URL;
  }
- if (bankroll < selectedBet) {
- log(I18N[lang].insufficient);
- return;
+
+ const rankMap = {
+ 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9",
+ 10: "0", 11: "J", 12: "Q", 13: "K", 14: "A"
+ };
+
+ const suitMap = { S: "S", H: "H", D: "D", C: "C" };
+ const r = rankMap[card.r];
+ const s = suitMap[card.s];
+
+ if (!r || !s) return CARD_BACK_URL;
+ return `https://deckofcardsapi.com/static/img/${r}${s}.png`;
+}
+
+function oddsValue(prob) {
+ if (!prob || prob <= 0) return null;
+ const fair = 1 / prob;
+ const withMargin = fair * (1 - CONFIG.margin);
+ return Math.round(withMargin * 100) / 100;
+}
+
+function isCertainWinProbability(prob) {
+ return Number.isFinite(prob) && prob >= 0.999999;
+}
+
+function formatOddsDisplay(prob) {
+ const ov = oddsValue(prob);
+ if (!ov) return "—";
+ if (ov < 1.01) return I18N[lang].lowOdds;
+ return ov.toFixed(2);
+}
+
+function isLowOddsDisplay(v) {
+ return v === I18N.fr.lowOdds || v === I18N.en.lowOdds;
+}
+
+function computePotentialByPhase(lotsByPhase) {
+ const out = { pre: 0, flop: 0, turn: 0 };
+ for (const ph of ["pre", "flop", "turn"]) {
+ for (const lot of lotsByPhase[ph]) out[ph] += lot.amt * lot.odds;
  }
-
- tieBet.bets[ph] += selectedBet;
- tieBet.lots[ph].push({
- amt: selectedBet,
- odds: Math.max(0, Number(tieBet.oddsStr) || 0),
- });
-
- updateBankroll(-selectedBet);
- triggerBetImpactSound();
- launchChipFlight(document.getElementById("tieBox"));
- computeTotalBets();
- renderHands();
- animateBetSquare(`.sq[data-tie-phase="${ph}"]`);
- log(`${I18N[lang].betPlaced}: ${selectedBet} → ${I18N[lang].tie} (${I18N[lang].phase[ph]})`);
- if (phase === "pre" && getPreflopCommittedBetTotal() > 0) advanceUnlockedForRound = true;
- refreshActionButtons();
+ return out;
 }
 
-function undoHandBet(index, ph) {
- const h = hands[index];
- if (!h || !h.betLots[ph] || h.betLots[ph].length === 0 || roundFinished || isCalculating) return;
-
- const removed = h.betLots[ph].pop();
- h.bets[ph] = Math.max(0, h.bets[ph] - removed.amt);
-
- updateBankroll(removed.amt);
- computeTotalBets();
- renderHands();
- log(`${I18N[lang].undo}: main ${index + 1} (${I18N[lang].phase[ph]})`);
- if (phase === "pre" && getPreflopCommittedBetTotal() <= 0) advanceUnlockedForRound = false;
- refreshActionButtons();
+function computeTotalFromLots(lotsByPhase) {
+ const p = computePotentialByPhase(lotsByPhase);
+ return p.pre + p.flop + p.turn;
 }
 
-function undoTieBet(ph) {
- if (!tieBet.lots[ph] || tieBet.lots[ph].length === 0 || roundFinished || isCalculating) return;
-
- const removed = tieBet.lots[ph].pop();
- tieBet.bets[ph] = Math.max(0, tieBet.bets[ph] - removed.amt);
-
- updateBankroll(removed.amt);
- computeTotalBets();
- renderHands();
- log(`${I18N[lang].undo}: ${I18N[lang].tie} (${I18N[lang].phase[ph]})`);
- if (phase === "pre" && getPreflopCommittedBetTotal() <= 0) advanceUnlockedForRound = false;
- refreshActionButtons();
+function phasePotentialForHand(hand, ph) {
+ if (!hand || !hand.betLots || !hand.betLots[ph]) return 0;
+ return hand.betLots[ph].reduce((sum, lot) => sum + (lot.amt * lot.odds), 0);
 }
 
-function onHandClick(index, ph) {
- startAmbience();
- placeBetOnHand(index, ph);
+function phasePotentialForTie(ph) {
+ if (!tieBet || !tieBet.lots || !tieBet.lots[ph]) return 0;
+ return tieBet.lots[ph].reduce((sum, lot) => sum + (lot.amt * lot.odds), 0);
 }
 
-function onTieClick(ph) {
- startAmbience();
- placeBetOnTie(ph);
-}
 
