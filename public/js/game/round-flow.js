@@ -431,7 +431,7 @@ function playTensionBeforeRiver(callback) {
  }
 
  stopSuspenseAudio();
- suspenseAudio = new Audio("/external-audio/suspense.mp3");
+ suspenseAudio = new Audio("/assets/audio/suspense.mp3");
  suspenseAudio.volume = 0.18;
  suspenseAudio.play().catch(() => {});
 

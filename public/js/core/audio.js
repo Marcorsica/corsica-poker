@@ -3,15 +3,15 @@
 // ==================================================
 
 const MAIN_AUDIO_TRACKS = {
-  0: ["/audio/audio_1_jazz.mp3", "/external-audio/audio_1_jazz.mp3"],
-  1: ["/audio/audio_2_jazz.mp3", "/external-audio/audio_2_jazz.mp3"],
-  2: ["/audio/audio_3_beats.mp3", "/external-audio/audio_3_beats.mp3"],
-  3: ["/audio/audio_4_rnb.mp3", "/external-audio/audio_4_rnb.mp3"],
-  4: ["/audio/audio_5_relax.mp3", "/external-audio/audio_5_relax.mp3"]
+  0: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_1_jazz.mp3"],
+  1: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_2_jazz.mp3"],
+  2: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_3_beats.mp3"],
+  3: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_4_rnb.mp3"],
+  4: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_5_relax.mp3"]
 };
 
-const CASINO_AUDIO_TRACKS = ["/audio/audio_6_casino.mp3", "/external-audio/audio_6_casino.mp3"];
-const AUDIO_FALLBACK_TRACKS = ["/audio/audio_1_jazz.mp3", "/external-audio/audio_1_jazz.mp3"];
+const CASINO_AUDIO_TRACKS = ["/assets/audio/snd_ambience_casino.mp3", "/external-audio/audio_6_casino.mp3"];
+const AUDIO_FALLBACK_TRACKS = ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_1_jazz.mp3"];
 
 function assetExists(url) {
  return fetch(url, { method: "HEAD", cache: "no-store" })
