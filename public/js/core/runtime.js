@@ -233,13 +233,18 @@ function canUseAbandon() {
 }
 
 function refreshActionButtons() {
- if (phase === "pre" && getPreflopCommittedBetTotal() > 0) {
+ // v15.20 : déverrouillage robuste de la validation.
+ // Dès qu'une mise réelle existe (main, égalité ou jackpot), le bouton doit pouvoir valider.
+ if (getCommittedBetTotal() > 0) {
   advanceUnlockedForRound = true;
  }
 
  if (btnSameTable) btnSameTable.disabled = !roundFinished;
  if (btnChangeTable) btnChangeTable.disabled = !roundFinished;
- if (btnAdvance) btnAdvance.disabled = roundFinished || isCalculating || isAdvancingPhase || !advanceUnlockedForRound;
+ if (btnAdvance) {
+  btnAdvance.disabled = roundFinished || isCalculating || isAdvancingPhase || !advanceUnlockedForRound;
+  btnAdvance.style.pointerEvents = btnAdvance.disabled ? "none" : "auto";
+ }
 
  if (btnAbandon) {
   const visible = canUseAbandon();
@@ -249,5 +254,6 @@ function refreshActionButtons() {
  updateJackpotDisplays();
  syncPostRoundControls();
  if (typeof syncAbandonDockVisibility === "function") syncAbandonDockVisibility();
+ if (typeof ensureAdvanceDockUsable === "function") ensureAdvanceDockUsable();
 }
 

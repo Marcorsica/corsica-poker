@@ -25,14 +25,18 @@ function getHandPositions(count) {
 let handLayoutRaf = 0;
 
 function getHandScale(count, layerRect) {
- let scale = ({ 4: 1.11, 5: 1.10, 6: 1.08, 7: 1.05, 8: 1.00, 9: 0.97, 10: 0.94 }[count] || 0.94);
+ // Blocs cartes/cotes agrandis : on garde une échelle haute sur grand écran,
+ // puis on réduit seulement quand la largeur/hauteur disponible l'impose.
+ let scale = ({ 4: 1.10, 5: 1.08, 6: 1.05, 7: 1.01, 8: 1.04, 9: 1.01, 10: 0.98 }[count] || 0.98);
 
- if (layerRect.width < 1300) scale -= 0.02;
- if (layerRect.width < 1120) scale -= 0.03;
- if (layerRect.width < 980) scale -= 0.04;
- if (layerRect.height < 760) scale -= 0.02;
+ if (layerRect.width < 1360) scale -= 0.02;
+ if (layerRect.width < 1220) scale -= 0.03;
+ if (layerRect.width < 1080) scale -= 0.04;
+ if (layerRect.width < 980) scale -= 0.05;
+ if (layerRect.height < 800) scale -= 0.03;
+ if (layerRect.height < 720) scale -= 0.04;
 
- return Math.max(0.87, Math.min(1.12, scale));
+ return Math.max(0.84, Math.min(1.12, scale));
 }
 
 function getRelativeObstacleRect(node, layerRect, padX = 0, padY = 0, extraLeft = 0, extraRight = 0) {
@@ -79,16 +83,16 @@ function resolveHandsLayout() {
  const boardWidth = boardRect ? boardRect.width : Math.min(420, layerRect.width * 0.38);
  const boardHeight = boardRect ? boardRect.height : Math.min(180, layerRect.height * 0.24);
 
- const radialGapX = Math.max(70, handWidth * 0.58);
- const radialGapY = Math.max(54, handHeight * 0.62);
+ const radialGapX = Math.max(88, handWidth * 0.68);
+ const radialGapY = Math.max(68, handHeight * 0.72);
 
  const minRadiusX = (boardWidth / 2) + radialGapX;
  const minRadiusY = (boardHeight / 2) + radialGapY;
- const maxRadiusX = (layerRect.width / 2) - hw - 18;
- const maxRadiusY = (layerRect.height / 2) - hh - 18;
+ const maxRadiusX = (layerRect.width / 2) - hw - 24;
+ const maxRadiusY = (layerRect.height / 2) - hh - 24;
 
- const preferredRadiusX = layerRect.width * ({ 4: 0.31, 5: 0.32, 6: 0.33, 7: 0.34, 8: 0.35, 9: 0.36, 10: 0.365 }[nodes.length] || 0.35);
- const preferredRadiusY = layerRect.height * ({ 4: 0.30, 5: 0.31, 6: 0.32, 7: 0.325, 8: 0.33, 9: 0.335, 10: 0.34 }[nodes.length] || 0.33);
+ const preferredRadiusX = layerRect.width * ({ 4: 0.33, 5: 0.34, 6: 0.35, 7: 0.36, 8: 0.37, 9: 0.385, 10: 0.395 }[nodes.length] || 0.37);
+ const preferredRadiusY = layerRect.height * ({ 4: 0.32, 5: 0.33, 6: 0.34, 7: 0.35, 8: 0.36, 9: 0.37, 10: 0.38 }[nodes.length] || 0.36);
 
  const radiusX = Math.max(minRadiusX, Math.min(maxRadiusX, preferredRadiusX));
  const radiusY = Math.max(minRadiusY, Math.min(maxRadiusY, preferredRadiusY));
@@ -103,7 +107,7 @@ function resolveHandsLayout() {
    y: centerY + (Math.sin(angle) * radiusY)
   };
 
-  clampHandPoint(point, hw, hh, layerRect.width, layerRect.height);
+  clampHandPoint(point, hw + 6, hh + 6, layerRect.width, layerRect.height);
 
   node.style.left = `${point.x}px`;
   node.style.top = `${point.y}px`;
@@ -275,7 +279,8 @@ function setLang(newLang) {
  if (roundSetupTitle) roundSetupTitle.textContent = t.roundSetupTitle;
  if (roundSetupSubtitle) roundSetupSubtitle.textContent = t.roundSetupSubtitle;
  if (btnRandomHands) btnRandomHands.textContent = t.randomHands;
- if (btnManualHands) btnManualHands.textContent = t.manualHands;
+ const handsChoiceOr = el("handsChoiceOr");
+ if (handsChoiceOr) handsChoiceOr.textContent = t.handsChoiceOr || "ou";
  if (handsCountLabel) handsCountLabel.textContent = t.handsCountLabel;
 
  setCalcStatus(isCalculating);
@@ -412,6 +417,8 @@ function pinHandDetailsBriefly(wrap, delay = 260) {
 function buildHandsUI() {
  if (!handsLayer) return;
  handsLayer.innerHTML = "";
+ handsLayer.dataset.handsCount = String(hands.length);
+ document.body.dataset.handsCount = String(hands.length);
 
  const positions = getHandPositions(hands.length);
 
@@ -470,6 +477,7 @@ function buildHandsUI() {
  sq.dataset.phase = ph;
  sq.dataset.hand = String(i);
  sq.addEventListener("click", () => {
+ if (sq.classList.contains("jackpot-square-locked")) return;
  openHandDetails(wrap);
  onHandClick(i, ph);
  });
@@ -571,7 +579,10 @@ function buildHandsUI() {
  betText.dataset.tieBetSquare = cleanSq.dataset.tiePhase;
  cleanSq.appendChild(betText);
 
- cleanSq.addEventListener("click", () => onTieClick(cleanSq.dataset.tiePhase));
+ cleanSq.addEventListener("click", () => {
+  if (cleanSq.classList.contains("jackpot-square-locked")) return;
+  onTieClick(cleanSq.dataset.tiePhase);
+ });
  cleanSq.appendChild(makeEraser(() => undoTieBet(cleanSq.dataset.tiePhase)));
  });
 
@@ -635,6 +646,8 @@ function highlightLowestDisplayedOdds() {
 
 function renderHands() {
  if (!handsLayer) return;
+ handsLayer.dataset.handsCount = String(hands.length);
+ document.body.dataset.handsCount = String(hands.length);
 
  hands.forEach((h, i) => {
  const wrap = handsLayer.children[i];
@@ -704,10 +717,12 @@ function renderHands() {
  }
  }
 
+ const hasAnyBetOnHand = ((h.bets.pre || 0) + (h.bets.flop || 0) + (h.bets.turn || 0)) > 0 || hasAnyJackpotBetOnTarget("hand", i);
+ wrap.classList.toggle("hand-bet-framed", hasAnyBetOnHand);
  const betDot = wrap.querySelector(`[data-hand-bet-dot="${i}"]`);
  if (betDot) {
- const hasAnyBet = ((h.bets.pre || 0) + (h.bets.flop || 0) + (h.bets.turn || 0)) > 0 || hasAnyJackpotBetOnTarget("hand", i);
- betDot.classList.toggle("visible", hasAnyBet);
+ // Ancien point rouge désactivé : la mise est maintenant indiquée par le cadre autour des cartes.
+ betDot.classList.remove("visible");
  }
 
  ["pre", "flop", "turn"].forEach((ph) => {
@@ -720,10 +735,12 @@ function renderHands() {
  const jackpotOfferSuppressed = jackpotType && shouldSuppressJackpotOfferAtPhase(jackpotType, "hand", i, ph);
  const jackpotEligibleCurrentPhase = jackpotType && ph === phase && phase !== "river" && !jackpotOfferSuppressed;
  const bettableHand = h.status === "active" && !isLowOddsDisplay(h.oddsStr);
- const active = phase === ph && phase !== "river" && (bettableHand || jackpotEligibleCurrentPhase);
  const jackpotBetTypeOnSquare = getJackpotBetTypeOnTargetPhase("hand", i, ph);
+ const jackpotSquareLocked = !!jackpotBetTypeOnSquare;
+ const active = phase === ph && phase !== "river" && !jackpotSquareLocked && (bettableHand || jackpotEligibleCurrentPhase);
  sq.classList.toggle("active", active);
- sq.classList.toggle("disabled", phase === "river" || !["pre", "flop", "turn"].includes(phase) || !active);
+ sq.classList.toggle("disabled", phase === "river" || !["pre", "flop", "turn"].includes(phase) || !active || jackpotSquareLocked);
+ sq.classList.toggle("jackpot-square-locked", jackpotSquareLocked);
  sq.classList.toggle("hasBet", (h.bets[ph] || 0) > 0 || !!jackpotBetTypeOnSquare);
  sq.classList.toggle("has-jackpot-bet", !!jackpotBetTypeOnSquare);
 
@@ -759,14 +776,19 @@ function renderHands() {
  });
 
  
+ const tieBox = document.getElementById("tieBox");
  const tieBetDot = document.getElementById("tieBetDot");
- if (tieBetDot) {
  const hasTieBet =
- (tieBet.bets.pre || 0) +
+ ((tieBet.bets.pre || 0) +
  (tieBet.bets.flop || 0) +
- (tieBet.bets.turn || 0) > 0 || hasAnyJackpotBetOnTarget("tie", -1);
+ (tieBet.bets.turn || 0)) > 0 || hasAnyJackpotBetOnTarget("tie", -1);
 
- tieBetDot.classList.toggle("visible", hasTieBet);
+ if (tieBox) {
+ tieBox.classList.toggle("tie-bet-framed", hasTieBet);
+ }
+ if (tieBetDot) {
+ // Ancien point rouge désactivé : l'égalité est maintenant indiquée par un contour, comme les mains.
+ tieBetDot.classList.remove("visible");
  }
 
 if (tieOddsEl) {
@@ -811,10 +833,12 @@ if (tieOddsEl) {
  const tieJackpotType = jackpotTypeForOddsValue(getTargetOddsValue("tie", -1));
  const tieJackpotOfferSuppressed = tieJackpotType && shouldSuppressJackpotOfferAtPhase(tieJackpotType, "tie", -1, ph);
  const jackpotEligibleCurrentPhase = tieJackpotType && ph === phase && phase !== "river" && !tieJackpotOfferSuppressed;
- const active = phase === ph && phase !== "river";
  const jackpotBetTypeOnSquare = getJackpotBetTypeOnTargetPhase("tie", -1, ph);
+ const jackpotSquareLocked = !!jackpotBetTypeOnSquare;
+ const active = phase === ph && phase !== "river" && !jackpotSquareLocked;
  sq.classList.toggle("active", active);
- sq.classList.toggle("disabled", phase === "river" || !active);
+ sq.classList.toggle("disabled", phase === "river" || !active || jackpotSquareLocked);
+ sq.classList.toggle("jackpot-square-locked", jackpotSquareLocked);
  sq.classList.toggle("hasBet", (tieBet.bets[ph] || 0) > 0 || !!jackpotBetTypeOnSquare);
  sq.classList.toggle("has-jackpot-bet", !!jackpotBetTypeOnSquare);
 

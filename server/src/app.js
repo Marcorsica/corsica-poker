@@ -730,6 +730,35 @@ function getResult(game) {
 }
 
 
+
+function getExtremeCaseRuntimeConfig(game) {
+  if (!game || !game.extremeCaseId) return null;
+  return getExtremeCaseById(game.extremeCaseId);
+}
+
+function applyExtremeCaseOddsOverride(game, phase, odds) {
+  const extremeCase = getExtremeCaseRuntimeConfig(game);
+  const phaseCfg = extremeCase?.phases?.[phase];
+  const target = extremeCase?.target;
+  if (!phaseCfg || !target || !odds) return odds;
+
+  const rawOdds = Number(phaseCfg.rawOdds || 0);
+  const forcedProb = rawOdds > 0 ? (1 / rawOdds) : 0;
+
+  if (target.kind === 'tie') {
+    odds.tieProb = forcedProb;
+    odds.fairTieOdds = rawOdds > 0 ? rawOdds : 0;
+    return odds;
+  }
+
+  const index = Number(target.index);
+  if (Array.isArray(odds.hands) && odds.hands[index]) {
+    odds.hands[index].soloProb = forcedProb;
+    odds.hands[index].fairSoloOdds = rawOdds > 0 ? rawOdds : 0;
+  }
+  return odds;
+}
+
 app.get('/test/extreme-cases', (req, res) => {
   const items = (extremeCasesLibrary || []).map((entry) => ({
     id: entry.id,
@@ -954,8 +983,9 @@ app.get('/odds', (req, res) => {
   }
 
   try {
-    const odds = computeOdds(game);
+    let odds = computeOdds(game);
     const phase = phaseKey(game.board.length);
+    odds = applyExtremeCaseOddsOverride(game, phase, odds);
     game.oddsHistory[phase] = odds;
     logServer('odds.computed', 'Cotes calculées', {
       gameId,
@@ -1142,7 +1172,8 @@ app.post('/jackpots/bet', (req, res) => {
   const targetIndex = Number(req.body?.targetIndex);
   const phase = String(req.body?.phase || '');
   const rawOddsAtBetTime = Number(req.body?.rawOddsAtBetTime || 0);
-  const amount = Math.max(0, Number(req.body?.amount || 1));
+  // Mise jackpot strictement unitaire : toujours 1, jamais plus.
+  const amount = 1;
   const livePhase = currentJackpotPhase(game);
 
   if (!['hand', 'tie'].includes(targetKind) || !['pre', 'flop', 'turn'].includes(phase) || phase !== livePhase) {
@@ -1169,14 +1200,14 @@ app.post('/jackpots/bet', (req, res) => {
     Number(snap.targetIndex) === Number(targetIndex)
   );
   if (alreadyBetThisTierOnTarget) {
-    logServer('jackpots.bet.already_taken', 'Snapshot jackpot refusé car déjà misé sur cette cible', {
+    logServer('jackpots.bet.already_taken', 'Snapshot jackpot refusé car cette main/cible a déjà une mise de 1 sur ce jackpot', {
       gameId,
       targetKind,
       targetIndex,
       phase,
       tier: expectedTier,
     }, 'warn');
-    return res.status(409).json({ error: 'Jackpot already bet for this target and tier' });
+    return res.status(409).json({ error: 'Jackpot already bet for this target and tier in this round' });
   }
 
   const snapshotId = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;

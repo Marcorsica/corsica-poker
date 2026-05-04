@@ -2,6 +2,66 @@
 // ODDS / JACKPOTS
 // ==================================================
 
+
+const JACKPOT_HEAT_STEP = {
+ argent: 1 / 800,
+ or: 1 / 26500,
+ diamant: 1 / 210000
+};
+
+const jackpotHeatState = {
+ argent: 0,
+ or: 0,
+ diamant: 0
+};
+
+function updateJackpotHeatBars() {
+ for (const type of JACKPOT_TYPES) {
+  const fill = document.getElementById(`${type}HeatFill`);
+  if (!fill) continue;
+  const pct = Math.max(0, Math.min(1, jackpotHeatState[type] || 0));
+  fill.style.width = "100%";
+  fill.style.setProperty("--heat-progress", `${pct * 100}%`);
+ }
+}
+
+function advanceJackpotHeat(type) {
+ if (!(type in jackpotHeatState)) return;
+ jackpotHeatState[type] = Math.min(1, jackpotHeatState[type] + (JACKPOT_HEAT_STEP[type] || 0));
+ updateJackpotHeatBars();
+}
+
+function normalizeJackpotHeatType(type) {
+ const normalized = String(type || "").toLowerCase().trim();
+ if (normalized === "silver") return "argent";
+ if (normalized === "gold") return "or";
+ if (normalized === "diamond") return "diamant";
+ return normalized;
+}
+
+function resetJackpotHeat(type) {
+ const normalizedType = normalizeJackpotHeatType(type);
+ if (!(normalizedType in jackpotHeatState)) return;
+ jackpotHeatState[normalizedType] = 0;
+ updateJackpotHeatBars();
+}
+
+function resetJackpotHeatOnWin(type) {
+ // Règle validée : dès qu'un jackpot est gagné,
+ // le curseur de chaleur associé repart immédiatement à 0.
+ resetJackpotHeat(type);
+}
+
+
+function setJackpotHeatForTest(percent = 0.9) {
+ const pct = Math.max(0, Math.min(1, Number(percent)));
+ for (const type of JACKPOT_TYPES) {
+  if (type in jackpotHeatState) jackpotHeatState[type] = pct;
+ }
+ updateJackpotHeatBars();
+}
+
+
 function parseOddsNumber(v) {
  if (!v || v === "—" || isLowOddsDisplay(v)) return null;
  const n = Number(v);
@@ -111,6 +171,10 @@ function isJackpotTypeLocked(type) {
 }
 
 function isJackpotTypeLockedForTarget(type, targetKind, targetIndex) {
+ // Règle validée Corsica Poker : une seule mise de 1 est autorisée
+ // par jackpot ET par main/cible.
+ // Exemple : Argent main 1 bloque seulement Argent main 1.
+ // Argent main 2, Or main 1 et Diamant main 1 restent jouables si éligibles.
  return hasJackpotTypeAlreadyBetOnTarget(type, targetKind, targetIndex);
 }
 
@@ -129,6 +193,8 @@ function hasJackpotTypeBetOnTargetAtPhase(type, targetKind, targetIndex, ph) {
 }
 
 function shouldSuppressJackpotOfferAtPhase(type, targetKind, targetIndex, ph) {
+ // Ne masquer/verrouiller que l'offre déjà jouée sur cette même cible.
+ // Les autres mains éligibles au même jackpot doivent rester disponibles.
  return hasJackpotTypeAlreadyBetOnTarget(type, targetKind, targetIndex);
 }
 
@@ -184,7 +250,7 @@ function updateJackpotDisplays() {
 async function placeJackpotBet(type, targetKind, targetIndex) {
  if (roundFinished || isCalculating || phase === "river") return;
  if (isJackpotTypeLockedForTarget(type, targetKind, targetIndex)) {
-  log(`${jackpotPotLabel(type)} ${lang === 'fr' ? 'déjà misé sur cette main' : 'already bet on this hand'}`);
+  log(`${jackpotPotLabel(type)} ${lang === 'fr' ? 'déjà misé pour cette manche' : 'already bet for this round'}`);
   return;
  }
 
@@ -227,6 +293,7 @@ async function placeJackpotBet(type, targetKind, targetIndex) {
  renderHands();
  updateJackpotDisplays();
  animateJackpotBoxOnBet(type);
+ advanceJackpotHeat(type);
 
  const targetNode = targetKind === "tie"
  ? document.getElementById("tieBox")
@@ -343,7 +410,7 @@ function getLostJackpotText(targetKind, targetIndex, ph) {
 
 function applyServerJackpotPayouts(jackpotPayouts = []) {
  for (const payout of jackpotPayouts) {
-  const type = payout?.tier;
+  const type = normalizeJackpotHeatType(payout?.tier || payout?.type || payout?.jackpotType);
   const paid = Number(payout?.paid || 0);
   const targetKind = payout?.targetKind;
   const targetIndex = Number(payout?.targetIndex);
@@ -359,7 +426,8 @@ function applyServerJackpotPayouts(jackpotPayouts = []) {
    updateTotalWinsDisplay();
   }
 
-  if (type) {
+  if (type && paid > 0) {
+   resetJackpotHeatOnWin(type);
    log(`🏆 ${I18N[lang].jackpotWon}: ${jackpotPotLabel(type)} +${paid.toFixed(2)}`);
   }
  }

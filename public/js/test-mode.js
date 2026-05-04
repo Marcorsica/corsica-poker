@@ -193,6 +193,40 @@
     list.style.display = 'none';
     list.style.gap = '8px';
 
+    const heatCard = document.createElement('div');
+    heatCard.style.border = '1px solid rgba(255,255,255,0.12)';
+    heatCard.style.borderRadius = '12px';
+    heatCard.style.padding = '10px';
+    heatCard.style.background = 'rgba(255,255,255,0.04)';
+
+    const heatTitle = document.createElement('div');
+    heatTitle.textContent = 'Curseurs chaleur — 90%';
+    heatTitle.style.fontWeight = '700';
+    heatTitle.style.fontSize = '13px';
+    heatTitle.style.marginBottom = '4px';
+    heatCard.appendChild(heatTitle);
+
+    const heatDesc = document.createElement('div');
+    heatDesc.textContent = 'Affiche les curseurs Argent, Or et Diamant remplis à 90% pour contrôle visuel.';
+    heatDesc.style.fontSize = '12px';
+    heatDesc.style.opacity = '0.75';
+    heatDesc.style.marginBottom = '8px';
+    heatCard.appendChild(heatDesc);
+
+    const heatBtn = document.createElement('button');
+    heatBtn.type = 'button';
+    heatBtn.textContent = 'Afficher à 90%';
+    heatBtn.className = 'pill';
+    heatBtn.style.width = '100%';
+    heatBtn.style.cursor = 'pointer';
+    heatBtn.addEventListener('click', () => {
+      if (typeof setJackpotHeatForTest === 'function') {
+        setJackpotHeatForTest(0.9);
+      }
+    });
+    heatCard.appendChild(heatBtn);
+    list.appendChild(heatCard);
+
     casesList.forEach((entry) => {
       const card = document.createElement('div');
       card.style.border = '1px solid rgba(255,255,255,0.12)';

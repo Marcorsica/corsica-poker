@@ -85,7 +85,7 @@ html,body{
 
 .stats{
   display:flex;
-  gap:8px;
+  gap:10px;
   flex-wrap:wrap;
   justify-content:center;
   align-items:center;
@@ -394,8 +394,8 @@ html,body{
 
 .hand{
   position:absolute;
-  width:256px;
-  min-height:112px;
+  width:284px;
+  min-height:126px;
   transform:translate(-50%,-50%);
   transform-origin:center center;
   will-change:left, top, transform;
@@ -412,14 +412,14 @@ html,body{
   background:rgba(0,0,0,.20);
   border:1px solid rgba(255,255,255,.10);
   border-radius:22px;
-  padding:8px 12px 10px;
+  padding:9px 14px 11px;
   text-align:center;
   overflow:visible;
   min-height:112px;
 }
 
 .hand-odds{
-  font-size:17px;
+  font-size:18px;
   font-weight:900;
   color:var(--ok);
   text-shadow:0 1px 0 rgba(0,0,0,.18);
@@ -444,8 +444,8 @@ html,body{
 }
 
 .hand-cards .card{
-  width:70px;
-  height:98px;
+  width:78px;
+  height:109px;
 }
 
 .hand-sub{
@@ -3240,10 +3240,10 @@ html,body{
 .tie-box:hover,
 .tie-box.tie-win,
 .tie-box.tie-expanded-final{
-  width:256px !important;
-  min-width:256px !important;
-  min-height:112px !important;
-  padding:8px 12px 10px !important;
+  width:284px !important;
+  min-width:284px !important;
+  min-height:126px !important;
+  padding:9px 14px 11px !important;
   border-radius:22px !important;
   overflow:visible !important;
 }
@@ -5900,3 +5900,737 @@ html, body, .game-shell, .table, .hands-layer, .hand, .hand *, .tie-box, .tie-bo
   pointer-events:auto !important;
 }
 /* === END FIX STRICT SURVOL MISES / CLIC DROIT === */
+
+/* === FIX PARAMETRES COMPACT - styles de jeu visibles sur petits écrans === */
+#settingsPanel.settings-panel{
+  top:48px !important;
+  right:10px !important;
+  width:min(320px, calc(100vw - 20px)) !important;
+  max-height:calc(100vh - 58px) !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain !important;
+  padding:10px 10px 12px !important;
+  box-sizing:border-box !important;
+  scrollbar-width:thin !important;
+}
+
+#settingsPanel.settings-panel .settings-title{
+  font-size:16px !important;
+  margin-bottom:8px !important;
+  line-height:1.1 !important;
+}
+
+#settingsPanel.settings-panel .settings-section{
+  gap:6px !important;
+  padding:7px 8px !important;
+  border-radius:12px !important;
+}
+
+#settingsPanel.settings-panel .settings-section + .settings-section{
+  margin-top:6px !important;
+}
+
+#settingsPanel.settings-panel .settings-label{
+  font-size:11px !important;
+  line-height:1.1 !important;
+}
+
+#settingsPanel.settings-panel .settings-rules-btn,
+#settingsPanel.settings-panel .settings-audio-btn,
+#settingsPanel.settings-panel .game-style-btn,
+#settingsPanel.settings-panel .felt-color-btn,
+#settingsPanel.settings-panel .settings-lang-row .pill,
+#settingsPanel.settings-panel .settings-lock-btn{
+  min-height:28px !important;
+  padding:6px 10px !important;
+  font-size:11px !important;
+  line-height:1.05 !important;
+}
+
+#settingsPanel.settings-panel .settings-audio-row,
+#settingsPanel.settings-panel .game-style-options,
+#settingsPanel.settings-panel .felt-color-options{
+  gap:6px !important;
+  max-width:270px !important;
+}
+
+#settingsPanel.settings-panel .settings-volume-row{
+  max-width:220px !important;
+}
+
+#settingsPanel.settings-panel .game-style-section{
+  margin-top:6px !important;
+  padding-top:7px !important;
+}
+
+@media (max-height: 760px){
+  #settingsPanel.settings-panel{
+    top:42px !important;
+    max-height:calc(100vh - 48px) !important;
+    padding:8px !important;
+  }
+  #settingsPanel.settings-panel .settings-title{
+    font-size:15px !important;
+    margin-bottom:6px !important;
+  }
+  #settingsPanel.settings-panel .settings-section{
+    gap:5px !important;
+    padding:6px 7px !important;
+  }
+  #settingsPanel.settings-panel .settings-section + .settings-section{
+    margin-top:5px !important;
+  }
+  #settingsPanel.settings-panel .settings-rules-btn,
+  #settingsPanel.settings-panel .settings-audio-btn,
+  #settingsPanel.settings-panel .game-style-btn,
+  #settingsPanel.settings-panel .felt-color-btn,
+  #settingsPanel.settings-panel .settings-lang-row .pill,
+  #settingsPanel.settings-panel .settings-lock-btn{
+    min-height:26px !important;
+    padding:5px 9px !important;
+    font-size:10.5px !important;
+  }
+}
+
+@media (max-width: 640px){
+  #settingsPanel.settings-panel{
+    left:10px !important;
+    right:10px !important;
+    width:auto !important;
+  }
+}
+/* === FIN FIX PARAMETRES COMPACT === */
+
+
+/* v15.07.3 — blocs cartes/cotes agrandis et espacés symétriquement */
+.hand{
+  width:284px !important;
+  min-height:126px !important;
+}
+.hand-inner{
+  min-height:126px !important;
+  padding:9px 14px 11px !important;
+}
+.hand-odds{
+  font-size:18px !important;
+  margin-bottom:6px !important;
+}
+.hand-cards{
+  gap:10px !important;
+}
+.hand-cards .card{
+  width:78px !important;
+  height:109px !important;
+}
+.tie-box,
+.tie-box:hover,
+.tie-box.tie-win,
+.tie-box.tie-expanded-final{
+  width:284px !important;
+  min-width:284px !important;
+  min-height:126px !important;
+  padding:9px 14px 11px !important;
+}
+@media (max-width: 1180px){
+  .hand{ width:270px !important; }
+  .hand-cards .card{ width:74px !important; height:104px !important; }
+  .tie-box, .tie-box:hover, .tie-box.tie-win, .tie-box.tie-expanded-final{ width:270px !important; min-width:270px !important; }
+}
+@media (max-height: 760px){
+  .hand{ width:270px !important; }
+  .hand-cards .card{ width:73px !important; height:102px !important; }
+  .tie-box, .tie-box:hover, .tie-box.tie-win, .tie-box.tie-expanded-final{ width:270px !important; min-width:270px !important; }
+}
+
+/* === v15.12 REAL FIX — suppression definitive des carres autour cartes/cotes ===
+   On garde les cartes et les cotes, mais on retire le bloc/cadre qui les enfermait. */
+.hand-inner,
+.hand-main:hover,
+.hand:focus-within .hand-inner,
+.hand-elim .hand-inner,
+.hand-splitOnly .hand-inner{
+  background: transparent !important;
+  border-color: transparent !important;
+  border-width: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.hand-inner::before,
+.hand-inner::after,
+.hand-main::before,
+.hand-main::after{
+  display:none !important;
+  content:none !important;
+  opacity:0 !important;
+}
+
+.hand-main:hover,
+.hand:focus-within .hand-inner{
+  transform:none !important;
+}
+
+.hand{
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Cartes plus lisibles sans cadre externe */
+.hand-cards .card{
+  width:84px !important;
+  height:118px !important;
+  border-radius:10px !important;
+}
+
+.hand-cards{
+  gap:12px !important;
+}
+
+.hand-odds{
+  font-size:20px !important;
+  margin-bottom:7px !important;
+}
+
+.hand{
+  width:300px !important;
+  min-height:142px !important;
+}
+
+.hand-inner{
+  min-height:142px !important;
+  padding:4px 8px 6px !important;
+}
+
+/* Panneaux de mise: conserves visibles et centres sous les cartes */
+.hand-details{
+  left:50% !important;
+  right:auto !important;
+  transform:translateX(-50%) !important;
+}
+
+.hand.details-open .hand-details,
+.hand:focus-within .hand-details{
+  transform:translateX(-50%) translateY(0) !important;
+}
+
+.hand.hand-edge-left .hand-details,
+.hand.hand-edge-right .hand-details{
+  left:50% !important;
+  right:auto !important;
+  transform:translateX(-50%) !important;
+}
+
+.hand.hand-edge-left.details-open .hand-details,
+.hand.hand-edge-left:focus-within .hand-details,
+.hand.hand-edge-right.details-open .hand-details,
+.hand.hand-edge-right:focus-within .hand-details{
+  transform:translateX(-50%) translateY(0) !important;
+}
+
+@media (max-width: 1180px), (max-height: 760px){
+  .hand{ width:286px !important; min-height:136px !important; }
+  .hand-inner{ min-height:136px !important; }
+  .hand-cards .card{ width:80px !important; height:112px !important; }
+  .hand-cards{ gap:10px !important; }
+}
+/* === END v15.12 REAL FIX === */
+
+
+/* === v15.14 — verrouillage complet de la case après mise jackpot === */
+.sq.jackpot-square-locked,
+.tie-box .sq.jackpot-square-locked,
+.hand .sq.jackpot-square-locked{
+  cursor:not-allowed !important;
+  opacity:.88 !important;
+  border-color:rgba(180,180,180,.35) !important;
+  background:linear-gradient(180deg, rgba(90,90,90,.30), rgba(38,38,38,.42)) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05), 0 4px 14px rgba(0,0,0,.20) !important;
+  filter:grayscale(.18) brightness(.92) !important;
+  animation:none !important;
+}
+
+.sq.jackpot-square-locked:hover,
+.tie-box .sq.jackpot-square-locked:hover,
+.hand .sq.jackpot-square-locked:hover{
+  transform:none !important;
+  cursor:not-allowed !important;
+}
+
+.sq.jackpot-square-locked .eraser{
+  pointer-events:auto !important;
+  cursor:pointer !important;
+}
+/* === FIN v15.14 === */
+
+
+/* === v15.16 : cartes agrandies 8/9/10 joueurs + appel jackpot premium === */
+.hands-layer[data-hands-count="8"] .hand,
+body[data-hands-count="8"] .hands-layer .hand{
+  width:310px;
+  min-height:136px;
+}
+
+.hands-layer[data-hands-count="9"] .hand,
+body[data-hands-count="9"] .hands-layer .hand{
+  width:304px;
+  min-height:134px;
+}
+
+.hands-layer[data-hands-count="10"] .hand,
+body[data-hands-count="10"] .hands-layer .hand{
+  width:298px;
+  min-height:132px;
+}
+
+.hands-layer[data-hands-count="8"] .hand-inner,
+body[data-hands-count="8"] .hand-inner,
+.hands-layer[data-hands-count="9"] .hand-inner,
+body[data-hands-count="9"] .hand-inner,
+.hands-layer[data-hands-count="10"] .hand-inner,
+body[data-hands-count="10"] .hand-inner{
+  padding:8px 12px 10px !important;
+}
+
+.hands-layer[data-hands-count="8"] .hand-cards .card,
+body[data-hands-count="8"] .hand-cards .card{
+  width:88px !important;
+  height:123px !important;
+  border-radius:12px !important;
+}
+
+.hands-layer[data-hands-count="9"] .hand-cards .card,
+body[data-hands-count="9"] .hand-cards .card{
+  width:86px !important;
+  height:120px !important;
+  border-radius:12px !important;
+}
+
+.hands-layer[data-hands-count="10"] .hand-cards .card,
+body[data-hands-count="10"] .hand-cards .card{
+  width:84px !important;
+  height:118px !important;
+  border-radius:12px !important;
+}
+
+.hands-layer[data-hands-count="8"] .hand-cards,
+.hands-layer[data-hands-count="9"] .hand-cards,
+.hands-layer[data-hands-count="10"] .hand-cards,
+body[data-hands-count="8"] .hand-cards,
+body[data-hands-count="9"] .hand-cards,
+body[data-hands-count="10"] .hand-cards{
+  gap:10px !important;
+}
+
+.hand-odds.jackpot-call,
+.tie-value.jackpot-call{
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-weight:900 !important;
+  letter-spacing:.075em !important;
+  text-transform:uppercase !important;
+  font-size:12px !important;
+  color:#fff2bd !important;
+  border:1px solid rgba(255,220,120,.68) !important;
+  background:
+    radial-gradient(circle at top, rgba(255,236,160,.24), transparent 62%),
+    linear-gradient(180deg, rgba(128,86,13,.96), rgba(54,38,7,.98)) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,245,190,.12) inset,
+    0 6px 18px rgba(0,0,0,.24),
+    0 0 15px rgba(246,211,107,.22) !important;
+  animation:softJackpotInvite 1.15s ease-in-out infinite !important;
+}
+
+.hand-odds.jackpot-call:hover,
+.tie-value.jackpot-call:hover{
+  color:#fff9dc !important;
+  border-color:rgba(255,239,170,.88) !important;
+  animation-duration:.9s !important;
+}
+
+@keyframes softJackpotInvite{
+  0%,100%{
+    filter:brightness(1);
+    transform:translateZ(0) scale(1);
+    box-shadow:
+      0 0 0 1px rgba(255,245,190,.10) inset,
+      0 6px 18px rgba(0,0,0,.24),
+      0 0 10px rgba(246,211,107,.16);
+  }
+  50%{
+    filter:brightness(1.16);
+    transform:translateZ(0) scale(1.035);
+    box-shadow:
+      0 0 0 1px rgba(255,245,190,.22) inset,
+      0 8px 22px rgba(0,0,0,.28),
+      0 0 22px rgba(246,211,107,.42),
+      0 0 36px rgba(246,211,107,.18);
+  }
+}
+
+@media (max-width: 1180px){
+  .hands-layer[data-hands-count="8"] .hand-cards .card,
+  body[data-hands-count="8"] .hand-cards .card{ width:84px !important; height:118px !important; }
+  .hands-layer[data-hands-count="9"] .hand-cards .card,
+  body[data-hands-count="9"] .hand-cards .card{ width:82px !important; height:115px !important; }
+  .hands-layer[data-hands-count="10"] .hand-cards .card,
+  body[data-hands-count="10"] .hand-cards .card{ width:80px !important; height:112px !important; }
+}
+
+@media (max-height: 760px){
+  .hands-layer[data-hands-count="8"] .hand-cards .card,
+  body[data-hands-count="8"] .hand-cards .card{ width:82px !important; height:115px !important; }
+  .hands-layer[data-hands-count="9"] .hand-cards .card,
+  body[data-hands-count="9"] .hand-cards .card{ width:80px !important; height:112px !important; }
+  .hands-layer[data-hands-count="10"] .hand-cards .card,
+  body[data-hands-count="10"] .hand-cards .card{ width:78px !important; height:109px !important; }
+}
+/* === fin v15.16 === */
+
+
+.jackpot-heat-bar{
+ width:100%;
+ height:8px;
+ margin-top:8px;
+ border-radius:999px;
+ overflow:hidden;
+ position:relative;
+ background:rgba(255,255,255,.12);
+ border:1px solid rgba(255,255,255,.18);
+ box-shadow: inset 0 1px 2px rgba(0,0,0,.45);
+}
+
+.jackpot-heat-fill{
+ --heat-progress:0%;
+ position:absolute;
+ inset:0;
+ width:100%;
+ height:100%;
+ border-radius:999px;
+ transition:clip-path .35s ease;
+ clip-path:inset(0 calc(100% - var(--heat-progress)) 0 0);
+ background:linear-gradient(90deg,
+  #20c05c 0%,
+  #d9db35 25%,
+  #ff9f1c 50%,
+  #ff3b30 75%,
+  #8b2cff 100%);
+ box-shadow:
+  0 0 8px rgba(255,120,0,.55),
+  0 0 14px rgba(139,44,255,.35);
+}
+
+
+.manual-arrow-btn{
+ min-width:52px;
+ font-size:1.4rem;
+ font-weight:700;
+ padding:0.45rem 0.9rem;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+}
+
+/* Correction accueil : bouton flèche aligné à droite du menu déroulant */
+.round-setup-manual{
+  flex-wrap:nowrap !important;
+}
+.round-setup-manual #handsCountSelect{
+  flex:0 0 auto;
+}
+.round-setup-manual .manual-arrow-btn{
+  min-width:52px !important;
+  width:52px !important;
+  height:44px !important;
+  padding:0 !important;
+  flex:0 0 52px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:1.35rem !important;
+  line-height:1 !important;
+}
+
+
+/* Accueil nouvelle manche : libellé + Aléatoire + menu + flèche sur une seule ligne */
+.round-setup-player-row{
+  margin-top:22px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:12px !important;
+  flex-wrap:nowrap !important;
+}
+.round-setup-player-label{
+  color:rgba(255,255,255,.82) !important;
+  font-size:13px !important;
+  font-weight:800 !important;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.round-setup-player-row .btn{
+  min-width:auto !important;
+  justify-content:center;
+  box-shadow:
+    0 0 18px rgba(246,211,107,.18),
+    0 10px 24px rgba(0,0,0,.26);
+}
+.round-setup-player-row #btnRandomHands{
+  min-width:118px !important;
+  padding-left:16px !important;
+  padding-right:16px !important;
+  flex:0 0 auto !important;
+}
+.round-setup-player-row #handsCountSelect{
+  flex:0 0 auto !important;
+  min-width:92px !important;
+}
+.round-setup-player-row .manual-arrow-btn{
+  min-width:52px !important;
+  width:52px !important;
+  height:44px !important;
+  padding:0 !important;
+  flex:0 0 52px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:1.35rem !important;
+}
+@media (max-width: 520px){
+  .round-setup-player-row{
+    gap:8px !important;
+  }
+  .round-setup-player-label{
+    font-size:11px !important;
+  }
+  .round-setup-player-row #btnRandomHands{
+    min-width:96px !important;
+    padding-left:10px !important;
+    padding-right:10px !important;
+  }
+  .round-setup-player-row #handsCountSelect{
+    min-width:74px !important;
+  }
+}
+
+
+/* Accueil : insertion de "ou" et synchronisation police/style joueur sur toute la ligne */
+.round-setup-player-row,
+.round-setup-player-row .round-setup-player-label,
+.round-setup-player-row .round-setup-or,
+.round-setup-player-row .btn,
+.round-setup-player-row select{
+  font-family: var(--theme-ui-font) !important;
+}
+.round-setup-or{
+  color: rgba(255,255,255,.84) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  flex: 0 0 auto !important;
+}
+body.theme-pro .round-setup-player-row,
+body.theme-pro .round-setup-player-row .round-setup-player-label,
+body.theme-pro .round-setup-player-row .round-setup-or,
+body.theme-pro .round-setup-player-row .btn,
+body.theme-pro .round-setup-player-row select{
+  font-family: var(--theme-ui-font) !important;
+}
+@media (max-width: 520px){
+  .round-setup-or{
+    font-size:11px !important;
+  }
+}
+
+
+/* Accueil v15.17 : titre Nombre de joueurs au-dessus, puis contrôles sur une seule ligne */
+.round-setup-box > .round-setup-player-label{
+  margin-top:18px !important;
+  margin-bottom:10px !important;
+  display:block !important;
+  text-align:center !important;
+  color:rgba(255,255,255,.86) !important;
+  font-size:13px !important;
+  font-weight:800 !important;
+  letter-spacing:.04em !important;
+  text-transform:uppercase !important;
+  white-space:nowrap !important;
+  font-family: var(--theme-ui-font) !important;
+}
+.round-setup-box > .round-setup-player-row{
+  margin-top:0 !important;
+}
+.round-setup-player-row #btnRandomHands{
+  min-width:198px !important;
+}
+@media (max-width: 520px){
+  .round-setup-player-row #btnRandomHands{
+    min-width:156px !important;
+    font-size:.78rem !important;
+  }
+}
+
+/* Accueil v15.18 : menu déroulant aligné sur le style du bouton Aléatoire */
+.round-setup-player-row #handsCountSelect{
+  height:44px !important;
+  min-width:92px !important;
+  padding:9px 34px 9px 14px !important;
+  border-radius:12px !important;
+  border:1px solid rgba(246,211,107,.55) !important;
+  background:linear-gradient(180deg, #ffe08a, #f6d36b) !important;
+  color:#2a2100 !important;
+  font-family:var(--theme-ui-font) !important;
+  font-weight:700 !important;
+  cursor:pointer !important;
+  box-shadow:
+    0 0 18px rgba(246,211,107,.18),
+    0 10px 24px rgba(0,0,0,.26) !important;
+  outline:none !important;
+  appearance:auto !important;
+}
+.round-setup-player-row #handsCountSelect:hover{
+  filter:brightness(1.04) !important;
+}
+.round-setup-player-row #handsCountSelect:focus{
+  box-shadow:
+    0 0 0 2px rgba(246,211,107,.22),
+    0 0 18px rgba(246,211,107,.22),
+    0 10px 24px rgba(0,0,0,.26) !important;
+}
+body.theme-fast .round-setup-player-row #handsCountSelect{
+  background:linear-gradient(180deg, #7bfff0, #35dec5) !important;
+  border-color:rgba(123,255,240,.65) !important;
+  color:#022722 !important;
+  font-family:var(--theme-ui-font) !important;
+  font-weight:800 !important;
+  letter-spacing:.05em !important;
+  text-transform:uppercase !important;
+  box-shadow:
+    0 0 0 2px rgba(123,255,240,.20),
+    0 0 18px rgba(88,255,213,.28),
+    0 10px 22px rgba(0,0,0,.28) !important;
+}
+body.theme-pro .round-setup-player-row #handsCountSelect{
+  background:linear-gradient(180deg, #d5b36a, #a8843d) !important;
+  color:#201707 !important;
+  border-color:rgba(213,179,106,.55) !important;
+  font-family:var(--theme-ui-font) !important;
+  font-weight:700 !important;
+  letter-spacing:.03em !important;
+  border-radius:14px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,245,215,.18),
+    0 10px 22px rgba(0,0,0,.32) !important;
+}
+@media (max-width: 520px){
+  .round-setup-player-row #handsCountSelect{
+    min-width:74px !important;
+    height:42px !important;
+    padding-left:10px !important;
+    padding-right:24px !important;
+    font-size:.78rem !important;
+  }
+}
+
+/* Accueil v15.19 : appliquer le style choisi à tout le menu déroulant natif */
+.round-setup-player-row #handsCountSelect,
+.round-setup-player-row #handsCountSelect option,
+.round-setup-player-row #handsCountSelect optgroup{
+  font-family:var(--theme-ui-font) !important;
+  font-weight:800 !important;
+}
+.round-setup-player-row #handsCountSelect option{
+  background:#f6d36b !important;
+  color:#2a2100 !important;
+  padding:10px 14px !important;
+}
+.round-setup-player-row #handsCountSelect option:checked,
+.round-setup-player-row #handsCountSelect option:hover{
+  background:#ffe08a !important;
+  color:#2a2100 !important;
+}
+body.theme-fast .round-setup-player-row #handsCountSelect option{
+  background:#35dec5 !important;
+  color:#022722 !important;
+  font-family:var(--theme-ui-font) !important;
+  font-weight:900 !important;
+  letter-spacing:.05em !important;
+  text-transform:uppercase !important;
+}
+body.theme-fast .round-setup-player-row #handsCountSelect option:checked,
+body.theme-fast .round-setup-player-row #handsCountSelect option:hover{
+  background:#7bfff0 !important;
+  color:#022722 !important;
+}
+body.theme-pro .round-setup-player-row #handsCountSelect option{
+  background:#a8843d !important;
+  color:#201707 !important;
+  font-family:var(--theme-ui-font) !important;
+  font-weight:800 !important;
+  letter-spacing:.03em !important;
+}
+body.theme-pro .round-setup-player-row #handsCountSelect option:checked,
+body.theme-pro .round-setup-player-row #handsCountSelect option:hover{
+  background:#d5b36a !important;
+  color:#201707 !important;
+}
+
+/* v15.20 FIX : le dock de validation ne doit jamais être neutralisé pendant la manche */
+body.gameplay-screen:not(.round-ended) #advanceDock{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+}
+body.gameplay-screen:not(.round-ended) #advanceDock #btnAdvance{
+  display:inline-flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+body.gameplay-screen:not(.round-ended) #advanceDock #btnAdvance:not(:disabled){
+  pointer-events:auto !important;
+}
+body.gameplay-screen:not(.round-ended) #advanceDock #btnAdvance:disabled{
+  pointer-events:none !important;
+}
+
+
+/* v15.21 — indicateur de mise par cadre autour des cartes, sans point rouge */
+.hand-bet-framed .hand-cards{
+  border-radius: calc(var(--card-radius, 10px) + 6px);
+  outline: 3px solid rgba(255, 224, 120, .96);
+  outline-offset: 6px;
+  box-shadow:
+    0 0 0 1px rgba(60, 34, 0, .55),
+    0 0 16px rgba(255, 208, 75, .70),
+    0 0 28px rgba(255, 145, 40, .35);
+}
+
+.hand-bet-dot{
+  display:none !important;
+}
+
+
+/* v15.23 — contours de mise moins lumineux + même effet pour Égalité */
+.hand-bet-framed .hand-cards{
+  outline:2px solid rgba(255, 224, 120, .64) !important;
+  outline-offset:5px !important;
+  box-shadow:
+    0 0 0 1px rgba(60, 34, 0, .34),
+    0 0 9px rgba(255, 208, 75, .34),
+    0 0 16px rgba(255, 145, 40, .16) !important;
+}
+.tie-box.tie-bet-framed{
+  outline:2px solid rgba(255, 224, 120, .64) !important;
+  outline-offset:5px !important;
+  box-shadow:
+    0 0 0 1px rgba(60, 34, 0, .34),
+    0 0 9px rgba(255, 208, 75, .34),
+    0 0 16px rgba(255, 145, 40, .16) !important;
+}
+.tie-bet-dot{
+  display:none !important;
+}

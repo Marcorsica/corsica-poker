@@ -1,8 +1,8 @@
 [
   {
-    "id": "diamant_main_1",
-    "title": "Diamant gagnant — Main 1",
-    "description": "Préflop diamant réel, puis régression au flop vers bronze. La main 1 gagne à la river.",
+    "id": "test_argent_regression_aucun",
+    "title": "Argent — régression vers aucun jackpot",
+    "description": "Main 1 commence en Argent puis régresse sous le seuil jackpot. Sert à vérifier que la mise Argent reste enregistrée et que seul le curseur Argent se réinitialise si le jackpot est gagné.",
     "playerCount": 10,
     "target": {
       "kind": "hand",
@@ -11,12 +11,12 @@
     },
     "phases": {
       "pre": {
-        "rawOdds": 7192,
-        "tier": "diamant"
+        "rawOdds": 250,
+        "tier": "argent"
       },
       "flop": {
-        "rawOdds": 406,
-        "tier": "bronze"
+        "rawOdds": 0,
+        "tier": null
       }
     },
     "hands": [
@@ -70,9 +70,9 @@
     ]
   },
   {
-    "id": "or_main_1",
-    "title": "Or gagnant — Main 1",
-    "description": "Préflop or réel. Au flop, la main 1 garde une vraie cote de victoire, sans jackpot, puis gagne à la river.",
+    "id": "test_or_regression_argent",
+    "title": "Or — régression vers Argent",
+    "description": "Main 1 commence en Or puis régresse en Argent. Sert à vérifier que le snapshot Or reste Or même si la cote baisse ensuite.",
     "playerCount": 10,
     "target": {
       "kind": "hand",
@@ -81,11 +81,81 @@
     },
     "phases": {
       "pre": {
-        "rawOdds": 3661.38,
+        "rawOdds": 1000,
         "tier": "or"
       },
       "flop": {
-        "rawOdds": 14.5,
+        "rawOdds": 250,
+        "tier": "argent"
+      }
+    },
+    "hands": [
+      [
+        "7C",
+        "2D"
+      ],
+      [
+        "2S",
+        "KC"
+      ],
+      [
+        "4H",
+        "5D"
+      ],
+      [
+        "3C",
+        "2H"
+      ],
+      [
+        "8D",
+        "AD"
+      ],
+      [
+        "2C",
+        "8S"
+      ],
+      [
+        "9C",
+        "9H"
+      ],
+      [
+        "9D",
+        "8H"
+      ],
+      [
+        "6S",
+        "6H"
+      ],
+      [
+        "7H",
+        "AS"
+      ]
+    ],
+    "board": [
+      "3S",
+      "4C",
+      "5C",
+      "6C",
+      "8C"
+    ]
+  },
+  {
+    "id": "test_or_regression_aucun",
+    "title": "Or — régression vers aucun jackpot",
+    "description": "Main 1 commence en Or puis passe sous tous les seuils. Sert à vérifier le maintien du snapshot Or et le reset du curseur Or au paiement.",
+    "playerCount": 10,
+    "target": {
+      "kind": "hand",
+      "index": 0,
+      "label": "Main 1"
+    },
+    "phases": {
+      "pre": {
+        "rawOdds": 1000,
+        "tier": "or"
+      },
+      "flop": {
+        "rawOdds": 0,
         "tier": null
       }
     },
@@ -99,50 +169,50 @@
         "KC"
       ],
       [
-        "7H",
+        "4H",
         "5D"
       ],
       [
-        "KD",
+        "3C",
         "2H"
       ],
       [
-        "JS",
-        "JH"
+        "8D",
+        "AD"
       ],
       [
         "2C",
-        "10H"
+        "8S"
       ],
       [
         "9C",
         "9H"
       ],
       [
-        "8S",
+        "9D",
         "8H"
       ],
       [
-        "AC",
+        "6S",
         "6H"
       ],
       [
-        "6S",
-        "3S"
+        "7H",
+        "AS"
       ]
     ],
     "board": [
+      "3S",
       "4C",
+      "5C",
       "6C",
-      "8C",
-      "4D",
-      "5C"
+      "8C"
     ]
   },
   {
-    "id": "argent_main_1",
-    "title": "Argent gagnant — Main 1",
-    "description": "Préflop argent réel, puis régression au flop vers bronze. La main 1 gagne à la river.",
+    "id": "test_diamant_regression_or",
+    "title": "Diamant — régression vers Or",
+    "description": "Main 1 commence en Diamant puis régresse en Or. Sert à vérifier que le jackpot Diamant reste payable malgré la régression.",
     "playerCount": 10,
     "target": {
       "kind": "hand",
@@ -151,12 +221,12 @@
     },
     "phases": {
       "pre": {
-        "rawOdds": 2455.8,
-        "tier": "argent"
+        "rawOdds": 9000,
+        "tier": "diamant"
       },
       "flop": {
-        "rawOdds": 406,
-        "tier": "bronze"
+        "rawOdds": 1000,
+        "tier": "or"
       }
     },
     "hands": [
@@ -169,120 +239,50 @@
         "KC"
       ],
       [
-        "7H",
-        "KH"
+        "4H",
+        "5D"
       ],
       [
-        "10C",
+        "3C",
         "2H"
       ],
       [
-        "QC",
-        "JH"
+        "8D",
+        "AD"
       ],
       [
         "2C",
-        "JC"
+        "8S"
       ],
       [
         "9C",
         "9H"
       ],
       [
-        "8S",
-        "10D"
-      ],
-      [
-        "QH",
-        "6D"
+        "9D",
+        "8H"
       ],
       [
         "6S",
-        "3S"
+        "6H"
+      ],
+      [
+        "7H",
+        "AS"
       ]
     ],
     "board": [
-      "4S",
-      "3D",
-      "4D",
-      "5D",
-      "AD"
-    ]
-  },
-  {
-    "id": "bronze_main_9",
-    "title": "Bronze gagnant — Main 9",
-    "description": "Bronze réel au préflop et au flop. La main 9 gagne à la river.",
-    "playerCount": 10,
-    "target": {
-      "kind": "hand",
-      "index": 8,
-      "label": "Main 9"
-    },
-    "phases": {
-      "pre": {
-        "rawOdds": 550.21,
-        "tier": "bronze"
-      },
-      "flop": {
-        "rawOdds": 406,
-        "tier": "bronze"
-      }
-    },
-    "hands": [
-      [
-        "7C",
-        "AH"
-      ],
-      [
-        "9C",
-        "10D"
-      ],
-      [
-        "9S",
-        "4S"
-      ],
-      [
-        "5S",
-        "5D"
-      ],
-      [
-        "4H",
-        "3S"
-      ],
-      [
-        "QD",
-        "KH"
-      ],
-      [
-        "8C",
-        "9D"
-      ],
-      [
-        "KS",
-        "7S"
-      ],
-      [
-        "JS",
-        "5C"
-      ],
-      [
-        "6D",
-        "JD"
-      ]
-    ],
-    "board": [
-      "6C",
-      "3H",
-      "3C",
+      "3S",
       "4C",
-      "2C"
+      "5C",
+      "6C",
+      "8C"
     ]
   },
   {
-    "id": "regression_diamant_bronze_main_1",
-    "title": "Régression — Diamant vers Bronze (Main 1)",
-    "description": "Même ligne que le cas diamant, utile pour tester visuellement la régression de jackpot sur une même main.",
+    "id": "test_diamant_regression_argent",
+    "title": "Diamant — régression vers Argent",
+    "description": "Main 1 commence en Diamant puis régresse en Argent. Sert à vérifier le cas de régression forte sans perdre le snapshot Diamant.",
     "playerCount": 10,
     "target": {
       "kind": "hand",
@@ -291,12 +291,82 @@
     },
     "phases": {
       "pre": {
-        "rawOdds": 7192,
+        "rawOdds": 9000,
         "tier": "diamant"
       },
       "flop": {
-        "rawOdds": 406,
-        "tier": "bronze"
+        "rawOdds": 250,
+        "tier": "argent"
+      }
+    },
+    "hands": [
+      [
+        "7C",
+        "2D"
+      ],
+      [
+        "2S",
+        "KC"
+      ],
+      [
+        "4H",
+        "5D"
+      ],
+      [
+        "3C",
+        "2H"
+      ],
+      [
+        "8D",
+        "AD"
+      ],
+      [
+        "2C",
+        "8S"
+      ],
+      [
+        "9C",
+        "9H"
+      ],
+      [
+        "9D",
+        "8H"
+      ],
+      [
+        "6S",
+        "6H"
+      ],
+      [
+        "7H",
+        "AS"
+      ]
+    ],
+    "board": [
+      "3S",
+      "4C",
+      "5C",
+      "6C",
+      "8C"
+    ]
+  },
+  {
+    "id": "test_diamant_regression_aucun",
+    "title": "Diamant — régression vers aucun jackpot",
+    "description": "Main 1 commence en Diamant puis passe sous tous les seuils. Sert à vérifier le reset Diamant après HIT et le non-impact sur Argent/Or.",
+    "playerCount": 10,
+    "target": {
+      "kind": "hand",
+      "index": 0,
+      "label": "Main 1"
+    },
+    "phases": {
+      "pre": {
+        "rawOdds": 9000,
+        "tier": "diamant"
+      },
+      "flop": {
+        "rawOdds": 0,
+        "tier": null
       }
     },
     "hands": [

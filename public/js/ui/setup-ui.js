@@ -1036,3 +1036,36 @@ window.addEventListener("load", syncHeaderTestButton);
 window.addEventListener("resize", syncHeaderTestButton);
 setTimeout(syncHeaderTestButton, 300);
 setTimeout(syncHeaderTestButton, 1200);
+
+
+/* === v15.20 FIX : validation des mises toujours accessible pendant la manche === */
+function ensureAdvanceDockUsable(){
+  try{
+    if (!document.body || !btnAdvance) return;
+    const splashVisible = !!(splashScreen && !splashScreen.classList.contains("hidden"));
+    const setupVisible = !!(roundSetupOverlay && !roundSetupOverlay.classList.contains("hidden"));
+    const gameplayVisible = !splashVisible && !setupVisible && !roundFinished;
+    const dock = document.getElementById("advanceDock");
+
+    if (dock){
+      dock.style.display = gameplayVisible ? "flex" : "none";
+      dock.style.visibility = gameplayVisible ? "visible" : "hidden";
+      dock.style.opacity = gameplayVisible ? "1" : "0";
+      dock.style.pointerEvents = gameplayVisible ? "auto" : "none";
+    }
+
+    btnAdvance.style.display = gameplayVisible ? "inline-flex" : "none";
+    btnAdvance.style.visibility = gameplayVisible ? "visible" : "hidden";
+    btnAdvance.style.opacity = gameplayVisible ? "1" : "0";
+    btnAdvance.style.pointerEvents = (!btnAdvance.disabled && gameplayVisible) ? "auto" : "none";
+  }catch(e){}
+}
+
+window.addEventListener("DOMContentLoaded", ensureAdvanceDockUsable);
+window.addEventListener("load", ensureAdvanceDockUsable);
+window.addEventListener("resize", ensureAdvanceDockUsable);
+setTimeout(ensureAdvanceDockUsable, 0);
+setTimeout(ensureAdvanceDockUsable, 200);
+setTimeout(ensureAdvanceDockUsable, 800);
+setInterval(ensureAdvanceDockUsable, 150);
+/* === FIN FIX VALIDATION === */

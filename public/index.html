@@ -64,14 +64,17 @@
  <div class="stat jackpot argent-jackpot" id="argentJackpotBox">
  <div class="label jackpot-label" id="lblArgentJackpot">Jackpot Argent</div>
  <div class="value jackpot-value"><span id="argentJackpotValue">250</span></div>
+ <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="argentHeatFill"></div></div>
  </div>
  <div class="stat jackpot or-jackpot" id="orJackpotBox">
  <div class="label jackpot-label" id="lblOrJackpot">Jackpot Or</div>
  <div class="value jackpot-value"><span id="orJackpotValue">800</span></div>
+ <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="orHeatFill"></div></div>
  </div>
  <div class="stat jackpot diamant-jackpot" id="diamantJackpotBox">
  <div class="label jackpot-label" id="lblDiamantJackpot">Jackpot Diamant</div>
  <div class="value jackpot-value"><span id="diamantJackpotValue">8000</span></div>
+ <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="diamantHeatFill"></div></div>
  </div>
  </div>
 
@@ -206,14 +209,12 @@
  <div class="round-setup-overlay hidden" id="roundSetupOverlay">
  <div class="round-setup-box" role="dialog" aria-modal="true" aria-labelledby="roundSetupTitle">
  <div class="round-setup-title" id="roundSetupTitle">Nouvelle manche</div>
- <div class="round-setup-subtitle" id="roundSetupSubtitle">Choisir le nombre de mains</div>
+ 
 
- <div class="round-setup-actions">
+ <div class="round-setup-player-label" id="handsCountLabel"></div>
+ <div class="round-setup-player-row">
  <button type="button" id="btnRandomHands" class="btn primary"></button>
- </div>
-
- <div class="round-setup-manual">
- <label for="handsCountSelect" id="handsCountLabel"></label>
+ <span class="round-setup-or" id="handsChoiceOr">ou</span>
  <select id="handsCountSelect">
  <option value="4">4</option>
  <option value="5">5</option>
@@ -223,7 +224,7 @@
  <option value="9">9</option>
  <option value="10" selected>10</option>
  </select>
- <button type="button" id="btnManualHands" class="btn"></button>
+ <button type="button" id="btnManualHands" class="btn manual-arrow-btn" aria-label="Valider">➜</button>
  </div>
  </div>
  </div>
