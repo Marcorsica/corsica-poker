@@ -3,15 +3,15 @@
 // ==================================================
 
 const MAIN_AUDIO_TRACKS = {
-  0: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_1_jazz.mp3"],
-  1: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_2_jazz.mp3"],
-  2: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_3_beats.mp3"],
-  3: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_4_rnb.mp3"],
-  4: ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_5_relax.mp3"]
+  0: ["/audio/audio_1_jazz.mp3", "/external-audio/audio_1_jazz.mp3"],
+  1: ["/audio/audio_2_jazz.mp3", "/external-audio/audio_2_jazz.mp3"],
+  2: ["/audio/audio_3_beats.mp3", "/external-audio/audio_3_beats.mp3"],
+  3: ["/audio/audio_4_rnb.mp3", "/external-audio/audio_4_rnb.mp3"],
+  4: ["/audio/audio_5_relax.mp3", "/external-audio/audio_5_relax.mp3"]
 };
 
-const CASINO_AUDIO_TRACKS = ["/assets/audio/snd_ambience_casino.mp3", "/external-audio/audio_6_casino.mp3"];
-const AUDIO_FALLBACK_TRACKS = ["/assets/audio/audio_1_jazz.mp3", "/external-audio/audio_1_jazz.mp3"];
+const CASINO_AUDIO_TRACKS = ["/audio/audio_6_casino.mp3", "/external-audio/audio_6_casino.mp3"];
+const AUDIO_FALLBACK_TRACKS = ["/audio/audio_1_jazz.mp3", "/external-audio/audio_1_jazz.mp3"];
 
 function assetExists(url) {
  return fetch(url, { method: "HEAD", cache: "no-store" })
@@ -204,13 +204,53 @@ function startAmbience() {
  fadeAmbienceToTargets(2200);
 }
 
+const EFFECT_AUDIO_FALLBACKS = {
+ sndDeal: ["/external-audio/snd_deal.mp3", "/audio/snd_deal.mp3"],
+ sndCard: ["/external-audio/snd_card.mp3", "/audio/snd_card.mp3"]
+};
+
+function ensureEffectAudioSource(a) {
+ if (!a) return;
+ const sources = EFFECT_AUDIO_FALLBACKS[a.id];
+ if (!sources || !sources.length) return;
+ const currentSrc = a.getAttribute("src") || "";
+ if (!currentSrc || currentSrc === "/audio/snd_deal.mp3" || currentSrc === "/audio/snd_card.mp3") {
+  a.setAttribute("src", sources[0]);
+  try { a.load(); } catch (_) {}
+ }
+ if (a.dataset.effectFallbackBound === "1") return;
+ a.dataset.effectFallbackBound = "1";
+ a.addEventListener("error", () => {
+  const src = a.getAttribute("src") || "";
+  const idx = sources.indexOf(src);
+  const next = sources[idx + 1];
+  if (!next) return;
+  a.setAttribute("src", next);
+  try { a.load(); } catch (_) {}
+ }, { passive: true });
+}
+
 function playSound(a) {
  if (!a || !soundEnabled) return;
  try {
+  ensureEffectAudioSource(a);
   a.currentTime = 0;
   if (a === sndDeal) a.volume = 0.30;
   else if (a === sndCard) a.volume = 0.22;
   else a.volume = 0.25;
-  a.play().catch(() => {});
+  a.play().catch(() => {
+   const sources = EFFECT_AUDIO_FALLBACKS[a.id];
+   if (!sources || sources.length < 2) return;
+   const src = a.getAttribute("src") || "";
+   const idx = sources.indexOf(src);
+   const next = sources[idx + 1];
+   if (!next) return;
+   a.setAttribute("src", next);
+   try {
+    a.load();
+    a.currentTime = 0;
+    a.play().catch(() => {});
+   } catch (_) {}
+  });
  } catch (_) {}
 }

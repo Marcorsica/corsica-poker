@@ -425,6 +425,8 @@ html,body{
   text-shadow:0 1px 0 rgba(0,0,0,.18);
   margin-bottom:5px;
   min-height:16px;
+  position:relative;
+  z-index:40;
 }
 
 .hand-odds.low{
@@ -645,12 +647,13 @@ html,body{
   transform:rotate(-12deg) scale(0.96);
 }
 
-.sq.hasBet:hover .eraser{
+/* Gomme visible au hover UNIQUEMENT si la phase est encore active */
+.sq.hasBet:not(.disabled):hover .eraser{
   display:block;
 }
 
 @media (hover:none){
-  .sq.hasBet .eraser{
+  .sq.hasBet:not(.disabled) .eraser{
     display:block;
   }
 }
@@ -1522,18 +1525,26 @@ html,body{
   align-items:flex-start;
 }
 
-.tie-box .tie-value.jackpot-call{
-  min-height:auto;
-  padding:4px 8px;
-  font-size:10px;
-  line-height:1.05;
-  white-space:normal;
-  text-align:center;
-  max-width:126px;
+.tie-box .tie-value.jackpot-call {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 5px 8px !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  letter-spacing: .04em !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  border-radius: 8px !important;
+  gap: 2px !important;
 }
 
-.tie-box:hover .tie-value.jackpot-call{
-  max-width:150px;
+.tie-box:hover .tie-value.jackpot-call {
+  max-width: 100% !important;
 }
 
 .tie-win{
@@ -2452,150 +2463,546 @@ html,body{
 
 
 
-/* === SPLASH SCREEN === */
-.splash{
-  position:fixed;
-  inset:0;
-  z-index:7000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+
+/* ============================================================
+   CORSICA POKER — SPLASH SCREEN REDESIGN
+   Remplace la section "=== SPLASH SCREEN ===" dans style.css
+   Compatible : theme-current (Classique) | theme-fast (Métal) | theme-pro (Premium)
+   ============================================================ */
+
+/* ---------- GOOGLE FONTS (à placer dans <head> du HTML) ----------
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+   ----------------------------------------------------------------- */
+
+
+/* ===== BASE SPLASH ===== */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 7000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* Fond par défaut = Classique */
   background:
-    radial-gradient(circle at 50% 40%, rgba(20,95,62,.88), rgba(6,20,14,.97) 58%),
-    linear-gradient(180deg, #08110d, #05080c);
-  overflow:hidden;
+    radial-gradient(ellipse 90% 70% at 50% 40%, rgba(15,75,45,.95), rgba(4,14,9,.98) 65%),
+    linear-gradient(180deg, #060f09, #040810);
 }
 
-.splash::before{
-  content:"";
-  position:absolute;
-  inset:-10%;
-  pointer-events:none;
+/* Lueur de fond animée */
+.splash::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  pointer-events: none;
   background:
     radial-gradient(circle at 20% 28%, rgba(255,255,255,.06), transparent 18%),
-    radial-gradient(circle at 78% 30%, rgba(246,211,107,.08), transparent 18%),
+    radial-gradient(circle at 78% 30%, rgba(200,168,75,.08), transparent 18%),
     radial-gradient(circle at 50% 72%, rgba(255,255,255,.045), transparent 24%);
-  animation:splashGlow 8s ease-in-out infinite;
+  animation: splashGlow 8s ease-in-out infinite;
 }
 
-.splash::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    linear-gradient(120deg, transparent 0%, rgba(255,255,255,.03) 45%, transparent 70%);
-  animation:splashSweep 6.4s linear infinite;
+/* Balayage lumineux */
+.splash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.03) 45%, transparent 70%);
+  animation: splashSweep 6.4s linear infinite;
 }
 
-.splash-content{
-  position:relative;
-  z-index:2;
-  width:min(480px, calc(100vw - 36px));
-  text-align:center;
-  padding:34px 26px 30px;
-  border-radius:28px;
-  background:rgba(0,0,0,.26);
-  border:1px solid rgba(246,211,107,.18);
+/* Carte centrale */
+.splash-content {
+  position: relative;
+  z-index: 2;
+  width: min(460px, calc(100vw - 36px));
+  text-align: center;
+  padding: 36px 30px 30px;
+  border-radius: 22px;
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(200,168,75,.2);
   box-shadow:
-    0 22px 70px rgba(0,0,0,.44),
-    0 0 28px rgba(246,211,107,.10),
+    0 24px 80px rgba(0,0,0,.5),
+    0 0 36px rgba(200,168,75,.08),
     inset 0 0 0 1px rgba(255,255,255,.04);
-  backdrop-filter:blur(8px);
-  animation:splashEnter .75s cubic-bezier(.2,.78,.2,1);
+  backdrop-filter: blur(10px);
+  animation: splashEnter .75s cubic-bezier(.2,.78,.2,1) both;
 }
 
-.splash-logo-wrap{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin-bottom:14px;
+/* Icône ♠ */
+.splash-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
 }
 
-.logo-main{
-  width:108px;
-  height:108px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:60px;
-  color:var(--accent);
+.logo-main {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  color: #c8a84b;
   background:
-    radial-gradient(circle at 35% 30%, rgba(255,255,255,.28), rgba(255,255,255,.05) 34%, transparent 36%),
-    linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.02));
-  border:1px solid rgba(246,211,107,.26);
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,.25), rgba(255,255,255,.04) 36%, transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.02));
+  border: 1px solid rgba(200,168,75,.28);
   box-shadow:
-    0 0 26px rgba(246,211,107,.24),
-    inset 0 0 14px rgba(255,255,255,.08);
-  text-shadow:0 0 22px rgba(246,211,107,.54);
-  animation:logoFloat 3.4s ease-in-out infinite;
+    0 0 28px rgba(200,168,75,.22),
+    inset 0 0 16px rgba(255,255,255,.06);
+  text-shadow: 0 0 22px rgba(200,168,75,.5);
+  animation: logoFloat 3.4s ease-in-out infinite;
 }
 
-.splash-brand{
-  font-size:34px;
-  font-weight:900;
-  letter-spacing:.04em;
-  color:#f7f2df;
-  text-shadow:0 0 18px rgba(246,211,107,.14);
+/* Nom du jeu */
+.splash-brand {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  color: #f2e8c8;
+  text-shadow: 0 0 20px rgba(200,168,75,.14);
 }
 
-.splash-tagline{
-  margin-top:8px;
-  color:#d4af37;
-  font-size:14px;
-  letter-spacing:.16em;
-  text-transform:uppercase;
+/* Slogan */
+.splash-tagline {
+  margin-top: 6px;
+  color: #c8a84b;
+  font-size: 11px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  opacity: .85;
 }
 
-.splash-start{
-  margin-top:24px;
-  min-width:172px;
-  font-size:16px;
-  padding:12px 18px;
+/* Séparateur */
+.splash-divider {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,168,75,.4), transparent);
+  margin: 18px auto;
+}
+
+/* Ligne jackpots */
+/* Jackpots du splash : mêmes classes que le header, même visuel */
+.splash-jackpots {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  flex-wrap: nowrap !important;
+  gap: clamp(8px, 1.4vw, 16px) !important;
+  margin-bottom: 22px;
+  width: 100%;
+  padding: 0 4px;
+}
+/* Empêcher les règles .stats d'écraser la grille */
+.splash-jackpots.stats {
+  display: grid !important;
+  flex-wrap: nowrap !important;
+}
+
+.splash-jackpots .stat.jackpot {
+  width: 100%;
+  min-width: 0;
+  flex: none;
+  text-align: center;
+  cursor: default;
+  box-sizing: border-box;
+}
+
+.splash-jackpots .jackpot-label {
+  font-size: 10px;
+}
+
+.splash-jackpots .jackpot-value {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.splash-jackpots .jackpot-heat-bar {
+  margin-top: 6px;
+}
+
+/* Bouton jouer */
+.splash-start {
+  width: 100%;
+  margin-top: 0;
+  padding: 14px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  border-radius: 12px;
   box-shadow:
-    0 0 18px rgba(246,211,107,.20),
-    0 10px 24px rgba(0,0,0,.26);
+    0 0 20px rgba(200,168,75,.22),
+    0 8px 24px rgba(0,0,0,.3);
+  transition: transform .15s, box-shadow .15s;
 }
 
-.splash-start:hover{
-  transform:translateY(-2px) scale(1.02);
+.splash-start:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow:
+    0 0 30px rgba(200,168,75,.32),
+    0 12px 28px rgba(0,0,0,.35);
 }
 
-.splash.hidden{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  transition:opacity .34s ease, visibility 0s linear .34s;
+/* Mention démo */
+.splash-demo-label {
+  margin-top: 14px;
+  font-size: 11px;
+  color: rgba(255,255,255,.28);
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
-@keyframes splashEnter{
-  from{
-    opacity:0;
-    transform:translateY(16px) scale(.97);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
+/* Cache */
+.splash.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .34s ease, visibility 0s linear .34s;
 }
 
-@keyframes logoFloat{
-  0%{ transform:translateY(0) scale(1); }
-  50%{ transform:translateY(-4px) scale(1.02); }
-  100%{ transform:translateY(0) scale(1); }
+/* Floaters (symboles cartes en fond) */
+.splash-floaters {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-@keyframes splashGlow{
-  0%{ transform:scale(1); opacity:.55; }
-  50%{ transform:scale(1.04); opacity:.92; }
-  100%{ transform:scale(1); opacity:.55; }
+.splash-floaters span {
+  position: absolute;
+  font-size: clamp(22px, 3.5vw, 48px);
+  opacity: .04;
+  color: #c8a84b;
+  animation: splashFloat linear infinite;
+  pointer-events: none;
+  user-select: none;
 }
 
-@keyframes splashSweep{
-  0%{ transform:translateX(-24px) skewX(-14deg); opacity:.18; }
-  50%{ transform:translateX(24px) skewX(-14deg); opacity:.48; }
-  100%{ transform:translateX(-24px) skewX(-14deg); opacity:.18; }
+
+/* ===== THÈME MÉTAL (theme-fast) ===== */
+
+body.theme-fast .splash {
+  background: linear-gradient(160deg, #0f1117 0%, #151a22 50%, #0c0f14 100%);
+}
+
+body.theme-fast .splash::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 50%, rgba(80,100,130,.12), transparent 60%),
+    radial-gradient(ellipse 40% 60% at 75% 30%, rgba(60,80,110,.1), transparent 55%);
+  animation: none;
+}
+
+/* Grille de fond */
+body.theme-fast .splash::after {
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: none;
+}
+
+body.theme-fast .splash-content {
+  border-radius: 4px;
+  background: rgba(10,13,18,.72);
+  border: 1px solid rgba(120,140,170,.16);
+  border-left: 3px solid #4a7cba;
+  box-shadow:
+    0 32px 90px rgba(0,0,0,.6),
+    -4px 0 24px rgba(74,124,186,.1);
+}
+
+body.theme-fast .logo-main {
+  border-radius: 6px;
+  width: 72px;
+  height: 72px;
+  font-size: 38px;
+  color: #6fa3d8;
+  background: rgba(74,124,186,.1);
+  border: 1px solid rgba(74,124,186,.28);
+  box-shadow: none;
+  text-shadow: none;
+}
+
+body.theme-fast .splash-brand {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #c8d4e8;
+  text-shadow: none;
+}
+
+body.theme-fast .splash-tagline {
+  color: #4a7cba;
+  letter-spacing: .28em;
+}
+
+body.theme-fast .splash-divider {
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74,124,186,.3), transparent);
+}
+
+body.theme-fast .splash-jp {
+  border-radius: 3px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+body.theme-fast .splash-jp.argent {
+  background: rgba(180,180,190,.07);
+  border-color: rgba(180,180,190,.18);
+  color: #aab0bc;
+}
+
+body.theme-fast .splash-jp.or {
+  background: rgba(180,150,60,.07);
+  border-color: rgba(180,150,60,.2);
+  color: #b8973c;
+}
+
+body.theme-fast .splash-jp.diamant {
+  background: rgba(74,124,186,.1);
+  border-color: rgba(74,124,186,.26);
+  color: #6fa3d8;
+}
+
+body.theme-fast .splash-start {
+  border-radius: 4px;
+  background: rgba(74,124,186,.15);
+  border: 1px solid rgba(74,124,186,.38);
+  color: #c8d4e8;
+  box-shadow: none;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+body.theme-fast .splash-start:hover {
+  background: rgba(74,124,186,.26);
+  border-color: rgba(74,124,186,.58);
+  color: #fff;
+  transform: none;
+  box-shadow: none;
+}
+
+body.theme-fast .splash-floaters span { display: none; }
+
+
+/* ===== THÈME PREMIUM (theme-pro) ===== */
+
+body.theme-pro .splash {
+  background: radial-gradient(ellipse 100% 80% at 50% 0%, #0e0b18, #06040c 60%);
+}
+
+body.theme-pro .splash::before {
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 60%, rgba(120,80,200,.07), transparent),
+    radial-gradient(ellipse 40% 50% at 80% 30%, rgba(200,160,60,.06), transparent);
+  animation: none;
+}
+
+body.theme-pro .splash::after {
+  background: none;
+  animation: none;
+}
+
+body.theme-pro .splash-content {
+  border-radius: 2px;
+  background: rgba(6,4,12,.62);
+  border-top: 1px solid rgba(212,175,55,.32);
+  border-bottom: 1px solid rgba(212,175,55,.1);
+  border-left: 1px solid rgba(212,175,55,.07);
+  border-right: 1px solid rgba(212,175,55,.07);
+  box-shadow:
+    0 40px 100px rgba(0,0,0,.72),
+    0 0 60px rgba(212,175,55,.05);
+  backdrop-filter: blur(14px);
+  padding-top: 32px;
+}
+
+/* Ornement haut */
+.splash-ornament {
+  display: none;
+}
+
+body.theme-pro .splash-ornament {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+body.theme-pro .splash-ornament-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,.28));
+}
+
+body.theme-pro .splash-ornament-line.r {
+  background: linear-gradient(90deg, rgba(212,175,55,.28), transparent);
+}
+
+body.theme-pro .splash-ornament-sym {
+  font-size: 11px;
+  color: rgba(212,175,55,.5);
+  letter-spacing: .1em;
+}
+
+body.theme-pro .logo-main {
+  width: 80px;
+  height: 80px;
+  font-size: 40px;
+  color: rgba(212,175,55,.9);
+  background: radial-gradient(circle at 35% 30%, rgba(212,175,55,.14), transparent 50%);
+  border: 1px solid rgba(212,175,55,.22);
+  box-shadow:
+    0 0 40px rgba(212,175,55,.1),
+    inset 0 1px 0 rgba(212,175,55,.18);
+  text-shadow: none;
+}
+
+body.theme-pro .splash-brand {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  background: linear-gradient(160deg, #f5e8c0, #d4af37 42%, #f5e8c0 72%, #b8922a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+}
+
+body.theme-pro .splash-tagline {
+  color: rgba(212,175,55,.5);
+  letter-spacing: .32em;
+}
+
+body.theme-pro .splash-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: none;
+}
+
+body.theme-pro .splash-divider::before,
+body.theme-pro .splash-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+}
+
+body.theme-pro .splash-divider::before {
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,.2));
+}
+
+body.theme-pro .splash-divider::after {
+  background: linear-gradient(90deg, rgba(212,175,55,.2), transparent);
+}
+
+body.theme-pro .splash-jp {
+  border-radius: 2px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+body.theme-pro .splash-jp.argent {
+  background: rgba(192,192,192,.05);
+  border-color: rgba(192,192,192,.16);
+  color: rgba(192,192,192,.65);
+}
+
+body.theme-pro .splash-jp.or {
+  background: rgba(212,175,55,.06);
+  border-color: rgba(212,175,55,.2);
+  color: rgba(212,175,55,.78);
+}
+
+body.theme-pro .splash-jp.diamant {
+  background: rgba(125,211,252,.05);
+  border-color: rgba(125,211,252,.16);
+  color: rgba(125,211,252,.65);
+}
+
+body.theme-pro .splash-start {
+  border-radius: 2px;
+  background: linear-gradient(135deg, rgba(212,175,55,.12), rgba(212,175,55,.06));
+  border: 1px solid rgba(212,175,55,.28);
+  color: rgba(212,175,55,.88);
+  font-family: 'Playfair Display', 'Georgia', serif;
+  font-size: 15px;
+  letter-spacing: .14em;
+  font-weight: 700;
+  box-shadow: none;
+  transition: all .2s;
+  overflow: hidden;
+  position: relative;
+}
+
+body.theme-pro .splash-start::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,.08), transparent);
+  transform: translateX(-100%);
+  transition: transform .5s;
+}
+
+body.theme-pro .splash-start:hover::after {
+  transform: translateX(100%);
+}
+
+body.theme-pro .splash-start:hover {
+  background: linear-gradient(135deg, rgba(212,175,55,.18), rgba(212,175,55,.1));
+  border-color: rgba(212,175,55,.48);
+  color: #d4af37;
+  transform: none;
+  box-shadow: none;
+}
+
+body.theme-pro .splash-floaters span { display: none; }
+
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes splashEnter {
+  from { opacity: 0; transform: translateY(14px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);   }
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-5px) scale(1.02); }
+}
+
+@keyframes splashGlow {
+  0%, 100% { transform: scale(1);    opacity: .55; }
+  50%       { transform: scale(1.04); opacity: .92; }
+}
+
+@keyframes splashSweep {
+  0%   { transform: translateX(-24px) skewX(-14deg); opacity: .18; }
+  50%  { transform: translateX(24px)  skewX(-14deg); opacity: .48; }
+  100% { transform: translateX(-24px) skewX(-14deg); opacity: .18; }
+}
+
+@keyframes splashFloat {
+  0%   { transform: translateY(110vh) rotate(var(--r)); opacity: 0; }
+  10%  { opacity: .04; }
+  90%  { opacity: .04; }
+  100% { transform: translateY(-10vh) rotate(var(--r)); opacity: 0; }
 }
 
 
@@ -3782,8 +4189,8 @@ body.setup-screen #advanceDock #btnAdvance{
 
 /* === VERSION PREMIUM BOUTON VALIDATION === */
 #advanceDock #btnAdvance{
-  min-width: 140px !important;
-  padding: 10px 16px !important;
+  min-width: 124px !important;
+  padding: 8px 13px !important;
   font-size: 0.95rem !important;
   font-weight: 800 !important;
   letter-spacing: 0.03em !important;
@@ -3793,7 +4200,7 @@ body.setup-screen #advanceDock #btnAdvance{
   color: #ffffff !important;
 
   border: 1.5px solid rgba(255,255,255,0.4) !important;
-  border-radius: 14px !important;
+  border-radius: 12px !important;
 
   box-shadow:
     0 4px 12px rgba(0,0,0,0.4),
@@ -3803,7 +4210,7 @@ body.setup-screen #advanceDock #btnAdvance{
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 8px !important;
+  gap: 6px !important;
 }
 
 #advanceDock #btnAdvance span:last-child{
@@ -4507,7 +4914,7 @@ body.theme-pro .pill{
   font-family: var(--theme-ui-font) !important;
   font-weight: 700 !important;
   letter-spacing: .03em !important;
-  border-radius: 14px !important;
+  border-radius: 12px !important;
 }
 
 body.theme-pro .btn:not(.primary),
@@ -4753,7 +5160,7 @@ body.theme-pro .jackpot-value{
 .game-style-options{
   display: flex !important;
   flex-wrap: nowrap !important;
-  gap: 8px !important;
+  gap: 6px !important;
   align-items: center !important;
   justify-content: space-between !important;
 }
@@ -6102,31 +6509,8 @@ html, body, .game-shell, .table, .hands-layer, .hand, .hand *, .tie-box, .tie-bo
   padding:4px 8px 6px !important;
 }
 
-/* Panneaux de mise: conserves visibles et centres sous les cartes */
-.hand-details{
-  left:50% !important;
-  right:auto !important;
-  transform:translateX(-50%) !important;
-}
-
-.hand.details-open .hand-details,
-.hand:focus-within .hand-details{
-  transform:translateX(-50%) translateY(0) !important;
-}
-
-.hand.hand-edge-left .hand-details,
-.hand.hand-edge-right .hand-details{
-  left:50% !important;
-  right:auto !important;
-  transform:translateX(-50%) !important;
-}
-
-.hand.hand-edge-left.details-open .hand-details,
-.hand.hand-edge-left:focus-within .hand-details,
-.hand.hand-edge-right.details-open .hand-details,
-.hand.hand-edge-right:focus-within .hand-details{
-  transform:translateX(-50%) translateY(0) !important;
-}
+/* Panneaux de mise: anciens centrage neutralisés — overlay v21.3 prend le relais */
+/* .hand-details left/transform réinitialisés en fin de fichier */
 
 @media (max-width: 1180px), (max-height: 760px){
   .hand{ width:286px !important; min-height:136px !important; }
@@ -6190,6 +6574,19 @@ body[data-hands-count="9"] .hand-inner,
 .hands-layer[data-hands-count="10"] .hand-inner,
 body[data-hands-count="10"] .hand-inner{
   padding:8px 12px 10px !important;
+}
+
+.hands-layer[data-hands-count="4"] .hand-cards .card,
+body[data-hands-count="4"] .hand-cards .card,
+.hands-layer[data-hands-count="5"] .hand-cards .card,
+body[data-hands-count="5"] .hand-cards .card,
+.hands-layer[data-hands-count="6"] .hand-cards .card,
+body[data-hands-count="6"] .hand-cards .card,
+.hands-layer[data-hands-count="7"] .hand-cards .card,
+body[data-hands-count="7"] .hand-cards .card{
+  width:88px !important;
+  height:123px !important;
+  border-radius:12px !important;
 }
 
 .hands-layer[data-hands-count="8"] .hand-cards .card,
@@ -6290,7 +6687,7 @@ body[data-hands-count="10"] .hand-cards{
 
 .jackpot-heat-bar{
  width:100%;
- height:8px;
+ height:16px;
  margin-top:8px;
  border-radius:999px;
  overflow:hidden;
@@ -6633,4 +7030,2934 @@ body.gameplay-screen:not(.round-ended) #advanceDock #btnAdvance:disabled{
 }
 .tie-bet-dot{
   display:none !important;
+}
+
+/* =========================================================
+   FIX FINAL CONTRASTE — Board + Même table + Changer de table
+   Placé en toute fin de CSS pour écraser les thèmes et variables.
+   ========================================================= */
+
+/* Variables utilisées par les boutons post-manche */
+:root,
+body,
+body.theme-fast,
+body.theme-pro,
+body.theme-current{
+  --post-round-btn-text:#f5d37a !important;
+  --post-round-btn-border:rgba(245,211,122,.72) !important;
+  --post-round-btn-text-shadow:
+    0 1px 2px rgba(0,0,0,.95),
+    0 0 7px rgba(0,0,0,.90),
+    0 0 14px rgba(0,0,0,.75) !important;
+}
+
+/* Boutons fin de manche : Même table / Changer de table */
+body #btnSameTable,
+body #btnChangeTable,
+body.theme-fast #btnSameTable,
+body.theme-fast #btnChangeTable,
+body.theme-pro #btnSameTable,
+body.theme-pro #btnChangeTable,
+body.theme-current #btnSameTable,
+body.theme-current #btnChangeTable{
+  color:#f5d37a !important;
+  background:linear-gradient(135deg, #15100a, #2a2115) !important;
+  border:1px solid rgba(245,211,122,.78) !important;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.98),
+    0 0 7px rgba(0,0,0,.92),
+    0 0 14px rgba(0,0,0,.78) !important;
+  font-weight:800 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 0 0 1px rgba(0,0,0,.55),
+    0 8px 20px rgba(0,0,0,.45),
+    0 0 14px rgba(245,211,122,.18) !important;
+}
+
+/* Forcer aussi les textes internes si le navigateur crée des spans */
+body #btnSameTable *,
+body #btnChangeTable *,
+body.theme-fast #btnSameTable *,
+body.theme-fast #btnChangeTable *,
+body.theme-pro #btnSameTable *,
+body.theme-pro #btnChangeTable *,
+body.theme-current #btnSameTable *,
+body.theme-current #btnChangeTable *{
+  color:#f5d37a !important;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.98),
+    0 0 7px rgba(0,0,0,.92),
+    0 0 14px rgba(0,0,0,.78) !important;
+}
+
+body #btnSameTable:hover,
+body #btnChangeTable:hover,
+body.theme-fast #btnSameTable:hover,
+body.theme-fast #btnChangeTable:hover,
+body.theme-pro #btnSameTable:hover,
+body.theme-pro #btnChangeTable:hover,
+body.theme-current #btnSameTable:hover,
+body.theme-current #btnChangeTable:hover{
+  color:#fff0b8 !important;
+  background:linear-gradient(135deg, #20170d, #3a2a16) !important;
+  border-color:rgba(255,236,165,.92) !important;
+}
+
+/* Inscription Board */
+body #boardTitle,
+body .board-title,
+body .board-label,
+body .board-header,
+body [data-i18n="board"],
+body.theme-fast #boardTitle,
+body.theme-pro #boardTitle,
+body.theme-current #boardTitle{
+  color:#f5d37a !important;
+  font-weight:800 !important;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.98),
+    0 0 7px rgba(0,0,0,.92),
+    0 0 14px rgba(0,0,0,.78) !important;
+}
+
+/* === RESPONSIVE ADAPTATION 2026-05-06 ===
+   Objectif : l'interface s'adapte à la taille réelle de l'écran sans modifier la logique du jeu.
+   Principe : variables de taille fluides + règles spécifiques tablette/mobile/petite hauteur.
+*/
+:root{
+  --cp-card-w: clamp(48px, 5.1vw, 78px);
+  --cp-card-h: calc(var(--cp-card-w) * 1.397);
+  --cp-board-card-w: clamp(46px, 7.4vw, 78px);
+  --cp-board-card-h: calc(var(--cp-board-card-w) * 1.397);
+  --cp-panel-scale: 1;
+  --cp-gap: clamp(6px, 1vw, 16px);
+}
+
+html, body{
+  width:100%;
+  min-width:0;
+}
+
+.topbar{
+  min-height: clamp(58px, 10vh, 78px);
+  padding: clamp(6px, 1vw, 10px) clamp(8px, 1.2vw, 16px);
+  gap: clamp(6px, 1vw, 12px);
+  flex-wrap: wrap;
+  align-content:center;
+}
+
+.title{ font-size: clamp(14px, 1.7vw, 18px); }
+.brand-slogan,
+.subtitle,
+.status{ font-size: clamp(10px, 1.1vw, 12px); }
+.logo{
+  width: clamp(28px, 3.4vw, 34px);
+  height: clamp(28px, 3.4vw, 34px);
+}
+.stats{
+  flex: 1 1 auto;
+  min-width:0;
+  gap: clamp(4px, .8vw, 10px) !important;
+}
+.stat{
+  min-width: clamp(70px, 8vw, 96px);
+  padding: clamp(4px, .7vw, 8px);
+}
+.stat .label{ font-size: clamp(9px, .9vw, 11px); }
+.stat .value{ font-size: clamp(11px, 1.1vw, 13px); }
+.stats .stat.jackpot{
+  left:0 !important;
+  margin:2px 3px !important;
+}
+
+.settings-btn,
+.toggle-log-btn{
+  top: clamp(8px, 1vw, 12px) !important;
+  height: clamp(34px, 4vw, 42px) !important;
+}
+.settings-btn{ right: clamp(8px, 1vw, 14px) !important; }
+.toggle-log-btn{ right: clamp(50px, 5.2vw, 64px) !important; }
+.settings-panel{
+  width:min(280px, calc(100vw - 24px));
+  right:12px !important;
+  top: clamp(52px, 9vh, 64px) !important;
+  max-height: calc(100vh - 70px);
+  overflow:auto;
+}
+
+.container{
+  height: calc(100vh - clamp(58px, 10vh, 82px));
+  padding: clamp(6px, 1vw, 16px);
+  gap: var(--cp-gap);
+  min-width:0;
+}
+.table{ min-width:0; min-height:0; }
+
+.board-center{
+  width:min(620px, 72vw) !important;
+  padding: clamp(10px, 1.7vw, 20px) clamp(12px, 2vw, 24px) !important;
+}
+.board-cards{
+  gap: clamp(5px, 1.2vw, 16px) !important;
+  flex-wrap: nowrap !important;
+}
+.board-cards .card{
+  width: var(--cp-board-card-w) !important;
+  height: var(--cp-board-card-h) !important;
+}
+.hand-cards .card{
+  width: var(--cp-card-w) !important;
+  height: var(--cp-card-h) !important;
+}
+.hand{
+  width: clamp(170px, 18.5vw, 284px) !important;
+  min-height: clamp(88px, 10vw, 126px) !important;
+}
+.hand-inner{
+  min-height: clamp(82px, 9.2vw, 112px) !important;
+  padding: clamp(6px, .9vw, 11px) clamp(8px, 1.15vw, 14px) !important;
+}
+.hand-odds{ min-height: clamp(22px, 2.2vw, 34px); }
+.odds-main{ font-size: clamp(12px, 1.5vw, 17px); }
+.odds-note{ font-size: clamp(7px, .8vw, 10px); }
+.phase-col,
+.tie-col{ width: clamp(38px, 4vw, 52px) !important; }
+.sq{
+  height: clamp(24px, 2.7vw, 30px) !important;
+  min-height: clamp(24px, 2.7vw, 30px) !important;
+}
+.pot{
+  height: clamp(17px, 2vw, 22px) !important;
+  min-height: clamp(17px, 2vw, 22px) !important;
+  line-height: clamp(17px, 2vw, 22px) !important;
+}
+.bet-panel{
+  width: clamp(164px, 18vw, 210px) !important;
+}
+.tie-box,
+.tie-box:hover,
+.tie-box.tie-win,
+.tie-box.tie-expanded-final{
+  width: clamp(168px, 18.5vw, 284px) !important;
+  min-width: clamp(168px, 18.5vw, 284px) !important;
+  min-height: clamp(84px, 9.5vw, 126px) !important;
+  padding: clamp(7px, .9vw, 11px) clamp(8px, 1.15vw, 14px) !important;
+}
+.tie-panel-title,
+.tie-value{ font-size: clamp(12px, 1.45vw, 17px) !important; }
+.chip{
+  width: clamp(28px, 3vw, 32px);
+  min-width: clamp(28px, 3vw, 32px);
+  padding: clamp(5px, .8vw, 7px) 0;
+}
+
+#advanceDock{
+  right: clamp(8px, 1.6vw, 24px) !important;
+  bottom: clamp(8px, 1.6vw, 24px) !important;
+}
+#advanceDock #btnAdvance{
+  min-width: clamp(112px, 13vw, 150px) !important;
+  min-height: clamp(42px, 5vw, 58px) !important;
+  padding: clamp(8px, 1vw, 12px) clamp(12px, 1.4vw, 18px) !important;
+  font-size: clamp(.78rem, 1.15vw, .95rem) !important;
+}
+#advanceDock #btnAdvance .advance-check{
+  width: clamp(18px, 2vw, 22px) !important;
+  height: clamp(18px, 2vw, 22px) !important;
+}
+
+@media (max-width: 900px){
+  body{
+    overflow:hidden;
+  }
+  .topbar{
+    justify-content:center;
+    padding-right:94px;
+  }
+  .brand{
+    flex:1 1 170px;
+  }
+  .stats{
+    order:3;
+    width:100%;
+    justify-content:center;
+  }
+  .stat.total-bets,
+  .stat.total-wins{
+    display:none;
+  }
+  .container{
+    grid-template-columns:1fr !important;
+    grid-template-rows:minmax(0, 1fr) !important;
+  }
+  .log{ display:none !important; }
+  .board-center{
+    width:min(94vw, 520px) !important;
+    top:48% !important;
+  }
+  .top-left{ left:8px; top:8px; }
+  .top-right{ right:8px; top:8px; }
+  .bottom-left{ left:8px; bottom:8px; }
+}
+
+@media (max-width: 640px){
+  :root{
+    --cp-card-w: clamp(34px, 9vw, 50px);
+    --cp-board-card-w: clamp(38px, 12vw, 58px);
+  }
+  .topbar{
+    min-height: 96px;
+    padding:6px 84px 6px 8px;
+  }
+  .brand-slogan,
+  .subtitle,
+  .status,
+  .stat .label{
+    display:none;
+  }
+  .stat{
+    min-width:64px;
+    border-radius:8px;
+  }
+  .container{
+    height: calc(100vh - 96px);
+    padding:6px;
+  }
+  .board-center{
+    width:min(96vw, 390px) !important;
+    padding:9px 10px !important;
+  }
+  .board-cards{ gap:4px !important; }
+  .hand{
+    width: clamp(118px, 31vw, 170px) !important;
+  }
+  .hand-inner{
+    border-radius:14px !important;
+    padding:5px 6px 7px !important;
+  }
+  .hand-cards{ gap:4px !important; }
+  .squares{ gap:4px !important; }
+  .phase-col,
+  .tie-col{ width:34px !important; }
+  .sq{ border-radius:7px !important; }
+  .bet-panel{
+    width:142px !important;
+    padding:6px !important;
+  }
+  .bet-buttons{ gap:3px !important; }
+  .chip{
+    width:25px !important;
+    min-width:25px !important;
+    font-size:10px !important;
+  }
+  .tie-box,
+  .tie-box:hover,
+  .tie-box.tie-win,
+  .tie-box.tie-expanded-final{
+    width:134px !important;
+    min-width:134px !important;
+    min-height:76px !important;
+    border-radius:14px !important;
+    padding:6px !important;
+  }
+  .tie-box .tie-details{
+    display:none !important;
+  }
+  .settings-panel{
+    top:48px !important;
+  }
+}
+
+@media (max-height: 720px){
+  .topbar{
+    min-height:58px;
+  }
+  .brand-slogan,
+  .subtitle,
+  .status{
+    display:none;
+  }
+  .container{
+    height: calc(100vh - 58px);
+    padding-top:6px;
+    padding-bottom:6px;
+  }
+  .board-center{
+    padding-top:8px !important;
+    padding-bottom:8px !important;
+  }
+}
+
+@media (max-height: 560px){
+  .topbar{
+    min-height:44px;
+    padding-top:4px;
+    padding-bottom:4px;
+  }
+  .logo{ display:none; }
+  .title{ font-size:13px; }
+  .stat{ padding:3px 5px; }
+  .container{
+    height: calc(100vh - 44px);
+    padding:4px;
+  }
+  .board-title,
+  .panel-title,
+  .bet-title,
+  .hand-sub,
+  .pot{
+    font-size:9px !important;
+  }
+  .board-center{
+    transform:translate(-50%,-50%) scale(.92) !important;
+  }
+}
+/* === FIN RESPONSIVE ADAPTATION === */
+
+/* === CORRECTION RESPONSIVE 2 : journal visible + cartes moins petites ===
+   Objectif : conserver le bouton Journal affiché et éviter que les cartes se réduisent trop tôt.
+   La logique du jeu n'est pas modifiée. */
+:root{
+  --cp-card-w: clamp(62px, 6.2vw, 78px);
+  --cp-card-h: calc(var(--cp-card-w) * 1.397);
+  --cp-board-card-w: clamp(56px, 7.8vw, 78px);
+  --cp-board-card-h: calc(var(--cp-board-card-w) * 1.397);
+}
+
+.settings-btn{
+  right: clamp(8px, 1vw, 14px) !important;
+  z-index: 3100 !important;
+}
+.toggle-log-btn{
+  display:inline-flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  right: clamp(64px, 7vw, 96px) !important;
+  min-width:72px !important;
+  padding-left:12px !important;
+  padding-right:12px !important;
+  z-index: 3090 !important;
+  white-space:nowrap !important;
+}
+.topbar{
+  padding-right: clamp(148px, 18vw, 190px) !important;
+}
+
+.hand{
+  width: clamp(190px, 19.5vw, 284px) !important;
+  min-height: clamp(98px, 10.5vw, 126px) !important;
+}
+.hand-inner{
+  min-height: clamp(92px, 9.8vw, 112px) !important;
+}
+.board-center{
+  width:min(660px, 78vw) !important;
+}
+
+@media (max-width: 900px){
+  :root{
+    --cp-card-w: clamp(56px, 8.2vw, 72px);
+    --cp-card-h: calc(var(--cp-card-w) * 1.397);
+    --cp-board-card-w: clamp(54px, 9.6vw, 72px);
+    --cp-board-card-h: calc(var(--cp-board-card-w) * 1.397);
+  }
+  .topbar{
+    padding-right:150px !important;
+  }
+  .toggle-log-btn{
+    right:64px !important;
+    min-width:72px !important;
+  }
+  .board-center{
+    width:min(96vw, 590px) !important;
+  }
+  .hand{
+    width: clamp(166px, 31vw, 230px) !important;
+  }
+}
+
+@media (max-width: 640px){
+  :root{
+    --cp-card-w: clamp(48px, 14vw, 62px);
+    --cp-card-h: calc(var(--cp-card-w) * 1.397);
+    --cp-board-card-w: clamp(48px, 16vw, 64px);
+    --cp-board-card-h: calc(var(--cp-board-card-w) * 1.397);
+  }
+  .topbar{
+    min-height:96px;
+    padding-right:144px !important;
+  }
+  .toggle-log-btn{
+    top:8px !important;
+    right:58px !important;
+    min-width:70px !important;
+    height:36px !important;
+    font-size:12px !important;
+    padding-left:10px !important;
+    padding-right:10px !important;
+  }
+  .settings-btn{
+    top:8px !important;
+    right:8px !important;
+    height:36px !important;
+  }
+  .hand{
+    width: clamp(150px, 42vw, 190px) !important;
+    min-height:92px !important;
+  }
+  .hand-inner{
+    min-height:86px !important;
+  }
+  .board-center{
+    width:min(98vw, 460px) !important;
+  }
+}
+
+@media (max-width: 390px){
+  :root{
+    --cp-card-w: clamp(44px, 13.4vw, 54px);
+    --cp-board-card-w: clamp(44px, 14.5vw, 56px);
+  }
+  .topbar{
+    padding-right:132px !important;
+  }
+  .toggle-log-btn{
+    min-width:64px !important;
+    right:54px !important;
+    padding-left:8px !important;
+    padding-right:8px !important;
+  }
+  .hand{
+    width: clamp(138px, 43vw, 158px) !important;
+  }
+}
+/* === FIN CORRECTION RESPONSIVE 2 === */
+
+
+/* === CORRECTION RESPONSIVE 3 : boutons Journal/Test + board proportionnel ===
+   Objectif : éviter le chevauchement Journal/Test et faire évoluer le board avec la même base de cartes que les mains.
+   La logique du jeu n'est pas modifiée. */
+:root{
+  --cp-card-w: clamp(58px, 6.0vw, 78px);
+  --cp-card-h: calc(var(--cp-card-w) * 1.397);
+  --cp-board-card-w: var(--cp-card-w);
+  --cp-board-card-h: var(--cp-card-h);
+  --cp-board-gap: clamp(6px, 0.95vw, 12px);
+}
+
+/* Zone droite du bandeau : ordre stable = Journal | Test | Paramètres */
+.topbar{
+  padding-right: clamp(236px, 26vw, 286px) !important;
+}
+.settings-btn{
+  right: 10px !important;
+  min-width: 42px !important;
+  width: 42px !important;
+  z-index: 3130 !important;
+}
+#extremeCasesToggleBtn{
+  display:inline-flex !important;
+  position:absolute !important;
+  top: clamp(8px, 1vw, 12px) !important;
+  right: 60px !important;
+  height: clamp(34px, 4vw, 42px) !important;
+  min-width: 70px !important;
+  padding: 0 10px !important;
+  align-items:center !important;
+  justify-content:center !important;
+  white-space:nowrap !important;
+  z-index: 3120 !important;
+}
+.toggle-log-btn{
+  right: 140px !important;
+  min-width: 86px !important;
+  width: auto !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  z-index: 3110 !important;
+}
+
+/* Board : largeur calculée depuis la taille réelle des cartes, pas depuis une largeur fixe indépendante. */
+.board-center{
+  width: min(calc((var(--cp-board-card-w) * 5) + (var(--cp-board-gap) * 4) + 48px), 94vw) !important;
+  max-width: 94vw !important;
+  padding: clamp(9px, 1.25vw, 17px) clamp(12px, 1.6vw, 24px) !important;
+  box-sizing: border-box !important;
+}
+.board-cards{
+  gap: var(--cp-board-gap) !important;
+  justify-content:center !important;
+}
+.board-cards .card{
+  width: var(--cp-board-card-w) !important;
+  height: var(--cp-board-card-h) !important;
+  flex: 0 0 var(--cp-board-card-w) !important;
+}
+
+@media (max-width: 900px){
+  :root{
+    --cp-card-w: clamp(56px, 8vw, 72px);
+    --cp-board-card-w: var(--cp-card-w);
+    --cp-board-gap: clamp(5px, 1.2vw, 10px);
+  }
+  .topbar{ padding-right: 232px !important; }
+  .toggle-log-btn{ right: 136px !important; min-width: 82px !important; }
+  #extremeCasesToggleBtn{ right: 58px !important; min-width: 68px !important; }
+  .settings-btn{ right: 8px !important; }
+}
+
+@media (max-width: 640px){
+  :root{
+    --cp-card-w: clamp(50px, 13.2vw, 62px);
+    --cp-board-card-w: var(--cp-card-w);
+    --cp-board-gap: clamp(4px, 1.25vw, 7px);
+  }
+  .topbar{
+    padding-right: 216px !important;
+    min-height: 96px !important;
+  }
+  .toggle-log-btn{
+    top:8px !important;
+    right:126px !important;
+    min-width:78px !important;
+    height:36px !important;
+    font-size:12px !important;
+    padding-left:9px !important;
+    padding-right:9px !important;
+  }
+  #extremeCasesToggleBtn{
+    top:8px !important;
+    right:54px !important;
+    min-width:62px !important;
+    height:36px !important;
+    font-size:12px !important;
+    padding-left:8px !important;
+    padding-right:8px !important;
+  }
+  .settings-btn{
+    top:8px !important;
+    right:8px !important;
+    width:36px !important;
+    min-width:36px !important;
+    height:36px !important;
+  }
+  .board-center{
+    width: min(calc((var(--cp-board-card-w) * 5) + (var(--cp-board-gap) * 4) + 32px), 98vw) !important;
+    padding: 8px 9px !important;
+  }
+}
+
+@media (max-width: 390px){
+  :root{
+    --cp-card-w: clamp(46px, 13vw, 54px);
+    --cp-board-card-w: var(--cp-card-w);
+    --cp-board-gap: 4px;
+  }
+  .topbar{ padding-right: 188px !important; }
+  .toggle-log-btn{
+    right:110px !important;
+    min-width:68px !important;
+    font-size:11px !important;
+    padding-left:7px !important;
+    padding-right:7px !important;
+  }
+  #extremeCasesToggleBtn{
+    right:50px !important;
+    min-width:52px !important;
+    font-size:11px !important;
+    padding-left:6px !important;
+    padding-right:6px !important;
+  }
+  .settings-btn{
+    width:34px !important;
+    min-width:34px !important;
+  }
+  .board-center{
+    width: min(calc((var(--cp-board-card-w) * 5) + 16px + 24px), 99vw) !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+}
+
+@media (max-height: 560px){
+  .board-center{
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+}
+/* === FIN CORRECTION RESPONSIVE 3 === */
+
+/* === v18.05 — SUPER VISUELS JACKPOTS ARGENT / OR / DIAMANT === */
+:root{
+  --jp-silver-1:#ffffff;
+  --jp-silver-2:#d7dde7;
+  --jp-silver-3:#7f8da3;
+  --jp-gold-1:#fff8b8;
+  --jp-gold-2:#ffd24a;
+  --jp-gold-3:#9b6100;
+  --jp-diamond-1:#f0fbff;
+  --jp-diamond-2:#7dd3fc;
+  --jp-diamond-3:#0f4e78;
+}
+
+.stats .stat.jackpot{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate;
+  min-width:104px;
+  min-height:58px;
+  padding:8px 10px 10px !important;
+  border-radius:17px !important;
+  transform:none !important;
+  backdrop-filter:blur(7px);
+}
+
+.stats .stat.jackpot .label,
+.stats .stat.jackpot .jackpot-value,
+.stats .stat.jackpot .jackpot-heat-bar{
+  position:relative;
+  z-index:3;
+}
+
+.stats .stat.jackpot .label{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  font-size:10px !important;
+  line-height:1.05;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+  font-weight:950 !important;
+}
+
+.stats .stat.jackpot .jackpot-value{
+  margin-top:3px;
+  font-size:18px !important;
+  line-height:1;
+  font-weight:1000 !important;
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+
+.stats .stat.jackpot::before{
+  content:"";
+  position:absolute;
+  inset:-45% -25%;
+  z-index:1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,.42), transparent 18%),
+    linear-gradient(115deg, transparent 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,.62) 48%, rgba(255,255,255,0) 63%, transparent 100%);
+  opacity:.36;
+  transform:translateX(-42%) rotate(0deg);
+  animation:jackpotSuperSweep 4.6s ease-in-out infinite;
+}
+
+.stats .stat.jackpot::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  z-index:2;
+  pointer-events:none;
+  border-radius:15px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.38), rgba(255,255,255,0) 22%, rgba(0,0,0,.08) 58%, rgba(255,255,255,.18)),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.08) 0 1px, transparent 1px 7px);
+  mix-blend-mode:screen;
+  opacity:.72;
+}
+
+.stats .stat.argent-jackpot,
+.stats .stat.argent-jackpot.available,
+.stats .stat.argent-jackpot.locked,
+.stats .stat.argent-jackpot.active-bet{
+  background:
+    radial-gradient(circle at 18% 15%, rgba(255,255,255,.90), transparent 24%),
+    linear-gradient(145deg, #ffffff 0%, #dfe5ee 22%, #9eaabd 48%, #f7faff 66%, #8795ab 100%) !important;
+  border:1px solid rgba(245,249,255,.96) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.96),
+    inset 0 -10px 18px rgba(70,82,105,.26),
+    0 0 16px rgba(235,242,255,.52),
+    0 14px 24px rgba(0,0,0,.24) !important;
+}
+
+.stats .stat.or-jackpot,
+.stats .stat.or-jackpot.available,
+.stats .stat.or-jackpot.locked,
+.stats .stat.or-jackpot.active-bet{
+  background:
+    radial-gradient(circle at 20% 13%, rgba(255,255,255,.88), transparent 22%),
+    linear-gradient(145deg, #fffbd1 0%, #ffd84f 24%, #c98800 48%, #fff19b 67%, #b36b00 100%) !important;
+  border:1px solid rgba(255,239,134,.98) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,252,201,.96),
+    inset 0 -10px 18px rgba(105,57,0,.24),
+    0 0 18px rgba(255,211,64,.54),
+    0 14px 24px rgba(0,0,0,.25) !important;
+}
+
+.stats .stat.diamant-jackpot,
+.stats .stat.diamant-jackpot.available,
+.stats .stat.diamant-jackpot.locked,
+.stats .stat.diamant-jackpot.active-bet{
+  background:
+    radial-gradient(circle at 20% 13%, rgba(255,255,255,.94), transparent 23%),
+    linear-gradient(145deg, #f5fdff 0%, #9ce7ff 22%, #2aa9e8 47%, #d9f8ff 66%, #075e91 100%) !important;
+  border:1px solid rgba(193,242,255,.98) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.96),
+    inset 0 -10px 18px rgba(0,65,105,.25),
+    0 0 20px rgba(125,211,252,.58),
+    0 14px 24px rgba(0,0,0,.25) !important;
+}
+
+.stats .stat.argent-jackpot .label::before{ content:"◈"; color:#334155; text-shadow:0 1px 0 rgba(255,255,255,.72); }
+.stats .stat.or-jackpot .label::before{ content:"✦"; color:#5b3000; text-shadow:0 1px 0 rgba(255,246,172,.72); }
+.stats .stat.diamant-jackpot .label::before{ content:"◆"; color:#043d63; text-shadow:0 1px 0 rgba(230,251,255,.72); }
+
+.stats .stat.argent-jackpot .label,
+.stats .stat.argent-jackpot .jackpot-value,
+.stats .stat.argent-jackpot .jackpot-value span{
+  color:#182235 !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.78), 0 0 12px rgba(255,255,255,.46) !important;
+}
+.stats .stat.or-jackpot .label,
+.stats .stat.or-jackpot .jackpot-value,
+.stats .stat.or-jackpot .jackpot-value span{
+  color:#3b2100 !important;
+  text-shadow:0 1px 0 rgba(255,249,190,.78), 0 0 12px rgba(255,232,98,.46) !important;
+}
+.stats .stat.diamant-jackpot .label,
+.stats .stat.diamant-jackpot .jackpot-value,
+.stats .stat.diamant-jackpot .jackpot-value span{
+  color:#032f4d !important;
+  text-shadow:0 1px 0 rgba(230,251,255,.82), 0 0 14px rgba(125,211,252,.54) !important;
+}
+
+.stats .stat.jackpot.available,
+.stats .stat.jackpot.active-bet,
+.stats .stat.jackpot.jackpot-bet-persistent{
+  animation:jackpotSuperBreath 2.25s ease-in-out infinite !important;
+}
+
+.stats .stat.argent-jackpot.available,
+.stats .stat.argent-jackpot.active-bet,
+.stats .stat.argent-jackpot.jackpot-bet-persistent{ --jp-glow:rgba(235,242,255,.78); }
+.stats .stat.or-jackpot.available,
+.stats .stat.or-jackpot.active-bet,
+.stats .stat.or-jackpot.jackpot-bet-persistent{ --jp-glow:rgba(255,215,64,.82); }
+.stats .stat.diamant-jackpot.available,
+.stats .stat.diamant-jackpot.active-bet,
+.stats .stat.diamant-jackpot.jackpot-bet-persistent{ --jp-glow:rgba(125,211,252,.86); }
+
+.stats .stat.jackpot .jackpot-heat-bar{
+  height:6px;
+  margin-top:7px;
+  background:rgba(0,0,0,.22) !important;
+  border-color:rgba(255,255,255,.42) !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.42), 0 1px 0 rgba(255,255,255,.24) !important;
+}
+
+.stats .stat.argent-jackpot .jackpot-heat-fill{
+  background:linear-gradient(90deg, #64748b, #f8fafc, #94a3b8) !important;
+  box-shadow:0 0 8px rgba(248,250,252,.64) !important;
+}
+.stats .stat.or-jackpot .jackpot-heat-fill{
+  background:linear-gradient(90deg, #b45309, #fde047, #fff7ad) !important;
+  box-shadow:0 0 9px rgba(253,224,71,.70) !important;
+}
+.stats .stat.diamant-jackpot .jackpot-heat-fill{
+  background:linear-gradient(90deg, #0284c7, #67e8f9, #f0fdff) !important;
+  box-shadow:0 0 10px rgba(103,232,249,.76) !important;
+}
+
+.pot.jackpot-argent,
+.pot.jackpot-or,
+.pot.jackpot-diamant{
+  position:relative;
+  overflow:hidden;
+  border-radius:999px !important;
+  letter-spacing:.055em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.34), 0 5px 12px rgba(0,0,0,.20) !important;
+}
+.pot.jackpot-argent{ background:linear-gradient(145deg,#ffffff,#b8c1ce,#f8fafc) !important; color:#182235 !important; border-color:#eef4fb !important; }
+.pot.jackpot-or{ background:linear-gradient(145deg,#fff6b8,#ffd84f,#b36b00) !important; color:#3b2100 !important; border-color:#ffe779 !important; }
+.pot.jackpot-diamant{ background:linear-gradient(145deg,#ecfeff,#67e8f9,#0ea5e9) !important; color:#032f4d !important; border-color:#bdf7ff !important; }
+
+@keyframes jackpotSuperSweep{
+  0%,28%{ transform:translateX(-48%) skewX(-18deg); opacity:.08; }
+  44%{ opacity:.58; }
+  68%,100%{ transform:translateX(48%) skewX(-18deg); opacity:.10; }
+}
+
+@keyframes jackpotSuperBreath{
+  0%,100%{ transform:translateY(0) scale(1); filter:brightness(1); }
+  50%{ transform:translateY(-1px) scale(1.018); filter:brightness(1.10) drop-shadow(0 0 10px var(--jp-glow)); }
+}
+
+@media (max-width: 760px){
+  .stats .stat.jackpot{
+    min-width:92px;
+    min-height:52px;
+    padding:7px 8px 8px !important;
+    border-radius:15px !important;
+  }
+  .stats .stat.jackpot .label{ font-size:9px !important; letter-spacing:.045em; }
+  .stats .stat.jackpot .jackpot-value{ font-size:16px !important; }
+  .stats .stat.jackpot .jackpot-heat-bar{ height:10px; margin-top:6px; }
+}
+/* === FIN v18.05 SUPER VISUELS JACKPOTS === */
+
+/* === v18.06 — ajustements jackpots: barre chauffe classique + cases uniformes === */
+.stats .stat.argent-jackpot,
+.stats .stat.or-jackpot,
+.stats .stat.diamant-jackpot{
+  width:118px !important;
+  min-width:118px !important;
+  max-width:118px !important;
+  height:64px !important;
+  min-height:64px !important;
+  max-height:64px !important;
+  flex:0 0 118px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:0 !important;
+}
+
+.stats .stat.jackpot .jackpot-value{
+  width:100% !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+}
+
+.stats .stat.jackpot .jackpot-heat-bar{
+  width:100% !important;
+  flex:0 0 auto !important;
+}
+
+.stats .stat.jackpot .jackpot-heat-fill,
+.stats .stat.argent-jackpot .jackpot-heat-fill,
+.stats .stat.or-jackpot .jackpot-heat-fill,
+.stats .stat.diamant-jackpot .jackpot-heat-fill{
+  background:linear-gradient(90deg,
+    #20c05c 0%,
+    #d9db35 25%,
+    #ff9f1c 50%,
+    #ff3b30 75%,
+    #8b2cff 100%) !important;
+  box-shadow:
+    0 0 8px rgba(255,120,0,.55),
+    0 0 14px rgba(139,44,255,.35) !important;
+}
+
+@media (max-width:760px){
+  .stats .stat.argent-jackpot,
+  .stats .stat.or-jackpot,
+  .stats .stat.diamant-jackpot{
+    width:104px !important;
+    min-width:104px !important;
+    max-width:104px !important;
+    height:58px !important;
+    min-height:58px !important;
+    max-height:58px !important;
+    flex-basis:104px !important;
+  }
+}
+/* === FIN v18.06 === */
+
+
+/* === v18.07 — labels jackpots + reflet dynamique === */
+.stats .stat.jackpot{
+  isolation:isolate !important;
+  overflow:hidden !important;
+}
+
+.stats .stat.argent-jackpot,
+.stats .stat.or-jackpot,
+.stats .stat.diamant-jackpot{
+  height:68px !important;
+  min-height:68px !important;
+  max-height:68px !important;
+  justify-content:center !important;
+}
+
+.stats .stat.jackpot .label{
+  position:relative !important;
+  z-index:4 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+  width:100% !important;
+  min-height:24px !important;
+  line-height:1.02 !important;
+  text-align:center !important;
+  white-space:normal !important;
+}
+
+.stats .stat.jackpot .label::before,
+.stats .stat.argent-jackpot .label::before,
+.stats .stat.or-jackpot .label::before,
+.stats .stat.diamant-jackpot .label::before{
+  content:"◆" !important;
+  display:inline-block !important;
+  flex:0 0 auto !important;
+  font-size:8px !important;
+  line-height:1 !important;
+  transform:translateY(-1px) rotate(45deg) !important;
+  color:currentColor !important;
+  opacity:.92 !important;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.62),
+    0 0 7px rgba(255,255,255,.40) !important;
+}
+
+.stats .stat.jackpot .jackpot-value,
+.stats .stat.jackpot .jackpot-heat-bar{
+  position:relative !important;
+  z-index:4 !important;
+}
+
+.stats .stat.jackpot::before{
+  content:"" !important;
+  position:absolute !important;
+  z-index:1 !important;
+  top:-45% !important;
+  bottom:-45% !important;
+  left:-90% !important;
+  width:58% !important;
+  pointer-events:none !important;
+  border-radius:999px !important;
+  background:
+    linear-gradient(105deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,.10) 22%,
+      rgba(255,255,255,.82) 47%,
+      rgba(255,255,255,.20) 58%,
+      rgba(255,255,255,0) 78%) !important;
+  filter:blur(.2px) !important;
+  mix-blend-mode:screen !important;
+  transform:translateX(0) skewX(-20deg) !important;
+  animation:jackpotDynamicReflection 2.8s cubic-bezier(.24,.62,.18,1) infinite !important;
+}
+
+.stats .stat.jackpot::after{
+  z-index:2 !important;
+  animation:jackpotFacetShimmer 3.4s ease-in-out infinite !important;
+}
+
+.stats .stat.or-jackpot::before{ animation-delay:.22s !important; }
+.stats .stat.diamant-jackpot::before{ animation-delay:.44s !important; }
+
+@keyframes jackpotDynamicReflection{
+  0%{ left:-90%; opacity:0; transform:skewX(-20deg) scaleX(.82); }
+  16%{ opacity:.28; }
+  42%{ opacity:.88; }
+  68%{ left:132%; opacity:.22; transform:skewX(-20deg) scaleX(1.10); }
+  100%{ left:132%; opacity:0; transform:skewX(-20deg) scaleX(.90); }
+}
+
+@keyframes jackpotFacetShimmer{
+  0%,100%{ opacity:.48; filter:brightness(1); }
+  50%{ opacity:.82; filter:brightness(1.16); }
+}
+
+@media (max-width:760px){
+  .stats .stat.argent-jackpot,
+  .stats .stat.or-jackpot,
+  .stats .stat.diamant-jackpot{
+    height:62px !important;
+    min-height:62px !important;
+    max-height:62px !important;
+  }
+  .stats .stat.jackpot .label{
+    min-height:22px !important;
+    line-height:1 !important;
+  }
+  .stats .stat.jackpot .label::before{
+    font-size:7px !important;
+  }
+}
+/* === FIN v18.07 === */
+
+
+/* === v18.08 CORRECTION VISIBLE JACKPOTS ===
+   Correctif dur: libellés sur deux lignes, losange à gauche, cases uniformes,
+   reflet dynamique toujours visible + cache busting index.html. */
+.stats .stat.argent-jackpot,
+.stats .stat.or-jackpot,
+.stats .stat.diamant-jackpot{
+  width:124px !important;
+  min-width:124px !important;
+  max-width:124px !important;
+  height:74px !important;
+  min-height:74px !important;
+  max-height:74px !important;
+  flex:0 0 124px !important;
+  box-sizing:border-box !important;
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:7px 10px 8px !important;
+}
+
+.stats .stat.jackpot .label,
+.stats .stat.jackpot .jackpot-label{
+  display:grid !important;
+  grid-template-columns:12px 1fr !important;
+  grid-template-rows:auto auto !important;
+  column-gap:4px !important;
+  align-items:center !important;
+  justify-items:center !important;
+  width:100% !important;
+  min-height:25px !important;
+  margin:0 0 2px !important;
+  padding:0 !important;
+  white-space:normal !important;
+  line-height:.98 !important;
+  text-align:center !important;
+}
+
+.stats .stat.jackpot .label::before,
+.stats .stat.jackpot .jackpot-label::before{
+  content:"◆" !important;
+  grid-column:1 !important;
+  grid-row:1 / span 2 !important;
+  display:block !important;
+  font-size:8px !important;
+  line-height:1 !important;
+  transform:rotate(45deg) !important;
+  opacity:.98 !important;
+  color:currentColor !important;
+  text-shadow:0 0 8px rgba(255,255,255,.72) !important;
+}
+
+.stats .stat.jackpot .jackpot-name-line{
+  grid-column:2 !important;
+  display:block !important;
+  width:100% !important;
+  text-align:center !important;
+}
+
+.stats .stat.jackpot .jackpot-value{
+  position:relative !important;
+  z-index:5 !important;
+  width:100% !important;
+  text-align:center !important;
+  line-height:1.05 !important;
+}
+
+.stats .stat.jackpot .jackpot-heat-bar{
+  position:relative !important;
+  z-index:5 !important;
+  width:100% !important;
+  height:6px !important;
+  margin-top:5px !important;
+  overflow:hidden !important;
+}
+
+.stats .stat.jackpot .jackpot-heat-fill,
+.stats .stat.argent-jackpot .jackpot-heat-fill,
+.stats .stat.or-jackpot .jackpot-heat-fill,
+.stats .stat.diamant-jackpot .jackpot-heat-fill{
+  background:linear-gradient(90deg,#20c05c 0%,#d9db35 25%,#ff9f1c 50%,#ff3b30 75%,#8b2cff 100%) !important;
+  box-shadow:0 0 8px rgba(255,120,0,.62),0 0 14px rgba(139,44,255,.42) !important;
+}
+
+.stats .stat.jackpot::before{
+  content:"" !important;
+  position:absolute !important;
+  z-index:3 !important;
+  top:-52% !important;
+  bottom:-52% !important;
+  left:-80% !important;
+  width:46% !important;
+  pointer-events:none !important;
+  border-radius:999px !important;
+  background:linear-gradient(105deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.12) 24%,rgba(255,255,255,.95) 47%,rgba(255,255,255,.22) 62%,rgba(255,255,255,0) 82%) !important;
+  filter:blur(.25px) !important;
+  mix-blend-mode:screen !important;
+  animation:jackpotV18VisibleSweep 1.85s cubic-bezier(.2,.65,.18,1) infinite !important;
+}
+
+.stats .stat.jackpot::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:2px !important;
+  z-index:2 !important;
+  border-radius:14px !important;
+  pointer-events:none !important;
+  opacity:.78 !important;
+  background:
+    linear-gradient(140deg,rgba(255,255,255,.34),rgba(255,255,255,0) 28%,rgba(0,0,0,.10) 62%,rgba(255,255,255,.22)),
+    repeating-linear-gradient(135deg,rgba(255,255,255,.10) 0 1px,transparent 1px 6px) !important;
+  animation:jackpotV18FacetBlink 2.25s ease-in-out infinite !important;
+}
+
+.stats .stat.or-jackpot::before{ animation-delay:.18s !important; }
+.stats .stat.diamant-jackpot::before{ animation-delay:.36s !important; }
+
+@keyframes jackpotV18VisibleSweep{
+  0%{ left:-80%; opacity:0; transform:skewX(-20deg) scaleX(.75); }
+  12%{ opacity:.45; }
+  38%{ opacity:1; }
+  62%{ left:128%; opacity:.45; transform:skewX(-20deg) scaleX(1.14); }
+  100%{ left:128%; opacity:0; transform:skewX(-20deg) scaleX(.85); }
+}
+
+@keyframes jackpotV18FacetBlink{
+  0%,100%{ opacity:.54; filter:brightness(1); }
+  50%{ opacity:.88; filter:brightness(1.18); }
+}
+
+@media (max-width:760px){
+  .stats .stat.argent-jackpot,
+  .stats .stat.or-jackpot,
+  .stats .stat.diamant-jackpot{
+    width:108px !important;
+    min-width:108px !important;
+    max-width:108px !important;
+    flex-basis:108px !important;
+    height:66px !important;
+    min-height:66px !important;
+    max-height:66px !important;
+    padding:6px 8px 7px !important;
+  }
+}
+/* === FIN v18.08 === */
+
+
+/* === v18.09 DEBUG JACKPOTS VISIBLE === */
+/* badge version supprimé */
+.stats .stat.jackpot.jackpot-debug-v1809,
+.stats .stat.argent-jackpot,
+.stats .stat.or-jackpot,
+.stats .stat.diamant-jackpot{
+  width:124px !important;
+  min-width:124px !important;
+  max-width:124px !important;
+  height:74px !important;
+  min-height:74px !important;
+  max-height:74px !important;
+  flex:0 0 124px !important;
+  outline:2px solid rgba(124,60,255,.95) !important;
+  outline-offset:2px !important;
+  overflow:hidden !important;
+  position:relative !important;
+}
+.stats .stat.jackpot .label,
+.stats .stat.jackpot .jackpot-label{
+  display:grid !important;
+  grid-template-columns:13px 1fr !important;
+  grid-template-rows:1fr 1fr !important;
+  gap:0 4px !important;
+  align-items:center !important;
+  justify-items:center !important;
+  text-align:center !important;
+  line-height:.95 !important;
+  white-space:normal !important;
+}
+.stats .stat.jackpot .label::before,
+.stats .stat.jackpot .jackpot-label::before,
+.stats .stat.jackpot .jackpot-diamond{
+  content:"◆" !important;
+  grid-column:1 !important;
+  grid-row:1 / span 2 !important;
+  display:block !important;
+  font-size:9px !important;
+  opacity:1 !important;
+  transform:rotate(45deg) !important;
+  text-shadow:0 0 8px rgba(255,255,255,.9) !important;
+}
+.stats .stat.jackpot .jackpot-name-line{
+  grid-column:2 !important;
+  display:block !important;
+  width:100% !important;
+  text-align:center !important;
+}
+.stats .stat.jackpot::before{
+  content:"" !important;
+  position:absolute !important;
+  z-index:20 !important;
+  top:-55% !important;
+  bottom:-55% !important;
+  left:-85% !important;
+  width:54% !important;
+  pointer-events:none !important;
+  background:linear-gradient(105deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.18) 24%,rgba(255,255,255,1) 46%,rgba(255,255,255,.26) 63%,rgba(255,255,255,0) 82%) !important;
+  filter:blur(.25px) !important;
+  mix-blend-mode:screen !important;
+  animation:jackpotV1809DebugSweep 1.35s linear infinite !important;
+}
+@keyframes jackpotV1809DebugSweep{
+  0%{ left:-85%; opacity:0; transform:skewX(-20deg); }
+  16%{ opacity:.85; }
+  50%{ opacity:1; }
+  74%{ left:135%; opacity:.75; transform:skewX(-20deg); }
+  100%{ left:135%; opacity:0; transform:skewX(-20deg); }
+}
+/* === FIN v18.09 DEBUG === */
+
+
+/* === v18.10 LOSANGES DES DEUX COTES + REFLETS DYNAMIQUES FORTS === */
+/* badge version supprimé */
+
+.stats .stat.argent-jackpot,
+.stats .stat.or-jackpot,
+.stats .stat.diamant-jackpot{
+  width:124px !important;
+  min-width:124px !important;
+  max-width:124px !important;
+  height:74px !important;
+  min-height:74px !important;
+  max-height:74px !important;
+  flex:0 0 124px !important;
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+}
+
+.stats .stat.jackpot .jackpot-label{
+  position:relative !important;
+  z-index:80 !important;
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns:14px 1fr 14px !important;
+  align-items:center !important;
+  justify-items:center !important;
+  column-gap:2px !important;
+  text-align:center !important;
+  white-space:normal !important;
+  line-height:.88 !important;
+  font-size:10px !important;
+  font-weight:1000 !important;
+  letter-spacing:.06em !important;
+}
+
+.stats .stat.jackpot .jackpot-label::before,
+.stats .stat.jackpot .jackpot-label::after{ content:none !important; display:none !important; }
+
+.stats .stat.jackpot .jackpot-name{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:0 !important;
+  min-width:0 !important;
+}
+.stats .stat.jackpot .jackpot-name span{ display:block !important; }
+
+.stats .stat.jackpot .jackpot-diamond.left,
+.stats .stat.jackpot .jackpot-diamond.right{
+  display:block !important;
+  position:relative !important;
+  z-index:90 !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  opacity:1 !important;
+  transform:none !important;
+  color:rgba(5,12,20,.92) !important;
+  text-shadow:0 0 6px rgba(255,255,255,.95), 0 1px 0 rgba(255,255,255,.65) !important;
+  animation:jackpotDiamondPulseV1810 1.15s ease-in-out infinite alternate !important;
+}
+.stats .stat.jackpot .jackpot-diamond.left{ grid-column:1 !important; }
+.stats .stat.jackpot .jackpot-diamond.right{ grid-column:3 !important; animation-delay:.35s !important; }
+
+.stats .stat.jackpot .jackpot-value,
+.stats .stat.jackpot .jackpot-value span,
+.stats .stat.jackpot .jackpot-heat-bar{
+  position:relative !important;
+  z-index:75 !important;
+}
+
+/* gros reflet diagonal : au-dessus du fond, derrière le texte */
+.stats .stat.argent-jackpot::before,
+.stats .stat.or-jackpot::before,
+.stats .stat.diamant-jackpot::before{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  z-index:55 !important;
+  top:-45% !important;
+  left:-110% !important;
+  width:74% !important;
+  height:210% !important;
+  pointer-events:none !important;
+  background:linear-gradient(105deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.12) 23%,
+    rgba(255,255,255,.95) 46%,
+    rgba(255,255,255,.35) 56%,
+    rgba(255,255,255,0) 76%) !important;
+  filter:blur(.15px) !important;
+  mix-blend-mode:screen !important;
+  transform:skewX(-19deg) !important;
+  animation:jackpotMegaSweepV1810 1.05s linear infinite !important;
+}
+
+/* second reflet horizontal pour que l'animation soit visible en permanence */
+.stats .stat.argent-jackpot::after,
+.stats .stat.or-jackpot::after,
+.stats .stat.diamant-jackpot::after{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  z-index:50 !important;
+  inset:0 !important;
+  pointer-events:none !important;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.55), transparent 22%),
+    linear-gradient(90deg, transparent 0%, rgba(255,255,255,.35) 45%, rgba(255,255,255,.85) 50%, rgba(255,255,255,.25) 55%, transparent 100%) !important;
+  background-size:100% 100%, 240% 100% !important;
+  background-position:center, -140% 0 !important;
+  mix-blend-mode:screen !important;
+  opacity:.78 !important;
+  animation:jackpotSurfaceShineV1810 1.8s ease-in-out infinite !important;
+}
+.stats .stat.or-jackpot::before{ animation-delay:.18s !important; }
+.stats .stat.diamant-jackpot::before{ animation-delay:.36s !important; }
+.stats .stat.or-jackpot::after{ animation-delay:.28s !important; }
+.stats .stat.diamant-jackpot::after{ animation-delay:.48s !important; }
+
+@keyframes jackpotMegaSweepV1810{
+  0%{ left:-110%; opacity:0; }
+  10%{ opacity:.95; }
+  48%{ opacity:1; }
+  72%{ left:145%; opacity:.9; }
+  100%{ left:145%; opacity:0; }
+}
+@keyframes jackpotSurfaceShineV1810{
+  0%{ background-position:center, -150% 0; opacity:.42; }
+  45%{ opacity:.95; }
+  100%{ background-position:center, 150% 0; opacity:.42; }
+}
+@keyframes jackpotDiamondPulseV1810{
+  from{ transform:scale(.92); filter:brightness(.85); }
+  to{ transform:scale(1.18); filter:brightness(1.45); }
+}
+/* === FIN v18.10 === */
+
+
+/* === v18.11 LOSANGES + REFLETS FORCÉS SUR LES VRAIS ÉLÉMENTS === */
+/* badge version supprimé */
+.stats .stat.argent-jackpot,
+.stats .stat.or-jackpot,
+.stats .stat.diamant-jackpot{
+  width:124px !important;
+  min-width:124px !important;
+  max-width:124px !important;
+  height:74px !important;
+  min-height:74px !important;
+  max-height:74px !important;
+  flex:0 0 124px !important;
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  background-size:230% 230%, 100% 100% !important;
+  animation:jackpotBoxBreathV1811 1.6s ease-in-out infinite alternate !important;
+}
+.stats .stat.argent-jackpot{ box-shadow:0 0 0 2px rgba(130,160,210,.9), 0 0 18px rgba(180,220,255,.65), inset 0 0 22px rgba(255,255,255,.24) !important; }
+.stats .stat.or-jackpot{ box-shadow:0 0 0 2px rgba(255,215,80,.9), 0 0 20px rgba(255,210,60,.85), inset 0 0 22px rgba(255,255,255,.24) !important; }
+.stats .stat.diamant-jackpot{ box-shadow:0 0 0 2px rgba(80,215,255,.9), 0 0 20px rgba(80,220,255,.85), inset 0 0 22px rgba(255,255,255,.24) !important; }
+
+.stats .stat.jackpot .label,
+.stats .stat.jackpot .jackpot-label{
+  position:relative !important;
+  z-index:90 !important;
+  display:grid !important;
+  grid-template-columns:18px 1fr 18px !important;
+  align-items:center !important;
+  justify-items:center !important;
+  width:100% !important;
+  box-sizing:border-box !important;
+  padding:0 3px !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  line-height:.92 !important;
+  text-align:center !important;
+  font-size:10px !important;
+  font-weight:1000 !important;
+  letter-spacing:.05em !important;
+}
+.stats .stat.jackpot .jackpot-label::before,
+.stats .stat.jackpot .jackpot-label::after{
+  content:"◆" !important;
+  display:block !important;
+  position:relative !important;
+  z-index:120 !important;
+  color:#06101c !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  text-shadow:0 0 4px rgba(255,255,255,1), 0 0 9px rgba(255,255,255,.95) !important;
+  opacity:1 !important;
+  animation:jackpotDiamondBlinkV1811 .9s ease-in-out infinite alternate !important;
+}
+.stats .stat.jackpot .jackpot-label::before{ grid-column:1 !important; }
+.stats .stat.jackpot .jackpot-label::after{ grid-column:3 !important; animation-delay:.35s !important; }
+.stats .stat.jackpot .jackpot-diamond{
+  display:none !important; /* les losanges sont maintenant forcés en pseudo-éléments des deux côtés */
+}
+.stats .stat.jackpot .jackpot-name,
+.stats .stat.jackpot .jackpot-name-line{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:0 !important;
+  width:100% !important;
+}
+.stats .stat.jackpot .jackpot-name span,
+.stats .stat.jackpot .jackpot-name-line{
+  display:block !important;
+  width:100% !important;
+  text-align:center !important;
+}
+
+.stats .stat.argent-jackpot::before,
+.stats .stat.or-jackpot::before,
+.stats .stat.diamant-jackpot::before{
+  content:"" !important;
+  position:absolute !important;
+  z-index:60 !important;
+  top:-55% !important;
+  left:-120% !important;
+  width:85% !important;
+  height:230% !important;
+  pointer-events:none !important;
+  background:linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.10) 18%, rgba(255,255,255,.98) 42%, rgba(255,255,255,.95) 49%, rgba(255,255,255,.18) 62%, rgba(255,255,255,0) 78%) !important;
+  filter:blur(.05px) !important;
+  mix-blend-mode:screen !important;
+  transform:skewX(-18deg) !important;
+  animation:jackpotStrongSweepV1811 1.15s linear infinite !important;
+}
+.stats .stat.argent-jackpot::after,
+.stats .stat.or-jackpot::after,
+.stats .stat.diamant-jackpot::after{
+  content:"" !important;
+  position:absolute !important;
+  z-index:55 !important;
+  inset:0 !important;
+  pointer-events:none !important;
+  background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.50) 42%, rgba(255,255,255,1) 50%, rgba(255,255,255,.38) 58%, transparent 100%) !important;
+  background-size:250% 100% !important;
+  background-position:-170% 0 !important;
+  opacity:.72 !important;
+  mix-blend-mode:screen !important;
+  animation:jackpotHorizontalFlashV1811 1.45s ease-in-out infinite !important;
+}
+.stats .stat.jackpot .jackpot-value,
+.stats .stat.jackpot .jackpot-value span,
+.stats .stat.jackpot .jackpot-heat-bar{
+  position:relative !important;
+  z-index:92 !important;
+}
+@keyframes jackpotStrongSweepV1811{
+  0%{ left:-120%; opacity:0; }
+  12%{ opacity:1; }
+  58%{ opacity:1; }
+  82%{ left:150%; opacity:.95; }
+  100%{ left:150%; opacity:0; }
+}
+@keyframes jackpotHorizontalFlashV1811{
+  0%{ background-position:-170% 0; opacity:.35; }
+  50%{ opacity:.95; }
+  100%{ background-position:170% 0; opacity:.35; }
+}
+@keyframes jackpotDiamondBlinkV1811{
+  from{ transform:scale(.9); filter:brightness(.75); }
+  to{ transform:scale(1.22); filter:brightness(1.65); }
+}
+@keyframes jackpotBoxBreathV1811{
+  from{ filter:brightness(1) saturate(1); }
+  to{ filter:brightness(1.12) saturate(1.18); }
+}
+/* === FIN v18.11 === */
+
+
+/* === v18.12 VISUEL JACKPOTS FORCE - LOSANGES + REFLETS REELS === */
+/* badge version supprimé */
+.stats .stat.argent-jackpot,.stats .stat.or-jackpot,.stats .stat.diamant-jackpot{
+  width:124px !important; min-width:124px !important; max-width:124px !important;
+  height:74px !important; min-height:74px !important; max-height:74px !important;
+  flex:0 0 124px !important; overflow:hidden !important; position:relative !important; isolation:isolate !important;
+}
+/* Les vrais losanges sont des éléments HTML injectés, pas des pseudo-éléments CSS. */
+.stats .stat.jackpot .jackpot-side-diamond{
+  position:absolute !important; top:17px !important; z-index:9999 !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  width:14px !important; height:14px !important;
+  font-size:13px !important; line-height:1 !important; font-weight:1000 !important;
+  color:#06101c !important; opacity:1 !important;
+  text-shadow:0 0 4px rgba(255,255,255,1),0 0 8px rgba(255,255,255,1),0 1px 0 rgba(255,255,255,.7) !important;
+  animation:jackpotRealDiamondPulseV1812 .75s ease-in-out infinite alternate !important;
+  pointer-events:none !important;
+}
+.stats .stat.jackpot .jackpot-side-diamond.left{ left:8px !important; }
+.stats .stat.jackpot .jackpot-side-diamond.right{ right:8px !important; animation-delay:.25s !important; }
+.stats .stat.jackpot .jackpot-label{
+  padding:0 22px !important; width:100% !important; box-sizing:border-box !important;
+  display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important;
+  gap:0 !important; text-align:center !important; line-height:.90 !important; position:relative !important; z-index:1000 !important;
+}
+.stats .stat.jackpot .jackpot-name{ display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; width:100% !important; }
+.stats .stat.jackpot .jackpot-name span{ display:block !important; width:100% !important; text-align:center !important; }
+.stats .stat.jackpot .jackpot-diamond{ display:none !important; }
+/* Le reflet dynamique est un vrai élément HTML injecté. Il passe au-dessus du fond et derrière le texte. */
+.stats .stat.jackpot .jackpot-real-shine{
+  position:absolute !important; z-index:200 !important; top:-60% !important; left:-125% !important;
+  width:92% !important; height:240% !important; pointer-events:none !important;
+  background:linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.16) 18%, rgba(255,255,255,1) 43%, rgba(255,255,255,.95) 50%, rgba(255,255,255,.18) 64%, rgba(255,255,255,0) 80%) !important;
+  filter:blur(.2px) !important; mix-blend-mode:screen !important;
+  transform:skewX(-18deg) !important;
+  animation:jackpotRealShineSweepV1812 1.05s linear infinite !important;
+}
+.stats .stat.or-jackpot .jackpot-real-shine{ animation-delay:.15s !important; }
+.stats .stat.diamant-jackpot .jackpot-real-shine{ animation-delay:.30s !important; }
+.stats .stat.jackpot .jackpot-real-flash{
+  position:absolute !important; z-index:180 !important; inset:0 !important; pointer-events:none !important;
+  background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.38) 44%, rgba(255,255,255,.95) 50%, rgba(255,255,255,.28) 58%, transparent 100%) !important;
+  background-size:260% 100% !important; background-position:-180% 0 !important;
+  opacity:.7 !important; mix-blend-mode:screen !important;
+  animation:jackpotRealFlashV1812 1.35s ease-in-out infinite !important;
+}
+.stats .stat.jackpot .jackpot-value,.stats .stat.jackpot .jackpot-heat-bar{ position:relative !important; z-index:1000 !important; }
+@keyframes jackpotRealShineSweepV1812{ 0%{left:-125%;opacity:0} 10%{opacity:1} 65%{left:155%;opacity:1} 100%{left:155%;opacity:0} }
+@keyframes jackpotRealFlashV1812{ 0%{background-position:-180% 0;opacity:.25} 45%{opacity:.95} 100%{background-position:180% 0;opacity:.25} }
+@keyframes jackpotRealDiamondPulseV1812{ from{transform:scale(.9) rotate(0deg);filter:brightness(.85)} to{transform:scale(1.28) rotate(0deg);filter:brightness(1.8)} }
+/* === FIN v18.12 === */
+
+
+/* === v18.13 — correction finale jackpots : uniquement 2 losanges + reflets dynamiques obliques === */
+.stats .stat.jackpot .label::before,
+.stats .stat.jackpot .label::after,
+.stats .stat.jackpot .jackpot-label::before,
+.stats .stat.jackpot .jackpot-label::after,
+.stats .stat.argent-jackpot .label::before,
+.stats .stat.or-jackpot .label::before,
+.stats .stat.diamant-jackpot .label::before,
+.stats .stat.argent-jackpot .label::after,
+.stats .stat.or-jackpot .label::after,
+.stats .stat.diamant-jackpot .label::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* On coupe tous les pseudo-éléments hérités pour éviter le carré/losange du haut. */
+.stats .stat.argent-jackpot::before,
+.stats .stat.argent-jackpot::after,
+.stats .stat.or-jackpot::before,
+.stats .stat.or-jackpot::after,
+.stats .stat.diamant-jackpot::before,
+.stats .stat.diamant-jackpot::after{
+  content:none !important;
+  display:none !important;
+  animation:none !important;
+  background:none !important;
+}
+
+.stats .stat.jackpot{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+}
+
+.stats .stat.jackpot .jackpot-side-diamond{
+  position:absolute !important;
+  top:27px !important;
+  z-index:50 !important;
+  display:block !important;
+  width:13px !important;
+  height:13px !important;
+  font-size:12px !important;
+  line-height:13px !important;
+  text-align:center !important;
+  color:#07111f !important;
+  opacity:1 !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.95), 0 0 7px rgba(255,255,255,.9) !important;
+  pointer-events:none !important;
+  animation:jackpotDiamondSoftV1813 1.2s ease-in-out infinite alternate !important;
+}
+.stats .stat.jackpot .jackpot-side-diamond.left{ left:9px !important; }
+.stats .stat.jackpot .jackpot-side-diamond.right{ right:9px !important; animation-delay:.25s !important; }
+
+.stats .stat.jackpot .jackpot-label,
+.stats .stat.jackpot .label{
+  position:relative !important;
+  z-index:70 !important;
+  padding:0 24px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  line-height:.9 !important;
+}
+.stats .stat.jackpot .jackpot-diamond{ display:none !important; }
+
+/* Reflet oblique dynamique à l'intérieur des carrés */
+.stats .stat.jackpot .jackpot-real-shine{
+  position:absolute !important;
+  z-index:35 !important;
+  top:-70% !important;
+  left:-95% !important;
+  width:48% !important;
+  height:260% !important;
+  pointer-events:none !important;
+  display:block !important;
+  opacity:0 !important;
+  background:linear-gradient(105deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.10) 18%,
+    rgba(255,255,255,.90) 42%,
+    rgba(255,255,255,1) 50%,
+    rgba(255,255,255,.20) 62%,
+    rgba(255,255,255,0) 100%) !important;
+  filter:blur(.35px) !important;
+  transform:rotate(18deg) skewX(-12deg) !important;
+  mix-blend-mode:screen !important;
+  animation:jackpotDiagonalSweepV1813 1.45s linear infinite !important;
+}
+.stats .stat.jackpot .jackpot-real-flash{
+  position:absolute !important;
+  z-index:34 !important;
+  top:-45% !important;
+  left:-110% !important;
+  width:34% !important;
+  height:220% !important;
+  pointer-events:none !important;
+  display:block !important;
+  opacity:0 !important;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,.46) 48%, transparent 100%) !important;
+  transform:rotate(18deg) skewX(-12deg) !important;
+  mix-blend-mode:screen !important;
+  animation:jackpotDiagonalSweepV1813 2.05s linear infinite .38s !important;
+}
+.stats .stat.or-jackpot .jackpot-real-shine{ animation-delay:.16s !important; }
+.stats .stat.diamant-jackpot .jackpot-real-shine{ animation-delay:.32s !important; }
+.stats .stat.or-jackpot .jackpot-real-flash{ animation-delay:.52s !important; }
+.stats .stat.diamant-jackpot .jackpot-real-flash{ animation-delay:.68s !important; }
+
+.stats .stat.jackpot .jackpot-value,
+.stats .stat.jackpot .jackpot-heat-bar{ position:relative !important; z-index:70 !important; }
+
+/* badge v18.13 supprimé */
+@keyframes jackpotDiagonalSweepV1813{
+  0%{ left:-110%; opacity:0; }
+  10%{ opacity:.95; }
+  58%{ left:128%; opacity:.95; }
+  100%{ left:128%; opacity:0; }
+}
+@keyframes jackpotDiamondSoftV1813{
+  from{ transform:scale(.95); filter:brightness(.9); }
+  to{ transform:scale(1.10); filter:brightness(1.35); }
+}
+/* === FIN v18.13 === */
+
+/* === v18.14 — losanges dynamiques + reflets obliques vraiment mouvants === */
+/* Retire définitivement les anciens petits carrés/losanges du titre. */
+.stats .stat.jackpot .jackpot-diamond,
+.stats .stat.jackpot .label .jackpot-diamond,
+.stats .stat.jackpot .jackpot-label .jackpot-diamond{
+  display:none !important;
+  visibility:hidden !important;
+}
+.stats .stat.jackpot .label::before,
+.stats .stat.jackpot .label::after,
+.stats .stat.jackpot .jackpot-label::before,
+.stats .stat.jackpot .jackpot-label::after,
+.stats .stat.argent-jackpot::before,
+.stats .stat.argent-jackpot::after,
+.stats .stat.or-jackpot::before,
+.stats .stat.or-jackpot::after,
+.stats .stat.diamant-jackpot::before,
+.stats .stat.diamant-jackpot::after{
+  content:none !important;
+  display:none !important;
+  animation:none !important;
+}
+
+.stats .stat.jackpot.jackpot-visual-v1814{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  transform:translateZ(0) !important;
+  width:124px !important;
+  min-width:124px !important;
+  max-width:124px !important;
+  height:74px !important;
+  min-height:74px !important;
+  max-height:74px !important;
+  flex:0 0 124px !important;
+}
+
+/* Deux losanges seulement : gauche et droite. Ils respirent, tournent légèrement et scintillent. */
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-side-diamond{
+  position:absolute !important;
+  top:28px !important;
+  z-index:95 !important;
+  display:block !important;
+  width:14px !important;
+  height:14px !important;
+  line-height:14px !important;
+  text-align:center !important;
+  font-size:12px !important;
+  font-weight:1000 !important;
+  color:#07111f !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.95), 0 0 5px rgba(255,255,255,.95), 0 0 11px rgba(255,255,255,.75) !important;
+  animation:jackpotDiamondAliveV1814 1.05s ease-in-out infinite alternate, jackpotDiamondSparkV1814 2.2s linear infinite !important;
+  will-change:transform, filter, opacity !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-side-diamond.left{ left:9px !important; }
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-side-diamond.right{ right:9px !important; animation-delay:.18s,.42s !important; }
+
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-label,
+.stats .stat.jackpot.jackpot-visual-v1814 .label{
+  position:relative !important;
+  z-index:90 !important;
+  padding:0 25px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  line-height:.9 !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-value,
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-heat-bar{
+  position:relative !important;
+  z-index:90 !important;
+}
+
+/* Trois vrais calques de reflets obliques à l'intérieur des cases jackpot. */
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-oblique-reflet{
+  position:absolute !important;
+  pointer-events:none !important;
+  z-index:45 !important;
+  top:-82% !important;
+  left:-95% !important;
+  height:285% !important;
+  transform:rotate(18deg) skewX(-10deg) translate3d(0,0,0) !important;
+  transform-origin:center !important;
+  mix-blend-mode:screen !important;
+  will-change:left, opacity, transform !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-oblique-reflet.reflet-a{
+  width:30% !important;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,.10) 22%, rgba(255,255,255,1) 48%, rgba(255,255,255,.18) 68%, transparent 100%) !important;
+  filter:blur(.18px) !important;
+  animation:jackpotObliqueMoveA1814 1.15s linear infinite !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-oblique-reflet.reflet-b{
+  width:18% !important;
+  top:-72% !important;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,.78) 48%, transparent 100%) !important;
+  filter:blur(.35px) !important;
+  animation:jackpotObliqueMoveB1814 1.85s linear infinite .32s !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1814 .jackpot-oblique-reflet.reflet-c{
+  width:46% !important;
+  top:-60% !important;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,.08) 18%, rgba(255,255,255,.55) 49%, rgba(255,255,255,.12) 70%, transparent 100%) !important;
+  filter:blur(.9px) !important;
+  animation:jackpotObliqueMoveC1814 2.45s linear infinite .72s !important;
+}
+.stats .stat.or-jackpot.jackpot-visual-v1814 .jackpot-oblique-reflet.reflet-a{ animation-delay:.12s !important; }
+.stats .stat.diamant-jackpot.jackpot-visual-v1814 .jackpot-oblique-reflet.reflet-a{ animation-delay:.24s !important; }
+.stats .stat.or-jackpot.jackpot-visual-v1814 .jackpot-oblique-reflet.reflet-b{ animation-delay:.48s !important; }
+.stats .stat.diamant-jackpot.jackpot-visual-v1814 .jackpot-oblique-reflet.reflet-b{ animation-delay:.66s !important; }
+
+/* badge v18.14 supprimé */
+@keyframes jackpotDiamondAliveV1814{
+  0%{ transform:translateY(0) scale(.92) rotate(-6deg); filter:brightness(.85); opacity:.85; }
+  50%{ transform:translateY(-1px) scale(1.18) rotate(0deg); filter:brightness(1.85); opacity:1; }
+  100%{ transform:translateY(1px) scale(1.04) rotate(7deg); filter:brightness(1.25); opacity:.95; }
+}
+@keyframes jackpotDiamondSparkV1814{
+  0%, 66%, 100%{ text-shadow:0 1px 0 rgba(255,255,255,.95),0 0 5px rgba(255,255,255,.80),0 0 9px rgba(255,255,255,.45); }
+  36%{ text-shadow:0 1px 0 rgba(255,255,255,1),0 0 10px rgba(255,255,255,1),0 0 18px rgba(255,255,255,.9); }
+}
+@keyframes jackpotObliqueMoveA1814{
+  0%{ left:-105%; opacity:0; }
+  8%{ opacity:.95; }
+  48%{ opacity:1; }
+  70%{ left:128%; opacity:.95; }
+  100%{ left:128%; opacity:0; }
+}
+@keyframes jackpotObliqueMoveB1814{
+  0%{ left:-120%; opacity:0; }
+  14%{ opacity:.72; }
+  62%{ left:140%; opacity:.72; }
+  100%{ left:140%; opacity:0; }
+}
+@keyframes jackpotObliqueMoveC1814{
+  0%{ left:-130%; opacity:0; }
+  18%{ opacity:.42; }
+  72%{ left:150%; opacity:.42; }
+  100%{ left:150%; opacity:0; }
+}
+/* === FIN v18.14 === */
+
+
+/* === v18.15 — losanges en PULSE + reflets obliques vraiment visibles === */
+.stats .stat.jackpot.jackpot-visual-v1815{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  transform:translateZ(0) !important;
+  width:124px !important;
+  min-width:124px !important;
+  max-width:124px !important;
+  height:74px !important;
+  min-height:74px !important;
+  max-height:74px !important;
+  flex:0 0 124px !important;
+}
+
+/* On masque tous les anciens losanges de titre. Il ne reste que les 2 vrais losanges latéraux. */
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-diamond,
+.stats .stat.jackpot.jackpot-visual-v1815 .label .jackpot-diamond,
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-label .jackpot-diamond{display:none!important;visibility:hidden!important;}
+.stats .stat.jackpot.jackpot-visual-v1815 .label::before,
+.stats .stat.jackpot.jackpot-visual-v1815 .label::after,
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-label::before,
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-label::after{content:none!important;display:none!important;}
+
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-side-diamond{
+  position:absolute !important;
+  top:30px !important;
+  z-index:120 !important;
+  display:block !important;
+  width:14px !important;
+  height:14px !important;
+  line-height:14px !important;
+  text-align:center !important;
+  font-size:12px !important;
+  font-weight:1000 !important;
+  color:#07111f !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+  text-shadow:0 1px 0 rgba(255,255,255,1),0 0 8px rgba(255,255,255,1),0 0 15px rgba(255,255,255,.85) !important;
+  animation:jackpotDiamondPulseV1815 .92s ease-in-out infinite !important;
+  will-change:transform, filter !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-side-diamond.left{ left:9px !important; }
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-side-diamond.right{ right:9px !important; animation-delay:.18s !important; }
+
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-label,
+.stats .stat.jackpot.jackpot-visual-v1815 .label{
+  position:relative !important;
+  z-index:100 !important;
+  padding:0 25px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  line-height:.9 !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-value,
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-heat-bar{ position:relative !important; z-index:100 !important; }
+
+/* Reflets : grosses bandes obliques qui traversent vraiment l'intérieur du carré. */
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-oblique-reflet{
+  position:absolute !important;
+  pointer-events:none !important;
+  z-index:70 !important;
+  top:-90% !important;
+  left:-120% !important;
+  height:310% !important;
+  transform:rotate(22deg) skewX(-14deg) translate3d(0,0,0) !important;
+  transform-origin:center !important;
+  mix-blend-mode:screen !important;
+  will-change:left, opacity !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-oblique-reflet.reflet-a{
+  width:38% !important;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,0) 18%, rgba(255,255,255,.95) 43%, rgba(255,255,255,.98) 51%, rgba(255,255,255,.18) 68%, transparent 100%) !important;
+  filter:blur(.15px) !important;
+  animation:jackpotReflectionSweepV1815 1.45s linear infinite !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-oblique-reflet.reflet-b{
+  width:22% !important;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,.85) 50%, transparent 100%) !important;
+  filter:blur(.45px) !important;
+  animation:jackpotReflectionSweepV1815 2.15s linear infinite .55s !important;
+}
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-oblique-reflet.reflet-c{
+  width:52% !important;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,.12) 25%, rgba(255,255,255,.55) 50%, rgba(255,255,255,.10) 72%, transparent 100%) !important;
+  filter:blur(1px) !important;
+  animation:jackpotReflectionSweepV1815 2.9s linear infinite 1.05s !important;
+}
+.stats .stat.or-jackpot.jackpot-visual-v1815 .jackpot-oblique-reflet.reflet-a{ animation-delay:.18s !important; }
+.stats .stat.diamant-jackpot.jackpot-visual-v1815 .jackpot-oblique-reflet.reflet-a{ animation-delay:.34s !important; }
+
+/* badge version supprimé */
+@keyframes jackpotDiamondPulseV1815{
+  0%,100%{ transform:scale(.86); filter:brightness(.85); }
+  50%{ transform:scale(1.38); filter:brightness(2.15); }
+}
+@keyframes jackpotReflectionSweepV1815{
+  0%{ left:-125%; opacity:0; }
+  10%{ opacity:1; }
+  55%{ opacity:1; }
+  82%{ left:138%; opacity:.95; }
+  100%{ left:138%; opacity:0; }
+}
+/* === FIN v18.15 === */
+
+
+/* ============================================================
+   RESPONSIVE v21 — Adaptation complète sans chevauchement
+   Principe : chaque breakpoint réduit ce qui déborde,
+   sans toucher à la logique JS de positionnement des mains.
+   ============================================================ */
+
+/* ── 1. Variables globales fluides ─────────────────────────── */
+:root {
+  --cp-card-w: clamp(54px, 5.6vw, 78px);
+  --cp-card-h: calc(var(--cp-card-w) * 1.397);
+  --cp-board-card-w: var(--cp-card-w);
+  --cp-board-card-h: var(--cp-card-h);
+  --cp-board-gap: clamp(5px, 0.9vw, 12px);
+  --topbar-h: clamp(62px, 9.5vh, 78px);
+}
+
+/* ── 2. Structure header ────────────────────────────────────── */
+.topbar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: clamp(6px, 1vw, 12px);
+  min-height: var(--topbar-h);
+  padding: 6px clamp(260px, 27vw, 300px) 6px clamp(8px, 1.2vw, 14px);
+  overflow: visible;
+}
+
+.brand { flex: 0 0 auto; min-width: 0; }
+.title { font-size: clamp(13px, 1.6vw, 18px); white-space: nowrap; }
+
+/* Stats + jackpots : ligne centrale scrollable si nécessaire */
+.stats {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, 0.7vw, 10px);
+  overflow: visible;
+}
+
+.stat {
+  flex: 0 0 auto;
+  min-width: clamp(68px, 7.5vw, 96px);
+  padding: clamp(4px, 0.6vw, 8px) clamp(5px, 0.7vw, 10px);
+}
+
+.stat .label  { font-size: clamp(9px, 0.85vw, 11px); }
+.stat .value  { font-size: clamp(11px, 1.05vw, 13px); }
+
+/* Jackpots : largeur fluide */
+.stats .stat.jackpot {
+  min-width: clamp(82px, 9vw, 115px);
+}
+.stats .stat.jackpot .jackpot-label { font-size: clamp(9px, 0.85vw, 11px); }
+.stats .stat.jackpot .jackpot-value { font-size: clamp(12px, 1.2vw, 16px); }
+.stats .stat.jackpot .jackpot-heat-bar { height: 10px; margin-top: 5px; }
+
+/* ── 3. Breakpoint 1100px : jackpots compacts ───────────────── */
+@media (max-width: 1100px) {
+  .topbar {
+    padding-right: clamp(240px, 25vw, 270px);
+  }
+  .stats .stat.jackpot .jackpot-name > span:first-child {
+    display: none; /* cache "JACKPOT", garde "ARGENT/OR/DIAMANT" */
+  }
+  .jackpot-diamond { font-size: 9px; }
+}
+
+/* ── 4. Breakpoint 900px : header 2 lignes propres ──────────── */
+@media (max-width: 900px) {
+  :root { --topbar-h: clamp(82px, 13vh, 100px); }
+
+  .topbar {
+    flex-wrap: wrap;
+    padding: 6px 90px 6px 8px;
+    gap: 4px;
+    align-content: flex-start;
+  }
+
+  .brand { flex: 1 1 auto; order: 1; }
+
+  .stats {
+    order: 2;
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 2px;
+  }
+  .stats::-webkit-scrollbar { display: none; }
+
+  .stat.total-bets,
+  .stat.total-wins { display: none; }
+
+  .stats .stat.jackpot {
+    min-width: clamp(78px, 20vw, 108px);
+    flex: 0 0 auto;
+  }
+
+  .container {
+    height: calc(100vh - var(--topbar-h)) !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    padding: 6px;
+  }
+
+  .log { display: none !important; }
+  .board-center { top: 50% !important; }
+}
+
+/* ── 5. Breakpoint 768px : panneaux de coin compacts ────────── */
+@media (max-width: 768px) {
+  :root {
+    --cp-card-w: clamp(46px, 8.5vw, 62px);
+  }
+
+  .bet-panel {
+    width: clamp(130px, 19vw, 160px) !important;
+    padding: 6px 8px !important;
+    border-radius: 12px !important;
+  }
+  .bet-title,
+  .panel-title { font-size: 10px !important; }
+  .chip {
+    width: clamp(24px, 4.5vw, 28px) !important;
+    min-width: clamp(24px, 4.5vw, 28px) !important;
+    font-size: 10px !important;
+    padding: 4px 0 !important;
+  }
+
+  .tie-box,
+  .tie-box:hover,
+  .tie-box.tie-win,
+  .tie-box.tie-expanded-final {
+    width: clamp(110px, 16vw, 148px) !important;
+    min-width: clamp(110px, 16vw, 148px) !important;
+    min-height: clamp(68px, 10vw, 90px) !important;
+    padding: 6px 8px !important;
+    border-radius: 12px !important;
+  }
+  .tie-panel-title { font-size: 11px !important; }
+  .tie-value { font-size: 13px !important; }
+  .tie-box .tie-details { display: none !important; }
+
+  #advanceDock #btnAdvance {
+    min-width: clamp(100px, 18vw, 140px) !important;
+    font-size: 0.78rem !important;
+    padding: 8px 12px !important;
+  }
+}
+
+/* ── 6. Breakpoint 640px : mobile ───────────────────────────── */
+@media (max-width: 640px) {
+  :root {
+    --cp-card-w: clamp(42px, 11vw, 56px);
+    --topbar-h: 88px;
+  }
+
+  .topbar {
+    padding: 6px 84px 6px 8px;
+    min-height: 88px;
+  }
+
+  .brand-slogan,
+  .subtitle,
+  .status { display: none; }
+
+  .title { font-size: 14px; }
+
+  .stats .stat.jackpot .jackpot-name > span {
+    display: none !important; /* cache tous les textes label */
+  }
+  .jackpot-diamond { font-size: 8px !important; }
+  .stats .stat.jackpot .jackpot-value {
+    font-size: 12px !important;
+  }
+  .stats .stat.jackpot {
+    min-width: 60px !important;
+    padding: 4px 5px !important;
+  }
+
+  .container {
+    height: calc(100vh - 88px) !important;
+    padding: 4px !important;
+  }
+
+  .bet-panel {
+    width: 120px !important;
+    padding: 5px 6px !important;
+  }
+  .bet-buttons { gap: 3px !important; }
+  .chip {
+    width: 22px !important;
+    min-width: 22px !important;
+    font-size: 9px !important;
+  }
+
+  .tie-box,
+  .tie-box:hover,
+  .tie-box.tie-win,
+  .tie-box.tie-expanded-final {
+    width: 90px !important;
+    min-width: 90px !important;
+    min-height: 60px !important;
+    padding: 5px !important;
+    border-radius: 10px !important;
+  }
+  .tie-panel-title { font-size: 10px !important; }
+  .tie-value { font-size: 12px !important; }
+
+  #advanceDock {
+    right: 6px !important;
+    bottom: 6px !important;
+  }
+  #advanceDock #btnAdvance {
+    min-width: 90px !important;
+    min-height: 38px !important;
+    font-size: 0.72rem !important;
+    padding: 6px 10px !important;
+  }
+
+  .board-center {
+    padding: 7px 8px !important;
+  }
+}
+
+/* ── 7. Breakpoint 480px : très petit écran ─────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --cp-card-w: clamp(36px, 10vw, 46px);
+  }
+
+  .bet-panel {
+    width: 100px !important;
+    padding: 4px 5px !important;
+  }
+  .chip {
+    width: 20px !important;
+    min-width: 20px !important;
+    font-size: 8px !important;
+  }
+
+  .tie-box,
+  .tie-box:hover,
+  .tie-box.tie-win,
+  .tie-box.tie-expanded-final {
+    width: 78px !important;
+    min-width: 78px !important;
+    padding: 4px !important;
+  }
+}
+
+/* ── 8. Breakpoints hauteur ─────────────────────────────────── */
+@media (max-height: 700px) {
+  :root { --topbar-h: clamp(56px, 8vh, 68px); }
+
+  .topbar {
+    min-height: var(--topbar-h);
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .brand-slogan,
+  .subtitle,
+  .status { display: none; }
+
+  .container {
+    height: calc(100vh - var(--topbar-h)) !important;
+    padding: 5px;
+  }
+}
+
+@media (max-height: 520px) {
+  :root { --topbar-h: 44px; }
+
+  .topbar {
+    min-height: 44px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+  .logo,
+  .stat.total-bets,
+  .stat.total-wins { display: none; }
+
+  .container {
+    height: calc(100vh - 44px) !important;
+    padding: 3px;
+  }
+
+  .bet-panel { padding: 3px 4px !important; }
+  .chip {
+    width: 18px !important;
+    min-width: 18px !important;
+    font-size: 8px !important;
+    padding: 3px 0 !important;
+  }
+
+  .board-center {
+    transform: translate(-50%, -50%) scale(0.88) !important;
+    transform-origin: center center;
+  }
+}
+
+/* ── 9. Combo largeur + hauteur réduite ─────────────────────── */
+@media (max-width: 640px) and (max-height: 600px) {
+  :root {
+    --cp-card-w: clamp(30px, 8.5vw, 42px);
+    --topbar-h: 52px;
+  }
+
+  .topbar { min-height: 52px; flex-wrap: nowrap; }
+  .stats .stat.jackpot { display: none; }
+  .stat { display: none; }
+  .brand { flex: 1 1 auto; }
+
+  .container { height: calc(100vh - 52px) !important; }
+}
+
+/* ── FIN RESPONSIVE v21 ──────────────────────────────────────── */
+
+
+/* ============================================================
+   FIX RESPONSIVE v21 — Écrase les tailles figées des jackpots
+   Ces règles doivent être en toute dernière position du CSS.
+   ============================================================ */
+
+/* Supprimer le décalage gauche fixe qui provoque le débordement */
+.stats .stat.jackpot {
+  left: 0 !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+/* Libérer les dimensions figées — valeurs fluides à la place */
+.stats .stat.argent-jackpot,
+.stats .stat.or-jackpot,
+.stats .stat.diamant-jackpot {
+  height: auto !important;
+  min-height: clamp(52px, 7vw, 72px) !important;
+  max-height: none !important;
+  min-width: clamp(82px, 9vw, 115px) !important;
+  max-width: none !important;
+  width: auto !important;
+  flex-basis: auto !important;
+  padding: clamp(5px, 0.7vw, 10px) clamp(6px, 0.9vw, 12px) !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 1100px) {
+  .stats .stat.argent-jackpot,
+  .stats .stat.or-jackpot,
+  .stats .stat.diamant-jackpot {
+    min-width: clamp(72px, 8vw, 100px) !important;
+    min-height: clamp(48px, 6.5vw, 64px) !important;
+    padding: 5px 7px !important;
+  }
+  .stats .stat.jackpot .jackpot-value {
+    font-size: clamp(12px, 1.3vw, 15px) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .stats .stat.argent-jackpot,
+  .stats .stat.or-jackpot,
+  .stats .stat.diamant-jackpot {
+    min-width: clamp(68px, 19vw, 100px) !important;
+    min-height: 48px !important;
+    padding: 5px 6px !important;
+  }
+  .stats .stat.jackpot .jackpot-value {
+    font-size: 13px !important;
+  }
+  .stats .stat.jackpot .jackpot-heat-bar {
+    height: 4px !important;
+    margin-top: 4px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats .stat.argent-jackpot,
+  .stats .stat.or-jackpot,
+  .stats .stat.diamant-jackpot {
+    min-width: 58px !important;
+    min-height: 40px !important;
+    padding: 4px 5px !important;
+    border-radius: 8px !important;
+  }
+  .stats .stat.jackpot .jackpot-value {
+    font-size: 12px !important;
+  }
+  .stats .stat.jackpot .label {
+    font-size: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats .stat.argent-jackpot,
+  .stats .stat.or-jackpot,
+  .stats .stat.diamant-jackpot {
+    min-width: 50px !important;
+    min-height: 36px !important;
+    padding: 3px 4px !important;
+  }
+  .stats .stat.jackpot .jackpot-value {
+    font-size: 11px !important;
+  }
+}
+
+/* Topbar : hauteur fluide — écrase toute valeur figée */
+.topbar {
+  min-height: var(--topbar-h, clamp(62px, 9.5vh, 78px)) !important;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    min-height: var(--topbar-h, clamp(82px, 13vh, 100px)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    min-height: 88px !important;
+  }
+}
+
+@media (max-height: 700px) {
+  .topbar {
+    min-height: clamp(50px, 8vh, 64px) !important;
+  }
+}
+
+@media (max-height: 520px) {
+  .topbar {
+    min-height: 44px !important;
+  }
+}
+
+/* Override flex:0 0 124px!important qui bloque le redimensionnement */
+.stats .stat.argent-jackpot,
+.stats .stat.or-jackpot,
+.stats .stat.diamant-jackpot {
+  flex: 0 1 auto !important;
+}
+
+/* Stats container : pas de coupure — les jackpots restent visibles */
+.stats {
+  overflow: visible !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Sur mobile : autoriser le scroll horizontal plutôt que couper */
+@media (max-width: 900px) {
+  .stats {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    padding-bottom: 2px;
+  }
+  .stats::-webkit-scrollbar { display: none !important; }
+}
+
+/* === FIN FIX RESPONSIVE v21 === */
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   OVERLAY MISE v21.4 — Alignement parfait, sans conflit
+   Neutralise toutes les règles left:50%/translateX héritées.
+   ============================================================ */
+
+/* FERMÉ — complètement absent du rendu */
+.hand-details,
+.hand-top .hand-details,
+.hand-bottom .hand-details,
+.hand.hand-edge-left .hand-details,
+.hand.hand-edge-right .hand-details,
+.hand:focus-within .hand-details {
+  display: none !important;
+}
+
+/* OUVERT — aligné exactement sur la main */
+.hand.details-open .hand-details {
+  display: block !important;
+  position: absolute !important;
+
+  /* Alignement : colle aux bords gauche/droit de .hand */
+  left: 0 !important;
+  right: 0 !important;
+  width: auto !important;
+
+  /* Position verticale : bas des cartes */
+  bottom: 0 !important;
+  top: auto !important;
+
+  /* Reset total des transforms hérités */
+  transform: none !important;
+
+  padding: 0 !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 50 !important;
+
+  /* Apparition douce en opacité uniquement */
+  animation: overlayFadeIn .12s ease both !important;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Le .hand ne clippe pas le panneau */
+.hand { overflow: visible !important; }
+
+/* Style du panneau */
+.hand.details-open .hand-details-panel {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: calc(var(--cp-card-h, 90px) * 0.68) !important;
+  background: rgba(6, 14, 24, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, .15) !important;
+  border-radius: 10px 10px 16px 16px !important;
+  padding: 7px 9px 10px !important;
+  box-shadow: 0 -4px 18px rgba(0, 0, 0, .45) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+body.theme-pro .hand.details-open .hand-details-panel {
+  background: rgba(4, 8, 18, 0.96) !important;
+  border-color: rgba(212, 175, 55, .22) !important;
+}
+
+body.theme-fast .hand.details-open .hand-details-panel {
+  background: rgba(8, 12, 20, 0.96) !important;
+  border-color: rgba(74, 124, 186, .24) !important;
+}
+
+/* === FIN OVERLAY MISE v21.4 === */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   FIX v21.11 — Jackpots fluides (bonne spécificité)
+                + tie-box redesign + chips + cartes
+   ============================================================ */
+
+/* ── 1. JACKPOTS : spécificité correcte ─────────────────────
+   .jackpot-visual-v1815 ajoute 1 classe → 4 sélecteurs.
+   On doit matcher exactement pour écraser ses règles.       */
+
+.stats .stat.jackpot.jackpot-visual-v1815,
+.stats .stat.argent-jackpot.jackpot-visual-v1815,
+.stats .stat.or-jackpot.jackpot-visual-v1815,
+.stats .stat.diamant-jackpot.jackpot-visual-v1815 {
+  width:     clamp(60px, 7.8vw, 120px) !important;
+  min-width: clamp(60px, 7.8vw, 120px) !important;
+  max-width: none !important;
+  height:    auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 0 1 clamp(60px, 7.8vw, 120px) !important;
+  padding: clamp(4px, 0.55vw, 9px) clamp(5px, 0.65vw, 10px) !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+/* Libérer le padding 0 25px sur le label */
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-label,
+.stats .stat.jackpot.jackpot-visual-v1815 .label {
+  padding: 0 !important;
+}
+
+/* Valeur jackpot */
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-value,
+.stats .stat.jackpot .jackpot-value {
+  font-size: clamp(10px, 1.15vw, 15px) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Label jackpot */
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-label .jackpot-name,
+.stats .stat.jackpot .jackpot-name {
+  font-size: clamp(7px, 0.72vw, 10px) !important;
+  line-height: 1.1 !important;
+}
+
+/* Masquer "JACKPOT" (1ère ligne) sous 1100px, garder ARGENT/OR/DIAMANT */
+@media (max-width: 1100px) {
+  .stats .stat.jackpot .jackpot-name span:first-child {
+    display: none !important;
+  }
+}
+
+/* Masquer les losanges latéraux sous 900px */
+@media (max-width: 900px) {
+  .stats .stat.jackpot.jackpot-visual-v1815 .jackpot-side-diamond {
+    display: none !important;
+  }
+}
+
+/* Barre de chaleur */
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-heat-bar,
+.stats .stat.jackpot .jackpot-heat-bar {
+  height: 3px !important;
+  margin-top: 3px !important;
+  min-height: 0 !important;
+}
+
+/* Stats container : flex-shrink autorisé, gap visible entre jackpots */
+.stats {
+  overflow: visible !important;
+  flex-wrap: wrap !important;
+  gap: clamp(5px, 0.8vw, 12px) !important;
+}
+
+/* Séparateur visuel entre les 3 jackpots : ligne semi-transparente */
+.stats .stat.argent-jackpot { margin-right: clamp(2px, 0.4vw, 6px) !important; }
+.stats .stat.or-jackpot     { margin-right: clamp(2px, 0.4vw, 6px) !important; }
+
+/* Stats simples (solde, mises, gains) */
+.stat:not(.jackpot) {
+  flex: 0 1 auto !important;
+  min-width: clamp(50px, 6vw, 90px) !important;
+  padding: clamp(3px, 0.5vw, 7px) clamp(4px, 0.6vw, 9px) !important;
+}
+.stat:not(.jackpot) .label { font-size: clamp(8px, 0.8vw, 11px) !important; }
+.stat:not(.jackpot) .value { font-size: clamp(10px, 0.95vw, 13px) !important; }
+
+/* Topbar */
+.topbar {
+  min-height: clamp(50px, 9vh, 76px) !important;
+  padding-right: clamp(165px, 19vw, 255px) !important;
+  gap: clamp(3px, 0.5vw, 8px) !important;
+}
+
+/* ── 2. TIE-BOX : rectangle allongé avec reveal au survol ───*/
+
+.tie-box {
+  width: clamp(90px, 11vw, 150px) !important;
+  min-width: clamp(90px, 11vw, 150px) !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  z-index: 65 !important;
+  transition: box-shadow .18s ease !important;
+  cursor: default !important;
+}
+
+/* En-tête du tie-box toujours visible */
+.tie-head {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 2px !important;
+}
+
+.tie-panel-title {
+  font-size: clamp(9px, 0.95vw, 12px) !important;
+  white-space: nowrap !important;
+}
+
+.tie-value {
+  font-size: clamp(13px, 1.4vw, 20px) !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+/* Les carrés de mise : cachés par défaut, révélés au survol */
+.tie-details {
+  max-height: 0 !important;
+  overflow: hidden !important;
+  transition: max-height .22s ease, opacity .2s ease, margin-top .22s ease !important;
+  opacity: 0 !important;
+  margin-top: 0 !important;
+}
+
+.tie-box:hover .tie-details,
+.tie-box.tie-win .tie-details,
+.tie-box.tie-expanded-final .tie-details {
+  max-height: 80px !important;
+  opacity: 1 !important;
+  margin-top: clamp(5px, 0.7vw, 8px) !important;
+}
+
+.tie-squares {
+  display: flex !important;
+  justify-content: center !important;
+  gap: clamp(3px, 0.5vw, 6px) !important;
+}
+
+.tie-col {
+  width: clamp(22px, 2.8vw, 36px) !important;
+  flex: 0 0 auto !important;
+}
+
+.sq {
+  height: clamp(18px, 2.2vw, 28px) !important;
+  min-height: clamp(18px, 2.2vw, 28px) !important;
+}
+
+/* ── 3. BET-PANEL + CHIPS ─────────────────────────────────── */
+
+/* La largeur du panel = 5 chips + 4 gaps + 2×padding, jamais moins */
+.bet-panel {
+  width: clamp(140px, 16vw, 200px) !important;
+  min-width: clamp(140px, 16vw, 200px) !important;
+  padding: clamp(5px, 0.7vw, 9px) clamp(6px, 0.85vw, 11px) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Chips sur une seule ligne, alignés et proportionnels au panel */
+.bet-buttons {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: clamp(2px, 0.35vw, 5px) !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+/* Chaque chip = 1/5 de la zone disponible */
+.chip {
+  flex: 1 1 0 !important;
+  min-width: clamp(18px, 2vw, 28px) !important;
+  max-width: clamp(28px, 3.2vw, 36px) !important;
+  font-size: clamp(8px, 0.95vw, 12px) !important;
+  padding: clamp(4px, 0.55vw, 7px) 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+.bet-title, .panel-title {
+  font-size: clamp(8px, 0.85vw, 11px) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ── 4. CARTES : layout géré par RESPONSIVE ADAPTATION — ne pas overrider ici */
+
+/* ── 5. SLOT MACHINE CSS ──────────────────────────────────── */
+
+.jp-slot {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  line-height: inherit !important;
+}
+.jp-digit {
+  display: inline-block !important;
+  overflow: hidden !important;
+  height: 1.1em !important;
+  line-height: 1.1em !important;
+  vertical-align: bottom !important;
+  position: relative !important;
+}
+.jp-digit-reel {
+  display: flex !important;
+  flex-direction: column !important;
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.jp-digit-reel span {
+  display: block !important;
+  height: 1.1em !important;
+  line-height: 1.1em !important;
+  text-align: center !important;
+}
+
+/* === FIN FIX v21.11 === */
+
+
+/* FIX v21.12 supprimé - body:overflow:hidden est la contrainte finale */
+
+
+/* ============================================================
+   FIX FINAL v21 — Barre de chaleur (hauteur) + Cotes (z-index)
+   Ces règles sont en toute dernière position pour écraser
+   toutes les overrides précédentes.
+   ============================================================ */
+
+/* Barre de chaleur : hauteur finale imposée */
+.stats .stat.jackpot.jackpot-visual-v1815 .jackpot-heat-bar,
+.stats .stat.jackpot .jackpot-heat-bar,
+.stats .stat.argent-jackpot .jackpot-heat-bar,
+.stats .stat.or-jackpot .jackpot-heat-bar,
+.stats .stat.diamant-jackpot .jackpot-heat-bar {
+  height: 8px !important;
+  min-height: 8px !important;
+  margin-top: 6px !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+}
+
+/* Cotes au-dessus des cartes : toujours au premier plan */
+.hand-odds,
+.hand-odds.jackpot-call,
+.odds-main {
+  position: relative !important;
+  z-index: 50 !important;
+  isolation: isolate !important;
+}
+
+/* hand-inner : les mains ne se coupent pas entre elles */
+.hand {
+  z-index: auto !important;
+}
+.hand:hover,
+.hand.details-open {
+  z-index: 55 !important;
+}
+
+/* La main survolée passe devant les mains voisines */
+.hands-layer {
+  isolation: isolate;
+}
+
+/* === FIN FIX FINAL v21 === */
+
+
+/* ── TIE-BOX JACKPOT-CALL : visuel compact ─────────────────── */
+
+/* Découper "TENTE LE JACKPOT OR" en 2 lignes visuelles */
+.tie-box .tie-value.jackpot-call {
+  white-space: normal !important;
+  word-break: break-word !important;
+  hyphens: none !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  font-size: 8.5px !important;
+  font-weight: 900 !important;
+  letter-spacing: .05em !important;
+  line-height: 1.25 !important;
+  padding: 5px 6px !important;
+  text-align: center !important;
+  border-radius: 8px !important;
+  gap: 0 !important;
+}
+
+/* Taille du tie-box avec jackpot-call : assez large pour le texte */
+.tie-box:has(.tie-value.jackpot-call) {
+  min-width: clamp(90px, 10.5vw, 130px) !important;
+}
+
+/* === FIN TIE-BOX JACKPOT-CALL === */
+
+
+/* ── TIE-BOX : bloquer le survol si pas de cotes ───────────── */
+
+/* Sans cotes : le panneau de mise ne s'ouvre pas au survol */
+.tie-box.tie-no-odds .tie-details,
+.tie-box.tie-no-odds:hover .tie-details {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Sans cotes : curseur normal, pas d'interaction */
+.tie-box.tie-no-odds {
+  cursor: default !important;
+}
+
+.tie-box.tie-no-odds .sq {
+  pointer-events: none !important;
+  opacity: 0.35 !important;
+}
+
+/* === FIN TIE-NO-ODDS === */
+
+
+/* ============================================================
+   FIX GOMME + COULEURS JACKPOT-CALL
+   ============================================================ */
+
+/* Gomme supprimée sur phases passées : les mises sont verrouillées */
+
+/* Couleurs par type de jackpot pour "TENTE LE JACKPOT ..." */
+/* Couleur de POLICE uniquement selon le type de jackpot
+   Rectangle (background/border) inchangé — géré par .jackpot-call de base */
+.hand-odds.jackpot-call[data-jackpot-type="argent"],
+.tie-value.jackpot-call[data-jackpot-type="argent"] {
+  color: #c8dcea !important;
+}
+.hand-odds.jackpot-call[data-jackpot-type="or"],
+.tie-value.jackpot-call[data-jackpot-type="or"] {
+  color: #fff0a0 !important;
+}
+.hand-odds.jackpot-call[data-jackpot-type="diamant"],
+.tie-value.jackpot-call[data-jackpot-type="diamant"] {
+  color: #a0d8ff !important;
+}
+
+/* === FIN FIX GOMME + COULEURS === */
+
+
+/* Gomme : cachée sur phases TERMINÉES (pas la phase en cours) */
+.sq.disabled:not(.sq-current-phase) .eraser {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Gomme visible sur la phase en cours si jackpot misé (au hover) */
+.sq.sq-current-phase.has-jackpot-bet:hover .eraser,
+.sq.sq-current-phase.jackpot-square-locked:hover .eraser {
+  display: block !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }

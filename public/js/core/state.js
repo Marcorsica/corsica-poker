@@ -8,7 +8,7 @@
     selectedBet: 5,
     bankroll: 1000,
     totalWins: 0,
-    jackpots: { argent: 250, or: 800, diamant: 8000 },
+    jackpots: { argent: 250, or: 850, diamant: 8000 },
     oddsSnapshots: { pre: null, flop: null, turn: null, river: null },
     jackpotSnapshots: { pre: null, flop: null, turn: null, river: null },
     jackpotBets: { argent: [], or: [], diamant: [] },

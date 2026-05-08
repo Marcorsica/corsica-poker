@@ -1,3 +1,48 @@
+
+
+function forceJackpotVisualsV1815(){
+  const config = [
+    ["argentJackpotBox", "lblArgentJackpot", "ARGENT"],
+    ["orJackpotBox", "lblOrJackpot", "OR"],
+    ["diamantJackpotBox", "lblDiamantJackpot", "DIAMANT"]
+  ];
+  for (const [boxId, labelId, name] of config) {
+    const box = el(boxId);
+    const label = el(labelId);
+    if (!box || !label) continue;
+
+    box.classList.add("jackpot-visual-v1815");
+    box.classList.remove("jackpot-visual-v1812", "jackpot-visual-v1813", "jackpot-visual-v1814");
+
+    // Important : on retire tous les anciens losanges/carrés dans le titre.
+    label.querySelectorAll('.jackpot-diamond,.jackpot-side-diamond').forEach(n => n.remove());
+    label.innerHTML = '<span class="jackpot-name"><span>JACKPOT</span><span>' + name + '</span></span>';
+
+    // On garantit exactement deux losanges autour du nom : gauche + droite.
+    box.querySelectorAll('.jackpot-side-diamond').forEach(n => n.remove());
+    const left = document.createElement('span');
+    left.className = 'jackpot-side-diamond left';
+    left.textContent = '◆';
+    box.appendChild(left);
+    const right = document.createElement('span');
+    right.className = 'jackpot-side-diamond right';
+    right.textContent = '◆';
+    box.appendChild(right);
+
+    // Reflets obliques réels : plusieurs calques HTML animés dans la case.
+    box.querySelectorAll('.jackpot-real-shine,.jackpot-real-flash,.jackpot-oblique-reflet').forEach(n => n.remove());
+    for (const cls of ['reflet-a', 'reflet-b', 'reflet-c']) {
+      const r = document.createElement('span');
+      r.className = 'jackpot-oblique-reflet ' + cls;
+      box.appendChild(r);
+    }
+  }
+}
+
+// Compatibilité avec les anciens appels internes.
+function forceJackpotVisualsV1814(){ forceJackpotVisualsV1815(); }
+function forceJackpotVisualsV1813(){ forceJackpotVisualsV1815(); }
+
 // ==================================================
 // TABLE LAYOUT / RENDERING
 // ==================================================
@@ -25,18 +70,20 @@ function getHandPositions(count) {
 let handLayoutRaf = 0;
 
 function getHandScale(count, layerRect) {
- // Blocs cartes/cotes agrandis : on garde une échelle haute sur grand écran,
- // puis on réduit seulement quand la largeur/hauteur disponible l'impose.
  let scale = ({ 4: 1.10, 5: 1.08, 6: 1.05, 7: 1.01, 8: 1.04, 9: 1.01, 10: 0.98 }[count] || 0.98);
 
  if (layerRect.width < 1360) scale -= 0.02;
  if (layerRect.width < 1220) scale -= 0.03;
  if (layerRect.width < 1080) scale -= 0.04;
  if (layerRect.width < 980) scale -= 0.05;
+ if (layerRect.width < 760) scale -= 0.12;
+ if (layerRect.width < 560) scale -= 0.20;
  if (layerRect.height < 800) scale -= 0.03;
  if (layerRect.height < 720) scale -= 0.04;
+ if (layerRect.height < 620) scale -= 0.10;
+ if (layerRect.height < 520) scale -= 0.16;
 
- return Math.max(0.84, Math.min(1.12, scale));
+ return Math.max(0.46, Math.min(1.12, scale));
 }
 
 function getRelativeObstacleRect(node, layerRect, padX = 0, padY = 0, extraLeft = 0, extraRight = 0) {
@@ -113,6 +160,8 @@ function resolveHandsLayout() {
   node.style.top = `${point.y}px`;
   node.style.transform = `translate(-50%,-50%) scale(${scale})`;
   node.style.transformOrigin = "center center";
+  // Mains plus basses = z-index plus élevé → cotes/jackpot-call passent devant les cartes du dessus
+  node.style.zIndex = String(10 + Math.round(point.y / 10));
  });
 
  updateJackpotDisplays();
@@ -232,10 +281,11 @@ function setLang(newLang) {
  if (lblBankroll) lblBankroll.textContent = t.bankroll;
  if (lblTotalBets) lblTotalBets.textContent = t.totalBets;
  if (lblTotalWins) lblTotalWins.textContent = t.totalWins;
- if (el("lblBronzeJackpot")) el("lblBronzeJackpot").textContent = t.bronzeJackpot;
- if (el("lblArgentJackpot")) el("lblArgentJackpot").textContent = t.argentJackpot;
- if (el("lblOrJackpot")) el("lblOrJackpot").textContent = t.orJackpot;
- if (el("lblDiamantJackpot")) el("lblDiamantJackpot").textContent = t.diamantJackpot;
+ if (el("lblBronzeJackpot")) el("lblBronzeJackpot").innerHTML = '<span class="jackpot-name-line">Jackpot</span><span class="jackpot-name-line">Bronze</span>';
+ if (el("lblArgentJackpot")) el("lblArgentJackpot").innerHTML = '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>ARGENT</span></span><span class="jackpot-diamond right">◆</span>';
+ if (el("lblOrJackpot")) el("lblOrJackpot").innerHTML = '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>OR</span></span><span class="jackpot-diamond right">◆</span>';
+ if (el("lblDiamantJackpot")) el("lblDiamantJackpot").innerHTML = '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>DIAMANT</span></span><span class="jackpot-diamond right">◆</span>';
+ forceJackpotVisualsV1815();
 
  if (boardTitle) boardTitle.textContent = t.board + " – " + t.phase[phase];
  if (btnSameTable) btnSameTable.textContent = t.sameTable;
@@ -366,6 +416,9 @@ function isPointerInsideElement(el, tolerance = 8) {
 function openHandDetails(wrap) {
  if (!wrap) return;
  if (typeof hasWinningHandLocked === "function" && hasWinningHandLocked()) return;
+ // Ne pas ouvrir si aucune case de mise n'est active (main éliminée ou sans cotes)
+ const hasActiveSq = wrap.querySelector('.sq.active, .sq.hasBet');
+ if (!hasActiveSq) return;
  closeOtherHandDetails(wrap);
  updateHandDetailsPlacement(wrap);
  if (wrap._closeDetailsTimer) {
@@ -388,14 +441,12 @@ function isPointerInsideHandInteractiveArea(wrap) {
     if (activeArea && wrap.contains(activeArea)) return true;
   }
   const trigger = wrap.querySelector(".hand-main");
-  const details = wrap.querySelector(".hand-details");
-  return !!(
-    (trigger && isPointerInsideElement(trigger, 14)) ||
-    (details && wrap.classList.contains("details-open") && isPointerInsideElement(details, 18))
-  );
+  // Le panneau overlay recouvre les cartes : tolérance réduite à 4px
+  // pour éviter qu'un panneau adjacent soit considéré "actif".
+  return !!(trigger && isPointerInsideElement(trigger, 4));
 }
 
-function closeHandDetailsSoon(wrap, delay = 320) {
+function closeHandDetailsSoon(wrap, delay = 120) {
  if (!wrap) return;
  if (wrap._closeDetailsTimer) clearTimeout(wrap._closeDetailsTimer);
  wrap._closeDetailsTimer = setTimeout(() => {
@@ -581,6 +632,7 @@ function buildHandsUI() {
 
  cleanSq.addEventListener("click", () => {
   if (cleanSq.classList.contains("jackpot-square-locked")) return;
+  if (cleanSq.classList.contains("disabled")) return;
   onTieClick(cleanSq.dataset.tiePhase);
  });
  cleanSq.appendChild(makeEraser(() => undoTieBet(cleanSq.dataset.tiePhase)));
@@ -690,6 +742,7 @@ function renderHands() {
  odds.textContent = visibleJackpotLabel;
  odds.classList.add("jackpot-call");
  const type = currentJackpotType;
+ if (type) odds.dataset.jackpotType = type.toLowerCase();
  const jackpotLocked = !!type && isJackpotTypeLockedForTarget(type, "hand", i);
  odds.classList.toggle("jackpot-locked", jackpotLocked);
  odds.onclick = jackpotLocked ? null : () => {
@@ -740,6 +793,8 @@ function renderHands() {
  const active = phase === ph && phase !== "river" && !jackpotSquareLocked && (bettableHand || jackpotEligibleCurrentPhase);
  sq.classList.toggle("active", active);
  sq.classList.toggle("disabled", phase === "river" || !["pre", "flop", "turn"].includes(phase) || !active || jackpotSquareLocked);
+ // Marquer les cases de la phase en cours pour la gomme jackpot
+ sq.classList.toggle("sq-current-phase", ph === phase && phase !== "river");
  sq.classList.toggle("jackpot-square-locked", jackpotSquareLocked);
  sq.classList.toggle("hasBet", (h.bets[ph] || 0) > 0 || !!jackpotBetTypeOnSquare);
  sq.classList.toggle("has-jackpot-bet", !!jackpotBetTypeOnSquare);
@@ -785,6 +840,11 @@ function renderHands() {
 
  if (tieBox) {
  tieBox.classList.toggle("tie-bet-framed", hasTieBet);
+ // Bloquer les nouvelles mises si pas de cotes ET pas de mises existantes
+ const tieHasOddsNow = !!(tieBet && (tieBet.tieProb > 0 || (tieBet.oddsStr && tieBet.oddsStr !== '—')));
+ const tieHasExistingBets = !!(tieBet && ((tieBet.bets && (tieBet.bets.pre || tieBet.bets.flop || tieBet.bets.turn))));
+ // tie-no-odds seulement si pas de cotes ET rien à consulter
+ tieBox.classList.toggle("tie-no-odds", !tieHasOddsNow && !tieHasExistingBets);
  }
  if (tieBetDot) {
  // Ancien point rouge désactivé : l'égalité est maintenant indiquée par un contour, comme les mains.
@@ -808,6 +868,7 @@ if (tieOddsEl) {
  tieOddsEl.textContent = visibleTieJackpotLabel;
  tieOddsEl.classList.add("jackpot-call");
  const type = currentTieJackpotType;
+ if (type) tieOddsEl.dataset.jackpotType = type.toLowerCase();
  const jackpotLocked = !!type && isJackpotTypeLockedForTarget(type, "tie", -1);
  tieOddsEl.classList.toggle("jackpot-locked", jackpotLocked);
  tieOddsEl.onclick = jackpotLocked ? null : () => {
@@ -835,9 +896,11 @@ if (tieOddsEl) {
  const jackpotEligibleCurrentPhase = tieJackpotType && ph === phase && phase !== "river" && !tieJackpotOfferSuppressed;
  const jackpotBetTypeOnSquare = getJackpotBetTypeOnTargetPhase("tie", -1, ph);
  const jackpotSquareLocked = !!jackpotBetTypeOnSquare;
- const active = phase === ph && phase !== "river" && !jackpotSquareLocked;
+ const tieHasOdds = !!(tieBet && (tieBet.tieProb > 0 || tieBet.oddsStr && tieBet.oddsStr !== '—'));
+ const active = phase === ph && phase !== "river" && !jackpotSquareLocked && (tieHasOdds || jackpotEligibleCurrentPhase);
  sq.classList.toggle("active", active);
  sq.classList.toggle("disabled", phase === "river" || !active || jackpotSquareLocked);
+ sq.classList.toggle("sq-current-phase", ph === phase && phase !== "river");
  sq.classList.toggle("jackpot-square-locked", jackpotSquareLocked);
  sq.classList.toggle("hasBet", (tieBet.bets[ph] || 0) > 0 || !!jackpotBetTypeOnSquare);
  sq.classList.toggle("has-jackpot-bet", !!jackpotBetTypeOnSquare);
@@ -1222,3 +1285,10 @@ function canBetOnPhase(ph) {
  return phase === ph && phase !== "river" && !roundFinished && !isCalculating;
 }
 
+
+
+// Filet de sécurité : si une autre fonction réécrit les labels jackpots, on les remet aussitôt.
+document.addEventListener('DOMContentLoaded', () => {
+  forceJackpotVisualsV1815();
+  setInterval(forceJackpotVisualsV1814, 300);
+});

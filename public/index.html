@@ -4,7 +4,9 @@
  <meta charset="utf-8" />
  <meta name="viewport" content="width=device-width,initial-scale=1" />
  <title>Corsica Poker – Demo</title>
- <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="css/style.css?v=18.15-pulse-reflets-bougent" />
 
  <script>
   // Bloque le menu navigateur avant même le chargement des modules du jeu.
@@ -22,14 +24,48 @@
 <body class="pregame-screen">
 
 <div id="splashScreen" class="splash">
- <div class="splash-content">
-  <div class="splash-logo-wrap">
-   <div class="logo-main">♠</div>
+
+  <div class="splash-floaters" id="splashFloaters"></div>
+
+  <div class="splash-content">
+
+    <div class="splash-ornament">
+      <div class="splash-ornament-line"></div>
+      <div class="splash-ornament-sym">◆ ◆ ◆</div>
+      <div class="splash-ornament-line r"></div>
+    </div>
+
+    <div class="splash-logo-wrap">
+      <div class="logo-main">♠</div>
+    </div>
+
+    <div class="splash-brand">Corsica Poker</div>
+    <div class="splash-tagline">Jouez la cote</div>
+
+    <div class="splash-divider"></div>
+
+    <div class="splash-jackpots stats">
+      <div class="stat jackpot argent-jackpot jackpot-visual-v1815" id="splashArgentBox">
+        <div class="label jackpot-label"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>ARGENT</span></span><span class="jackpot-diamond right">◆</span></div>
+        <div class="value jackpot-value"><span id="splashJpArgent">250</span></div>
+        <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="splashArgentFill" style="--heat-progress:18%"></div></div>
+      </div>
+      <div class="stat jackpot or-jackpot jackpot-visual-v1815" id="splashOrBox">
+        <div class="label jackpot-label"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>OR</span></span><span class="jackpot-diamond right">◆</span></div>
+        <div class="value jackpot-value"><span id="splashJpOr">850</span></div>
+        <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="splashOrFill" style="--heat-progress:32%"></div></div>
+      </div>
+      <div class="stat jackpot diamant-jackpot jackpot-visual-v1815" id="splashDiamantBox">
+        <div class="label jackpot-label"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>DIAMANT</span></span><span class="jackpot-diamond right">◆</span></div>
+        <div class="value jackpot-value"><span id="splashJpDiamant">8 000</span></div>
+        <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="splashDiamantFill" style="--heat-progress:12%"></div></div>
+      </div>
+    </div>
+
+    <button type="button" id="btnStart" class="btn primary splash-start">Jouer</button>
+    <div class="splash-demo-label" id="splashDemoLabel">Démo — Pas d'argent réel</div>
+
   </div>
-  <div class="splash-brand">Corsica Poker</div>
-  <div class="splash-tagline">Jouez la cote</div>
-  <button type="button" id="btnStart" class="btn primary splash-start">Jouer</button>
- </div>
 </div>
 
  <header class="topbar">
@@ -43,7 +79,7 @@
  </div>
  </div>
 
- <div class="stats">
+ <div class="stats" data-version="v18.15-LOSANGES-PULSE-REFLETS-MOUVANTS">
  
  <div class="stat">
  <div class="label" id="lblBankroll"></div>
@@ -61,18 +97,18 @@
  <div class="label jackpot-label" id="lblBronzeJackpot">Jackpot Bronze</div>
  <div class="value jackpot-value"><span id="bronzeJackpotValue">200</span></div>
  </div>
- <div class="stat jackpot argent-jackpot" id="argentJackpotBox">
- <div class="label jackpot-label" id="lblArgentJackpot">Jackpot Argent</div>
+ <div class="stat jackpot argent-jackpot jackpot-visual-v1815" id="argentJackpotBox">
+ <div class="label jackpot-label" id="lblArgentJackpot"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>ARGENT</span></span><span class="jackpot-diamond right">◆</span></div>
  <div class="value jackpot-value"><span id="argentJackpotValue">250</span></div>
  <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="argentHeatFill"></div></div>
  </div>
- <div class="stat jackpot or-jackpot" id="orJackpotBox">
- <div class="label jackpot-label" id="lblOrJackpot">Jackpot Or</div>
- <div class="value jackpot-value"><span id="orJackpotValue">800</span></div>
+ <div class="stat jackpot or-jackpot jackpot-visual-v1815" id="orJackpotBox">
+ <div class="label jackpot-label" id="lblOrJackpot"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>OR</span></span><span class="jackpot-diamond right">◆</span></div>
+ <div class="value jackpot-value"><span id="orJackpotValue">850</span></div>
  <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="orHeatFill"></div></div>
  </div>
- <div class="stat jackpot diamant-jackpot" id="diamantJackpotBox">
- <div class="label jackpot-label" id="lblDiamantJackpot">Jackpot Diamant</div>
+ <div class="stat jackpot diamant-jackpot jackpot-visual-v1815" id="diamantJackpotBox">
+ <div class="label jackpot-label" id="lblDiamantJackpot"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>DIAMANT</span></span><span class="jackpot-diamond right">◆</span></div>
  <div class="value jackpot-value"><span id="diamantJackpotValue">8000</span></div>
  <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="diamantHeatFill"></div></div>
  </div>
@@ -229,23 +265,23 @@
  </div>
  </div>
 
- <audio id="sndDeal" preload="auto" src="/assets/audio/snd_deal.mp3"></audio>
- <audio id="sndCard" preload="auto" src="/assets/audio/snd_card.mp3"></audio>
+ <audio id="sndDeal" preload="auto" src="/external-audio/snd_deal.mp3"></audio>
+ <audio id="sndCard" preload="auto" src="/external-audio/snd_card.mp3"></audio>
  <audio id="sndAmbience" preload="auto" loop src="/audio/audio_1_jazz.mp3"></audio>
  <audio id="sndCasino" preload="auto" loop src="/audio/audio_6_casino.mp3"></audio>
 
  <div id="tableTransition" class="table-transition"></div>
  <script src="js/core/state.js"></script>
- <script src="js/core/config-state.js"></script>
+ <script src="js/config/game-config.js"></script>
  <script src="js/core/runtime.js"></script>
- <script src="js/core/actions.js"></script>
+ <script src="js/controllers/actions.js"></script>
  <script src="js/core/audio.js"></script>
  <script src="js/game/odds.js"></script>
- <script src="js/game/jackpot-engine.js"></script>
- <script src="js/game/jackpots.js"></script>
- <script src="js/game/cards-engine.js"></script>
- <script src="js/ui/rendering.js"></script>
- <script src="js/game/betting.js"></script>
+ <script src="js/economy/jackpot-engine.js"></script>
+ <script src="js/economy/jackpots.js"></script>
+ <script src="js/core/cards-engine.js"></script>
+ <script src="js/ui/rendering.js?v=18.15-pulse-reflets-bougent"></script>
+ <script src="js/economy/betting.js"></script>
  <script src="js/game/round-flow.js"></script>
  <script src="js/ui/setup-ui.js"></script>
  <script src="js/api/server-sync.js"></script>
@@ -343,5 +379,77 @@
     </div>
   </div>
 </div>
+
+<script>
+/* === SPLASH — Floaters + sync jackpots === */
+(function() {
+  // Floaters Classique
+  var container = document.getElementById('splashFloaters');
+  if (container) {
+    var suits = ['♠','♥','♦','♣'];
+    for (var i = 0; i < 20; i++) {
+      var s = document.createElement('span');
+      s.textContent = suits[i % 4];
+      s.style.left = (Math.random() * 100) + '%';
+      s.style.animationDuration = (14 + Math.random() * 18) + 's';
+      s.style.animationDelay = (-Math.random() * 24) + 's';
+      s.style.setProperty('--r', ((Math.random() - .5) * 40) + 'deg');
+      container.appendChild(s);
+    }
+  }
+
+  // Sync jackpots splash ← valeurs du header, en boucle tant que le splash est visible
+  var splashSyncInterval = null;
+
+  function syncSplashJackpots() {
+    var map = [
+      { src: 'argentJackpotValue',  dst: 'splashJpArgent',  fill: 'splashArgentFill',  reset: 250,  max: 2000  },
+      { src: 'orJackpotValue',      dst: 'splashJpOr',      fill: 'splashOrFill',       reset: 850,  max: 5000  },
+      { src: 'diamantJackpotValue', dst: 'splashJpDiamant', fill: 'splashDiamantFill',  reset: 8000, max: 50000 }
+    ];
+    var anyUpdated = false;
+    map.forEach(function(m) {
+      var srcEl  = document.getElementById(m.src);
+      var dstEl  = document.getElementById(m.dst);
+      var fillEl = document.getElementById(m.fill);
+      if (!srcEl || !dstEl) return;
+      var raw = srcEl.textContent.replace(/[\s\u00a0]/g, '').replace(',', '.');
+      var val = parseFloat(raw) || m.reset;
+      // Ne mettre à jour que si la valeur est différente du défaut déjà affiché
+      var displayed = parseFloat(dstEl.textContent.replace(/[^0-9.]/g, '')) || 0;
+      if (Math.abs(val - displayed) > 0.01) {
+        dstEl.textContent = val.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        anyUpdated = true;
+      }
+      if (fillEl) {
+        var pct = Math.min(100, Math.max(0, Math.round(((val - m.reset) / (m.max - m.reset)) * 100)));
+        fillEl.style.setProperty('--heat-progress', pct + '%');
+      }
+    });
+    return anyUpdated;
+  }
+
+  function startSplashJackpotSync() {
+    syncSplashJackpots();
+    // Relancer toutes les 300ms tant que le splash est visible
+    splashSyncInterval = setInterval(function() {
+      var splash = document.getElementById('splashScreen');
+      if (!splash || splash.classList.contains('hidden')) {
+        clearInterval(splashSyncInterval);
+        return;
+      }
+      syncSplashJackpots();
+    }, 300);
+  }
+
+  if (document.readyState === 'complete') {
+    startSplashJackpotSync();
+  } else {
+    window.addEventListener('load', startSplashJackpotSync);
+  }
+})();
+</script>
+
+<script src="js/ui/slot-animation.js"></script>
 </body>
 </html>

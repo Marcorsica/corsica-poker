@@ -1020,14 +1020,16 @@ function syncHeaderTestButton(){
   const isGame = document.body && document.body.classList.contains("gameplay-screen");
   testBtn.style.display = isGame ? "inline-flex" : "none";
   testBtn.style.position = "absolute";
-  testBtn.style.top = "12px";
-  testBtn.style.right = "64px";
+  testBtn.style.top = "";
+  testBtn.style.right = "";
   testBtn.style.transform = "none";
-  testBtn.style.zIndex = "2100";
+  testBtn.style.zIndex = "3120";
   testBtn.style.pointerEvents = isGame ? "auto" : "none";
-  testBtn.style.height = "42px";
+  testBtn.style.height = "";
   testBtn.style.alignItems = "center";
+  testBtn.style.justifyContent = "center";
   testBtn.style.whiteSpace = "nowrap";
+  testBtn.classList.add("header-test-btn");
   if (testBtn.parentElement !== journalBtn.parentElement) {
     journalBtn.parentElement.insertBefore(testBtn, journalBtn.nextSibling);
   }

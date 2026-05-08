@@ -19,7 +19,7 @@ const MARGIN = 0.015;
 
 const jackpotConfig = {
   argent: { reset: 250, color: '#C0C0C0' },
-  or: { reset: 800, color: '#FFD700' },
+  or: { reset: 850, color: '#FFD700' },
   diamant: { reset: 8000, color: '#7dd3fc' },
 };
 const ECONOMY_SPLITS = {
@@ -103,6 +103,41 @@ function getExtremeCaseById(caseId) {
 
 const jackpots = Object.fromEntries(Object.entries(jackpotConfig).map(([k,v]) => [k, { value: v.reset, reset: v.reset, relay: 0, color: v.color }]));
 
+// ── Persistence jackpots ──────────────────────────────────────────────────────
+const JACKPOTS_FILE = path.join(__dirname, '..', 'data', 'jackpots.json');
+
+function saveJackpots() {
+  try {
+    const dir = path.dirname(JACKPOTS_FILE);
+    if (!require('fs').existsSync(dir)) require('fs').mkdirSync(dir, { recursive: true });
+    const data = {};
+    for (const [k, v] of Object.entries(jackpots)) {
+      data[k] = { value: v.value, relay: v.relay };
+    }
+    require('fs').writeFileSync(JACKPOTS_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (e) {
+    console.error('saveJackpots error:', e.message);
+  }
+}
+
+function loadJackpots() {
+  try {
+    if (!require('fs').existsSync(JACKPOTS_FILE)) return;
+    const data = JSON.parse(require('fs').readFileSync(JACKPOTS_FILE, 'utf8'));
+    for (const [k, v] of Object.entries(data)) {
+      if (jackpots[k] && typeof v.value === 'number' && v.value >= jackpots[k].reset) {
+        jackpots[k].value = Math.round(v.value * 100) / 100;
+        jackpots[k].relay = Math.round((v.relay || 0) * 100) / 100;
+      }
+    }
+    console.log('Jackpots restaurés:', JSON.stringify(jackpotSnapshot()));
+  } catch (e) {
+    console.error('loadJackpots error:', e.message);
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+
 function jackpotSnapshot() {
   const out = {};
   for (const [k,v] of Object.entries(jackpots)) out[k] = Math.round(v.value * 100) / 100;
@@ -117,6 +152,7 @@ function contributeJackpots(amount) {
     jackpots[key].value = Math.round(jackpots[key].value * 100) / 100;
     jackpots[key].relay = Math.round(jackpots[key].relay * 100) / 100;
   }
+  saveJackpots();
 }
 
 function refundJackpots(amount) {
@@ -125,6 +161,7 @@ function refundJackpots(amount) {
     jackpots[key].value = Math.max(jackpots[key].reset, jackpots[key].value - (net * jackpotSplits[key]));
     jackpots[key].value = Math.round(jackpots[key].value * 100) / 100;
   }
+  saveJackpots();
 }
 
 function claimJackpot(type) {
@@ -134,8 +171,11 @@ function claimJackpot(type) {
   const relayBoost = Math.min(jp.relay, jp.reset * 0.25);
   jp.value = Math.round((jp.reset + relayBoost) * 100) / 100;
   jp.relay = Math.round(Math.max(0, jp.relay - relayBoost) * 100) / 100;
+  saveJackpots();
   return { type, paid, resetTo: jp.value };
 }
+
+loadJackpots();
 
 const LOGS_DIR = path.join(__dirname, '..', '..', 'logs');
 const SERVER_LOG_FILE = path.join(LOGS_DIR, 'corsica-server.log');

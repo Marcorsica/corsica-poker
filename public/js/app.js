@@ -9,4 +9,4 @@ document.addEventListener("dragstart", (event) => {
 });
 
 // Point d'entrée léger : les scripts sont désormais découpés par responsabilités.
-// Voir public/js/core, public/js/game, public/js/ui et public/js/api.
+// Voir public/js/config, public/js/core, public/js/economy, public/js/game, public/js/ui, public/js/controllers et public/js/api.
