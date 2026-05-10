@@ -13,7 +13,7 @@ function saveSettings() {
    casinoLayerEnabled
   };
   localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(payload));
- } catch (_) {}
+ } catch(_){ console.warn("[runtime] erreur silencieuse:", _); }
 }
 
 function loadSettings() {
@@ -51,7 +51,7 @@ function sendClientLog(entry) {
    body: JSON.stringify(entry),
    keepalive: true,
   }).catch(() => {});
- } catch (_) {}
+ } catch(_){ console.warn("[runtime] erreur silencieuse:", _); }
 }
 
 function log(line, meta = {}) {

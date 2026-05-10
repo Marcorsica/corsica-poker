@@ -37,7 +37,7 @@
     autoFinishTimer: null,
     lastWinningTargets: [],
     advanceUnlockedForRound: false,
-    currentFeltIndex: 9,
+    currentFeltIndex: 5,  // Gris anthracite par défaut
     serverGameId: null,
   };
 
@@ -92,10 +92,65 @@
     return state;
   }
 
+  /* ── Fonctions de protection contre les modifications non coordonnées ── */
+
+  // totalWins : toujours passer par addToTotalWins() pour éviter les doublons
+  function addToTotalWins(amount, source) {
+    if (!amount || amount <= 0) return;
+    state.totalWins += amount;
+    console.info('[gains] +' + amount.toFixed(2) + ' via ' + (source || 'inconnu') + ' -> total: ' + state.totalWins.toFixed(2));
+  }
+
+  // resetTotalWins : réinitialise en début de manche
+  function resetTotalWins(source) {
+    console.info('[gains] remise a zero via ' + (source || 'inconnu'));
+    state.totalWins = 0;
+  }
+
+  // setRoundFinished : trace qui termine la manche
+  function setRoundFinished(value, source) {
+    console.info('[manche] roundFinished = ' + value + ' via ' + (source || 'inconnu'));
+    state.roundFinished = value;
+  }
+
+  // resetJackpotRound : un seul endroit pour réinitialiser les mises jackpot
+  function resetJackpotRound(source) {
+    state.jackpotBets = { argent: [], or: [], diamant: [] };
+    state.jackpotRoundStake = { argent: 0, or: 0, diamant: 0 };
+    console.info('[jackpot] mises reinitialisees via ' + (source || 'inconnu'));
+  }
+
+  function addToTotalWins(amount, source) {
+    if (!amount || amount <= 0) return;
+    state.totalWins += amount;
+    console.info('[gains] +' + amount.toFixed(2) + ' via ' + (source || 'inconnu') + ' -> total: ' + state.totalWins.toFixed(2));
+  }
+  function resetTotalWins(source) {
+    console.info('[gains] remise a zero via ' + (source || 'inconnu'));
+    state.totalWins = 0;
+  }
+  function setRoundFinished(value, source) {
+    console.info('[manche] roundFinished = ' + value + ' via ' + (source || 'inconnu'));
+    state.roundFinished = value;
+  }
+  function resetJackpotRound(source) {
+    state.jackpotBets = { argent: [], or: [], diamant: [] };
+    state.jackpotRoundStake = { argent: 0, or: 0, diamant: 0 };
+    console.info('[jackpot] mises reinitialisees via ' + (source || 'inconnu'));
+  }
+
   global.CorsicaState = state;
   global.setStateValue = setStateValue;
   global.patchState = patchState;
   global.resetRoundState = resetRoundState;
+  global.addToTotalWins = addToTotalWins;
+  global.resetTotalWins = resetTotalWins;
+  global.setRoundFinished = setRoundFinished;
+  global.resetJackpotRound = resetJackpotRound;
+  global.addToTotalWins = addToTotalWins;
+  global.resetTotalWins = resetTotalWins;
+  global.setRoundFinished = setRoundFinished;
+  global.resetJackpotRound = resetJackpotRound;
 
   [
     'lang', 'phase', 'deck', 'board', 'hands', 'selectedBet', 'bankroll', 'totalWins',

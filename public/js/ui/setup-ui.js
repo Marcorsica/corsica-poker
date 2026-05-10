@@ -337,7 +337,7 @@ document.addEventListener("click", startAmbience, { once: true });
 const settingsLockBtn = document.getElementById("settingsLockBtn");
 if (settingsLockBtn) {
  settingsLockBtn.addEventListener("click", async () => {
-  try { await fetch("/logout", { method: "POST" }); } catch (_) {}
+  try { await fetch("/logout", { method: "POST" }); } catch(_){ console.warn("[setup-ui] erreur silencieuse"); }
   window.location.href = "/login";
  });
 }
@@ -841,7 +841,7 @@ function playSoftUiTone(type = "validate"){
     osc2.start(now);
     osc.stop(now + 0.22);
     osc2.stop(now + 0.22);
-  }catch(e){}
+  }catch(e){ console.warn("[audio] oscillator stop:", e); }
 }
 
 function bindPremiumRoundButtons(){
@@ -874,8 +874,8 @@ setInterval(bindPremiumRoundButtons, 1000);
 const GAME_STYLE_STORAGE_KEY = "corsicaPokerGameStyle";
 
 function applyGameStyle(style){
-  const safeStyle = ["current", "fast", "pro"].includes(style) ? style : "current";
-  document.body.classList.remove("theme-current", "theme-fast", "theme-pro");
+  const safeStyle = ["current", "fast", "pro", "nuit"].includes(style) ? style : "current";
+  document.body.classList.remove("theme-current", "theme-fast", "theme-pro", "theme-nuit");
   document.body.classList.add(`theme-${safeStyle}`);
 
   document.querySelectorAll(".game-style-btn").forEach(btn => {
@@ -884,7 +884,7 @@ function applyGameStyle(style){
 
   try{
     localStorage.setItem(GAME_STYLE_STORAGE_KEY, safeStyle);
-  }catch(e){}
+  }catch(e){ console.warn("[setup-ui]:", e); }
 }
 
 function bindGameStyleSettings(){
@@ -900,7 +900,7 @@ function bindGameStyleSettings(){
   let saved = "current";
   try{
     saved = localStorage.getItem(GAME_STYLE_STORAGE_KEY) || "current";
-  }catch(e){}
+  }catch(e){ console.warn("[setup-ui]:", e); }
   applyGameStyle(saved);
 }
 
@@ -915,19 +915,19 @@ setTimeout(bindGameStyleSettings, 1000);
 
 function syncAdvanceAndAbandonButtonsSafe(){
   if (typeof mountValidationButtonBottomRight === "function") {
-    try { mountValidationButtonBottomRight(); } catch (_) {}
+    try { mountValidationButtonBottomRight(); } catch (e) { console.warn("[ui] mountValidationButtonBottomRight:", e); }
   }
   if (typeof updateValidationButtonContext === "function") {
-    try { updateValidationButtonContext(); } catch (_) {}
+    try { updateValidationButtonContext(); } catch (e) { console.warn("[ui] updateValidationButtonContext:", e); }
   }
   if (typeof syncAbandonDockVisibility === "function") {
-    try { syncAbandonDockVisibility(); } catch (_) {}
+    try { syncAbandonDockVisibility(); } catch (e) { console.warn("[ui] syncAbandonDockVisibility:", e); }
   }
   if (typeof stylizeAdvanceButtonInPlace === "function") {
-    try { stylizeAdvanceButtonInPlace(); } catch (_) {}
+    try { stylizeAdvanceButtonInPlace(); } catch (e) { console.warn("[ui] stylizeAdvanceButtonInPlace:", e); }
   }
   if (typeof stylizeAbandonButtonPremium === "function") {
-    try { stylizeAbandonButtonPremium(); } catch (_) {}
+    try { stylizeAbandonButtonPremium(); } catch (e) { console.warn("[ui] stylizeAbandonButtonPremium:", e); }
   }
 }
 
@@ -1060,7 +1060,7 @@ function ensureAdvanceDockUsable(){
     btnAdvance.style.visibility = gameplayVisible ? "visible" : "hidden";
     btnAdvance.style.opacity = gameplayVisible ? "1" : "0";
     btnAdvance.style.pointerEvents = (!btnAdvance.disabled && gameplayVisible) ? "auto" : "none";
-  }catch(e){}
+  }catch(e){ console.warn("[ui] ensureAdvanceDockUsable:", e); }
 }
 
 window.addEventListener("DOMContentLoaded", ensureAdvanceDockUsable);

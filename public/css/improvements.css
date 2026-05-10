@@ -1,0 +1,171 @@
+.chip[data-amt] {
+  position: relative !important;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.14), transparent 38%),
+    linear-gradient(160deg, #2a2620 0%, #0e0c09 55%, #1a1710 100%) !important;
+  border: 2px solid rgba(212,175,55,.60) !important;
+  color: #f0c84a !important;
+  font-weight: 900 !important;
+  text-shadow: 0 0 8px rgba(246,211,107,.55), 0 1px 2px rgba(0,0,0,.80) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12),
+    0 0 0 1px rgba(0,0,0,.50), 0 6px 14px rgba(0,0,0,.40) !important;
+}
+.chip[data-amt]::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 4px !important;
+  border-radius: 50% !important;
+  border: 1px dashed rgba(212,175,55,.38) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+.chip.active[data-amt] {
+  background: linear-gradient(160deg, #ffe08a 0%, #d4a820 45%, #f0c040 100%) !important;
+  border: 2px solid rgba(255,255,255,.85) !important;
+  color: #1a1000 !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.25),
+    0 0 18px rgba(246,211,107,.65) !important;
+  transform: translateY(-3px) scale(1.12) !important;
+}
+@keyframes oddsFlash {
+  0%   { transform: scale(1.28); filter: brightness(1.75); }
+  45%  { transform: scale(1.10); filter: brightness(1.30); }
+  100% { transform: scale(1);    filter: brightness(1); }
+}
+.hand-odds.odds-updated {
+  animation: oddsFlash .65s ease forwards !important;
+}
+.board-title {
+  color: #f6d36b !important;
+  font-weight: 900 !important;
+  letter-spacing: .18em !important;
+  text-transform: uppercase !important;
+}
+
+/* FAVORI : clignotement rouge permanent sur le texte */
+@keyframes favoriBlink {
+  0%   { color: #ffffff; text-shadow: 0 0 18px rgba(255,60,40,.90), 0 0 30px rgba(255,40,20,.60); }
+  50%  { color: #ffffff; text-shadow: 0 0 4px rgba(200,40,20,.20); }
+  100% { color: #ffffff; text-shadow: 0 0 18px rgba(255,60,40,.90), 0 0 30px rgba(255,40,20,.60); }
+}
+
+.hand-odds.lowest-odds .odds-main {
+  animation: favoriBlink 1.2s ease-in-out infinite !important;
+  font-weight: 900 !important;
+}
+
+/* OUTSIDER EXTREME : reflet doré pour cotes > 100 */
+@keyframes goldShimmer {
+  0%   { color: #f6d36b; text-shadow: 0 0 16px rgba(246,211,107,.90), 0 0 30px rgba(246,180,50,.60); }
+  50%  { color: #c8a020; text-shadow: 0 0 6px rgba(200,160,40,.40); }
+  100% { color: #f6d36b; text-shadow: 0 0 16px rgba(246,211,107,.90), 0 0 30px rgba(246,180,50,.60); }
+}
+
+.hand-odds.extreme-odds .odds-main {
+  animation: goldShimmer 2s ease-in-out infinite !important;
+  font-weight: 900 !important;
+}
+
+/* ── JACKPOT WIN OVERLAY ─────────────────────────────────────── */
+
+@keyframes jpOverlayIn  { from{opacity:0;} to{opacity:1;} }
+@keyframes jpOverlayOut { from{opacity:1;transform:scale(1);} to{opacity:0;transform:scale(1.04);} }
+@keyframes jpSubIn      { from{transform:translateY(-20px);opacity:0;} to{transform:none;opacity:1;} }
+@keyframes jpCardIn     { from{transform:scale(.5) translateY(40px) rotate(-6deg);opacity:0;} to{transform:none;opacity:1;} }
+@keyframes jpNormalIn   { from{transform:translateY(16px);opacity:0;} to{transform:none;opacity:1;} }
+@keyframes jpBtnIn      { from{transform:translateY(22px) scale(.85);opacity:0;} to{transform:none;opacity:1;} }
+@keyframes jpGlow {
+  0%,100%{text-shadow:0 0 26px var(--jp-glow),0 0 52px var(--jp-glow),0 2px 0 rgba(0,0,0,.65);}
+  50%    {text-shadow:0 0 52px var(--jp-glow),0 0 100px var(--jp-glow),0 2px 0 rgba(0,0,0,.65);}
+}
+@keyframes jpBtnPulse {
+  0%,100%{box-shadow:0 0 0 0 var(--jp-glow),0 6px 20px rgba(0,0,0,.50);}
+  50%    {box-shadow:0 0 0 12px rgba(255,255,255,0),0 6px 20px rgba(0,0,0,.50);}
+}
+@keyframes jpIconFloat {
+  0%,100%{transform:translateY(0);}
+  50%    {transform:translateY(-8px);}
+}
+
+.jp-win-overlay { animation:jpOverlayIn .22s ease forwards; display:flex; align-items:center; justify-content:center; }
+.jp-win-overlay.jp-win-exit { animation:jpOverlayOut .60s ease forwards !important; }
+
+.jp-win-content { display:flex; flex-direction:column; align-items:center; gap:22px; padding:36px 52px; text-align:center; }
+
+.jp-win-sub {
+  font-size:clamp(16px,2.2vw,22px); font-weight:700; letter-spacing:.40em;
+  color:rgba(255,255,255,.65); text-transform:uppercase;
+  animation:jpSubIn .35s ease .10s both;
+}
+
+.jp-cards-row { display:flex; gap:28px; flex-wrap:wrap; justify-content:center; }
+
+.jp-card {
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  padding:24px 32px; border-radius:20px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(8px);
+  animation:jpCardIn .70s cubic-bezier(.22,.78,.20,1) both;
+}
+.jp-card:nth-child(1){animation-delay:.15s;}
+.jp-card:nth-child(2){animation-delay:.28s;}
+.jp-card:nth-child(3){animation-delay:.40s;}
+
+.jp-card-icon {
+  font-size:clamp(42px,7vw,72px); color:var(--jp-c1); line-height:1;
+  animation:jpGlow 2s ease-in-out .8s infinite, jpIconFloat 3s ease-in-out infinite;
+  filter:drop-shadow(0 0 18px var(--jp-glow));
+}
+.jp-card-label {
+  font-size:clamp(13px,2.2vw,22px); font-weight:900; letter-spacing:.20em;
+  text-transform:uppercase; color:var(--jp-c1);
+  animation:jpGlow 2s ease-in-out .5s infinite;
+}
+.jp-card-amount {
+  font-size:clamp(28px,5vw,62px); font-weight:900; color:var(--jp-c1);
+  letter-spacing:.04em;
+  animation:jpGlow 2s ease-in-out 1s infinite;
+}
+
+.jp-normal-win {
+  font-size:clamp(14px,2vw,22px); font-weight:700; color:#e8f0ff;
+  letter-spacing:.08em; padding:10px 28px;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;
+  animation:jpNormalIn .35s ease .90s both;
+}
+
+.jp-win-btn {
+  padding:14px 48px; font-size:clamp(13px,1.6vw,17px);
+  font-weight:900; letter-spacing:.12em; text-transform:uppercase;
+  color:#060606; background:var(--jp-c1); border:none; border-radius:999px;
+  cursor:pointer;
+  animation:jpBtnIn .40s ease 1.20s both, jpBtnPulse 2s ease-in-out 1.6s infinite;
+  transition:transform .10s ease, filter .10s ease;
+}
+.jp-win-btn:hover  {transform:scale(1.06);filter:brightness(1.14);}
+.jp-win-btn:active {transform:scale(.97);filter:brightness(.94);}
+
+.jp-total-gain {
+  font-size:clamp(13px,1.8vw,19px); font-weight:900; color:#ffffff;
+  letter-spacing:.10em; padding:10px 30px;
+  background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.22);
+  border-radius:999px;
+  animation:jpNormalIn .35s ease 1.05s both;
+  text-shadow:0 1px 4px rgba(0,0,0,.60);
+}
+
+
+/* ── END JACKPOT WIN OVERLAY ─────────────────────────────────── */
+
+/* ── ANIMATION GAINS NORMAUX ─────────────────────────────────── */
+@keyframes winsPop {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.55); color: #f6d36b; text-shadow: 0 0 18px rgba(246,211,107,.80); }
+  55%  { transform: scale(1.30); }
+  100% { transform: scale(1); }
+}
+#totalWins.wins-pop {
+  animation: winsPop .55s cubic-bezier(.22,.78,.20,1) forwards !important;
+  display: inline-block;
+}
+/* ── END ANIMATION GAINS NORMAUX ─────────────────────────────── */

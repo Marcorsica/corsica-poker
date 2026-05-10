@@ -121,13 +121,13 @@ async function finalizeRiverFromServerResult() {
     if (paid > 0) {
       launchWinCoinBurst(document.getElementById("tieBox"), paid);
       updateBankroll(paid);
-      totalWins += paid;
+       addToTotalWins(paid, "server-sync/local-tie");
       triggerWinEffects(paid);
       updateTotalWinsDisplay();
     }
 
     tieBet.resultLabel = makeResultLabel(tieBet.preflopOddsStr);
-    applyServerJackpotPayouts(settlement.jackpotPayouts || []);
+    applyServerJackpotPayouts(settlement.jackpotPayouts || [], paid);
     log(`🏆 ${t.winners}: ${handsTxt} (${t.tie})`);
   } else if (winners.length) {
     const w = winners[0];
@@ -138,13 +138,13 @@ async function finalizeRiverFromServerResult() {
       const winnerNode = handsLayer ? handsLayer.children[w]?.querySelector(".hand-inner") : null;
       launchWinCoinBurst(winnerNode, paid);
       updateBankroll(paid);
-      totalWins += paid;
+       addToTotalWins(paid, "server-sync/local-winner");
       triggerWinEffects(paid);
       updateTotalWinsDisplay();
     }
 
     hands[w].resultLabel = makeResultLabel(hands[w].preflopOddsStr);
-    applyServerJackpotPayouts(settlement.jackpotPayouts || []);
+    applyServerJackpotPayouts(settlement.jackpotPayouts || [], paid);
     log(`🏆 ${t.winner}: ${cardToStr(hc[0])} ${cardToStr(hc[1])}`);
   }
 
@@ -152,7 +152,7 @@ async function finalizeRiverFromServerResult() {
   log(`${t.betsEngaged}: ${engagedTotal.toFixed(0)} (pre ${engagedPre.toFixed(0)} / flop ${engagedFlop.toFixed(0)} / turn ${engagedTurn.toFixed(0)})`);
   log(`${t.winningsPaid}: ${paid.toFixed(2)}`);
 
-  roundFinished = true;
+  setRoundFinished(true, "server-sync/settle");
   computeTotalBets();
   refreshActionButtons();
   renderHands();
@@ -162,14 +162,14 @@ newRound = async function newRoundServerDriven() {
   try {
     applyPendingJackpotCredits();
     phase = "pre";
-    roundFinished = false;
+    setRoundFinished(false, "server-sync/reset");
     advanceUnlockedForRound = false;
     isAdvancingPhase = false;
     if (autoFinishTimer) {
       clearTimeout(autoFinishTimer);
       autoFinishTimer = null;
     }
-    jackpotBets = { argent: [], or: [], diamant: [] };
+     resetJackpotRound("server-sync");
     jackpotRoundStake = { argent: 0, or: 0, diamant: 0 };
     board = [];
     deck = [];
@@ -185,7 +185,7 @@ newRound = async function newRoundServerDriven() {
       tieBox.classList.remove("tie-win", "tie-lose", "tie-expanded-final");
     }
 
-    totalWins = 0;
+    resetTotalWins("server-sync");
     lastWinningTargets = [];
     updateTotalWinsDisplay();
 
@@ -210,7 +210,7 @@ newRound = async function newRoundServerDriven() {
   } catch (err) {
     console.error(err);
     log("Erreur serveur au démarrage de la manche");
-    roundFinished = true;
+     setRoundFinished(true, "server-sync/advance");
     refreshActionButtons();
   }
 };
@@ -465,13 +465,13 @@ finalizeRiverFromServerResult = async function finalizeRiverFromServerResultServ
     if (paid > 0) {
       launchWinCoinBurst(document.getElementById("tieBox"), paid);
       updateBankroll(paid);
-      totalWins += paid;
+       addToTotalWins(paid, "server-sync/settle-tie");
       triggerWinEffects(paid);
       updateTotalWinsDisplay();
     }
 
     tieBet.resultLabel = makeResultLabel(tieBet.preflopOddsStr);
-    applyServerJackpotPayouts(settlement.jackpotPayouts || []);
+    applyServerJackpotPayouts(settlement.jackpotPayouts || [], paid);
     log(`🏆 ${t.winners}: ${handsTxt} (${t.tie})`);
   } else if (winners.length) {
     const w = winners[0];
@@ -481,13 +481,13 @@ finalizeRiverFromServerResult = async function finalizeRiverFromServerResultServ
       const winnerNode = handsLayer ? handsLayer.children[w]?.querySelector(".hand-inner") : null;
       launchWinCoinBurst(winnerNode, paid);
       updateBankroll(paid);
-      totalWins += paid;
+       addToTotalWins(paid, "server-sync/settle-winner");
       triggerWinEffects(paid);
       updateTotalWinsDisplay();
     }
 
     hands[w].resultLabel = makeResultLabel(hands[w].preflopOddsStr);
-    applyServerJackpotPayouts(settlement.jackpotPayouts || []);
+    applyServerJackpotPayouts(settlement.jackpotPayouts || [], paid);
     log(`🏆 ${t.winner}: ${cardToStr(hc[0])} ${cardToStr(hc[1])}`);
   }
 
@@ -495,7 +495,7 @@ finalizeRiverFromServerResult = async function finalizeRiverFromServerResultServ
   log(`${t.betsEngaged}: ${engagedTotal.toFixed(0)} (pre ${engagedPre.toFixed(0)} / flop ${engagedFlop.toFixed(0)} / turn ${engagedTurn.toFixed(0)})`);
   log(`${t.winningsPaid}: ${paid.toFixed(2)}`);
 
-  roundFinished = true;
+   setRoundFinished(true, "server-sync/settle");
   computeTotalBets();
   refreshActionButtons();
   renderHands();

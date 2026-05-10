@@ -8,14 +8,96 @@ const audit = require('../audit/auditLogger');
 console.log("A2 RNG SERVER LOADED");
 
 const app = express();
-const ACCESS_CODE = String(process.env.CORSICA_ACCESS_CODE || '1969');
-const SESSION_SECRET = String(process.env.SESSION_SECRET || 'corsica-poker-session-secret');
+const ACCESS_CODE = String(process.env.CORSICA_ACCESS_CODE || '');
+const SESSION_SECRET = String(process.env.SESSION_SECRET || '');
+
+// ── Vérification des secrets au démarrage ─────────────────────────────────────
+if (!ACCESS_CODE) {
+  console.error('⛔  ERREUR CRITIQUE : La variable CORSICA_ACCESS_CODE n\'est pas définie.');
+  console.error('    Définissez-la dans les variables d\'environnement de Render avant de démarrer.');
+  process.exit(1);
+}
+if (!SESSION_SECRET) {
+  console.error('⛔  ERREUR CRITIQUE : La variable SESSION_SECRET n\'est pas définie.');
+  console.error('    Définissez-la dans les variables d\'environnement de Render avant de démarrer.');
+  process.exit(1);
+}
+if (ACCESS_CODE.length < 6) {
+  console.warn('⚠️  AVERTISSEMENT : Le code d\'accès fait moins de 6 caractères. Recommandé : 8 caractères minimum.');
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Protection anti brute-force (sans dépendance externe) ────────────────────
+// Mécanisme simple : on bloque une adresse IP après trop de tentatives échouées.
+// Max 10 tentatives ratées par IP sur une fenêtre de 15 minutes.
+const loginAttempts = new Map(); // ip -> { count, firstAttempt, lockedUntil }
+const LOGIN_MAX_ATTEMPTS = 10;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;   // 15 minutes
+const LOGIN_LOCKOUT_MS = 15 * 60 * 1000;  // bloqué 15 minutes après dépassement
+
+function getLoginState(ip) {
+  const now = Date.now();
+  let state = loginAttempts.get(ip);
+  if (!state) {
+    state = { count: 0, firstAttempt: now, lockedUntil: 0 };
+    loginAttempts.set(ip, state);
+  }
+  // Réinitialiser la fenêtre si elle est expirée
+  if (now - state.firstAttempt > LOGIN_WINDOW_MS && now > state.lockedUntil) {
+    state.count = 0;
+    state.firstAttempt = now;
+  }
+  return state;
+}
+
+function isLoginBlocked(ip) {
+  const state = getLoginState(ip);
+  return Date.now() < state.lockedUntil;
+}
+
+function recordFailedAttempt(ip) {
+  const state = getLoginState(ip);
+  state.count += 1;
+  if (state.count >= LOGIN_MAX_ATTEMPTS) {
+    state.lockedUntil = Date.now() + LOGIN_LOCKOUT_MS;
+  }
+}
+
+function resetLoginAttempts(ip) {
+  loginAttempts.delete(ip);
+}
+
+// Nettoyage périodique pour éviter que la Map grossisse indéfiniment
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, state] of loginAttempts.entries()) {
+    if (now - state.firstAttempt > LOGIN_WINDOW_MS * 2 && now > state.lockedUntil) {
+      loginAttempts.delete(ip);
+    }
+  }
+}, 30 * 60 * 1000);
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Comparaison sécurisée du code d'accès ────────────────────────────────────
+// La comparaison classique (===) peut révéler la longueur du code via le temps
+// de réponse. timingSafeEqual neutralise cette fuite.
+function timingSafeCodeEqual(input, expected) {
+  try {
+    const a = Buffer.from(String(input).padEnd(64, '\0'));
+    const b = Buffer.from(String(expected).padEnd(64, '\0'));
+    return crypto.timingSafeEqual(a, b) && input.length === expected.length;
+  } catch {
+    return false;
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
 const LOCAL_AUDIO_DIR = path.join(__dirname, '..', '..', 'public', 'audio');
 const EXTERNAL_AUDIO_DIR = process.env.CORSICA_AUDIO_DIR || 'C:\\Users\\user\\Desktop\\CORSICA\\CorsicaPokerAssets\\audio';
 audit.startSession({ app: 'Corsica Poker A2', port: Number(process.env.PORT || 3001) });
 const PORT = Number(process.env.PORT || 3001);
 const games = Object.create(null);
-const MARGIN = 0.015;
+const MARGIN_NORMAL = 0.05;   // marge maison sur mises normales (5%)
+const MARGIN_JACKPOT = 0.015; // prélèvement sur mises jackpot (1,5%)
 
 const jackpotConfig = {
   argent: { reset: 250, color: '#C0C0C0' },
@@ -145,7 +227,7 @@ function jackpotSnapshot() {
 }
 
 function contributeJackpots(amount) {
-  const net = Math.max(0, Number(amount || 0)) * (1 - MARGIN);
+  const net = Math.max(0, Number(amount || 0)) * (1 - MARGIN_JACKPOT);
   for (const key of Object.keys(jackpots)) {
     jackpots[key].value += net * jackpotSplits[key];
     jackpots[key].relay += net * jackpotHiddenSplits[key];
@@ -156,7 +238,7 @@ function contributeJackpots(amount) {
 }
 
 function refundJackpots(amount) {
-  const net = Math.max(0, Number(amount || 0)) * (1 - MARGIN);
+  const net = Math.max(0, Number(amount || 0)) * (1 - MARGIN_JACKPOT);
   for (const key of Object.keys(jackpots)) {
     jackpots[key].value = Math.max(jackpots[key].reset, jackpots[key].value - (net * jackpotSplits[key]));
     jackpots[key].value = Math.round(jackpots[key].value * 100) / 100;
@@ -168,7 +250,7 @@ function claimJackpot(type) {
   const jp = jackpots[type];
   if (!jp) return null;
   const paid = Math.round(jp.value * 100) / 100;
-  const relayBoost = Math.min(jp.relay, jp.reset * 0.25);
+  const relayBoost = jp.relay * 0.75;
   jp.value = Math.round((jp.reset + relayBoost) * 100) / 100;
   jp.relay = Math.round(Math.max(0, jp.relay - relayBoost) * 100) / 100;
   saveJackpots();
@@ -260,11 +342,21 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+  const ip = String(req.ip || 'unknown');
   const code = String(req.body?.code || '').trim();
-  if (code !== ACCESS_CODE) {
-    logServer('auth.login.failed', "Code d'accès refusé", { ip: req.ip }, 'warn');
+
+  if (isLoginBlocked(ip)) {
+    logServer('auth.login.blocked', "IP bloquée temporairement", { ip }, 'warn');
+    return res.status(429).json({ ok: false, error: 'TOO_MANY_ATTEMPTS' });
+  }
+
+  if (!timingSafeCodeEqual(code, ACCESS_CODE)) {
+    recordFailedAttempt(ip);
+    logServer('auth.login.failed', "Code d'accès refusé", { ip }, 'warn');
     return res.status(401).json({ ok: false, error: 'INVALID_CODE' });
   }
+
+  resetLoginAttempts(ip);
   req.session.regenerate((err) => {
     if (err) {
       logServer('auth.login.error', 'Erreur création session', { error: String(err) }, 'error');
@@ -643,7 +735,7 @@ function computeOdds(game) {
 function oddsValue(prob) {
   if (!prob || prob <= 0) return 0;
   const fair = 1 / prob;
-  return Math.round((fair * (1 - MARGIN)) * 100) / 100;
+  return Math.round((fair * (1 - MARGIN_NORMAL)) * 100) / 100;
 }
 
 function rawOddsValue(prob) {
@@ -721,15 +813,15 @@ function buildFairnessReveal(game) {
 function buildRtpSummary() {
   return {
     mode: 'dynamic-probability-quoted-odds',
-    margin: MARGIN,
+    margin: MARGIN_NORMAL,
     quotedOddsFormula: 'rounded((1 / probability) * (1 - margin), 2)',
     standardBetRtpFormula: 'probability * quotedOdds',
-    standardBetRtpTarget: Number((1 - MARGIN).toFixed(4)),
-    standardBetRtpPercentTarget: Number(((1 - MARGIN) * 100).toFixed(2)),
+    standardBetRtpTarget: Number((1 - MARGIN_NORMAL).toFixed(4)),
+    standardBetRtpPercentTarget: Number(((1 - MARGIN_NORMAL) * 100).toFixed(2)),
     roundingImpact: {
       quotedOddsPrecision: 2,
-      theoreticalMinRtpPercent: Number((((1 - MARGIN) - 0.005) * 100).toFixed(2)),
-      theoreticalMaxRtpPercent: Number((((1 - MARGIN) + 0.005) * 100).toFixed(2)),
+      theoreticalMinRtpPercent: Number((((1 - MARGIN_NORMAL) - 0.005) * 100).toFixed(2)),
+      theoreticalMaxRtpPercent: Number((((1 - MARGIN_NORMAL) + 0.005) * 100).toFixed(2)),
       note: 'Real RTP of an individual priced bet stays close to the 95% target because quoted odds are rounded to 2 decimals.',
     },
     scope: 'Standard win and tie bets settled by /settle. Jackpot side bets are excluded from this RTP summary.',

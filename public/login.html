@@ -29,7 +29,7 @@
       try {
         const res = await fetch('/login', {method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify({ code })});
         const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data.ok) { errorEl.textContent = 'Code incorrect'; submitBtn.disabled = false; codeInput.focus(); codeInput.select(); return; }
+        if (!res.ok || !data.ok) { errorEl.textContent = res.status === 429 ? 'Trop de tentatives. Réessayez dans 15 minutes.' : 'Code incorrect'; submitBtn.disabled = false; codeInput.focus(); codeInput.select(); return; }
         window.location.href = data.redirect || '/';
       } catch (err) { errorEl.textContent = 'Connexion impossible'; submitBtn.disabled = false; }
     }

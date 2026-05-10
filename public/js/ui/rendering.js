@@ -200,7 +200,7 @@ function premiumBoardImpact() {
   node.classList.remove("cinematic-flash");
   void node.offsetWidth;
   node.classList.add("cinematic-flash");
- } catch (_) {}
+ } catch(_){ console.warn("[rendering.js] erreur silencieuse:", _); }
 }
 
 function flashBoardCenter() {
@@ -211,7 +211,7 @@ function flashBoardCenter() {
  void bc.offsetWidth;
  bc.classList.add("card-impact","cinematic-flash");
  }
- } catch(e) {}
+ } catch(e){ console.warn("[rendering.js] erreur silencieuse:", e); }
  const boardCenter = document.querySelector(".board-center");
  if (boardCenter) {
  boardCenter.classList.remove("card-impact");
@@ -666,12 +666,14 @@ function highlightLowestDisplayedOdds() {
  if (!oddsNode) return;
 
  oddsNode.classList.remove("lowest-odds");
+ oddsNode.classList.remove("extreme-odds");
 
  if (h && isLowOddsDisplay(h.oddsStr)) {
  hasLowOddsHand = true;
  }
 
  const value = parseOddsNumber(phase === "river" ? (h.oddsStr || "—") : (h.oddsStr || "—"));
+ if (value >= 100) oddsNode.classList.add("extreme-odds");
  if (value && !oddsNode.classList.contains("jackpot-call")) {
  oddsNodes.push({ node: oddsNode, value });
  }

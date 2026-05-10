@@ -334,14 +334,14 @@ function resetBets() {
 function newRound() {
  applyPendingJackpotCredits();
  phase = "pre";
- roundFinished = false;
+  setRoundFinished(false, "round-flow/start");
  advanceUnlockedForRound = false;
  isAdvancingPhase = false;
  if (autoFinishTimer) {
  clearTimeout(autoFinishTimer);
  autoFinishTimer = null;
  }
- jackpotBets = { argent: [], or: [], diamant: [] };
+  resetJackpotRound("round-flow");
  jackpotRoundStake = { argent: 0, or: 0, diamant: 0 };
  deck = shuffleInPlace(makeDeck());
  board = [];
@@ -368,7 +368,7 @@ function newRound() {
  tieBox.classList.remove("tie-win", "tie-lose", "tie-expanded-final");
  }
 
- totalWins = 0;
+ resetTotalWins("round-flow");
  lastWinningTargets = [];
  updateTotalWinsDisplay();
 
@@ -399,7 +399,7 @@ function stopSuspenseAudio() {
  try {
  suspenseAudio.pause();
  suspenseAudio.currentTime = 0;
- } catch (_) {}
+ } catch(_){ console.warn("[round-flow] erreur silencieuse:", _); }
 }
 
 function duckSuspenseForCoins(durationMs = 950) {
@@ -622,7 +622,7 @@ function advanceToShowdown() {
  if (paid > 0) {
  launchWinCoinBurst(document.getElementById("tieBox"), paid);
  updateBankroll(paid);
- totalWins += paid;
+  addToTotalWins(paid, "round-flow/tie");
  triggerWinEffects(paid);
  updateTotalWinsDisplay();
  }
@@ -639,7 +639,7 @@ function advanceToShowdown() {
  const winnerNode = handsLayer ? handsLayer.children[w]?.querySelector(".hand-inner") : null;
  launchWinCoinBurst(winnerNode, paid);
  updateBankroll(paid);
- totalWins += paid;
+  addToTotalWins(paid, "round-flow/winner");
  triggerWinEffects(paid);
  updateTotalWinsDisplay();
  }
@@ -654,7 +654,7 @@ function advanceToShowdown() {
  log(`${t.betsEngaged}: ${engagedTotal.toFixed(0)} (pre ${engagedPre.toFixed(0)} / flop ${engagedFlop.toFixed(0)} / turn ${engagedTurn.toFixed(0)})`);
  log(`${t.winningsPaid}: ${paid.toFixed(2)}`);
 
- roundFinished = true;
+  setRoundFinished(true, "round-flow/end");
  computeTotalBets();
  refreshActionButtons();
  renderHands();
