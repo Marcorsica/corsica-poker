@@ -369,6 +369,34 @@ async function serverSettleRound() {
   return data;
 }
 
+// ── SÉCURITÉ : enregistrement des mises côté serveur ─────────────────────────
+
+async function serverRecordBet(target, index, phase, amount) {
+  const res = await fetch('/bet', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gameId: serverGameId, target, index, phase, amount })
+  });
+  if (!res.ok) {
+    log('Avertissement : mise non enregistrée sur le serveur', { level: 'warn', event: 'client.server.bet.error', data: { status: res.status } });
+    throw new Error('bet failed: ' + res.status);
+  }
+  return res.json();
+}
+
+async function serverUndoBet(target, index, phase, amount) {
+  const res = await fetch('/bet/undo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gameId: serverGameId, target, index, phase, amount })
+  });
+  if (!res.ok) {
+    log('Avertissement : annulation de mise non enregistrée sur le serveur', { level: 'warn', event: 'client.server.bet.undo.error', data: { status: res.status } });
+    throw new Error('bet/undo failed: ' + res.status);
+  }
+  return res.json();
+}
+
 recalcOdds = async function recalcOddsServerDriven() {
   if (phase === "river") return;
 

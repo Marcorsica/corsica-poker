@@ -348,10 +348,10 @@ function makeEraser(onClick) {
  b.type = "button";
  b.className = "eraser";
  b.title = "Supprimer les mises";
- b.addEventListener("click", (e) => {
- e.stopPropagation();
- onClick();
- });
+ b.onclick = (e) => {
+  e.stopPropagation();
+  onClick();
+ };
  return b;
 }
 

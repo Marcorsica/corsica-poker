@@ -46,7 +46,8 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' },
 }));
 
-// /audio et /external-audio sont servis via express.static(public) ci-dessous
+app.use('/audio',          express.static(LOCAL_AUDIO_DIR,    { fallthrough: true }));
+app.use('/external-audio', express.static(EXTERNAL_AUDIO_DIR, { fallthrough: true }));
 app.use(express.static(path.join(__dirname, '..', '..', 'public'), { index: false }));
 
 app.use((req, res, next) => {

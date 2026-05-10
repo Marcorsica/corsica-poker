@@ -45,6 +45,9 @@ function placeBetOnHand(index, ph) {
  odds: Math.max(0, Number(h.oddsStr) || 0),
  });
 
+ // SÉCURITÉ : enregistrement côté serveur
+ serverRecordBet('hand', index, ph, selectedBet).catch(err => console.warn('[bet] serverRecordBet failed', err));
+
  updateBankroll(-selectedBet);
  const targetNode = document.querySelector(`.hand:nth-child(${index + 1}) .hand-inner`) || document.querySelector(`.hand[data-hand="${index}"] .hand-inner`);
  triggerBetImpactSound();
@@ -83,6 +86,9 @@ function placeBetOnTie(ph) {
  odds: Math.max(0, Number(tieBet.oddsStr) || 0),
  });
 
+ // SÉCURITÉ : enregistrement côté serveur
+ serverRecordBet('tie', -1, ph, selectedBet).catch(err => console.warn('[bet] serverRecordBet tie failed', err));
+
  updateBankroll(-selectedBet);
  triggerBetImpactSound();
  launchChipFlight(document.getElementById("tieBox"));
@@ -101,6 +107,9 @@ function undoHandBet(index, ph) {
  const removed = h.betLots[ph].pop();
  h.bets[ph] = Math.max(0, h.bets[ph] - removed.amt);
 
+ // SÉCURITÉ : annulation côté serveur
+ serverUndoBet('hand', index, ph, removed.amt).catch(err => console.warn('[bet] serverUndoBet failed', err));
+
  updateBankroll(removed.amt);
  computeTotalBets();
  renderHands();
@@ -114,6 +123,9 @@ function undoTieBet(ph) {
 
  const removed = tieBet.lots[ph].pop();
  tieBet.bets[ph] = Math.max(0, tieBet.bets[ph] - removed.amt);
+
+ // SÉCURITÉ : annulation côté serveur
+ serverUndoBet('tie', -1, ph, removed.amt).catch(err => console.warn('[bet] serverUndoBet tie failed', err));
 
  updateBankroll(removed.amt);
  computeTotalBets();
