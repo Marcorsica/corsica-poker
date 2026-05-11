@@ -110,9 +110,13 @@ function applyFeltColor(index) {
  const tableEl = document.querySelector("section.table");
  if (tableEl) {
    if (palette.bg) {
-     tableEl.style.background = palette.bg;
+     tableEl.style.backgroundImage = palette.bg.split(' ')[0];
+     tableEl.style.backgroundSize = 'cover';
+     tableEl.style.backgroundPosition = 'center';
    } else {
-     tableEl.style.removeProperty("background");
+     tableEl.style.removeProperty('backgroundImage');
+     tableEl.style.removeProperty('backgroundSize');
+     tableEl.style.removeProperty('backgroundPosition');
    }
  }
 
@@ -130,7 +134,13 @@ function buildFeltColorOptions() {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "felt-color-btn";
-  btn.style.background = palette.bg || `linear-gradient(180deg, ${palette.table}, ${palette.table2})`;
+  if (palette.bg) {
+    btn.style.backgroundImage = palette.bg.split(' ')[0];
+    btn.style.backgroundSize = 'cover';
+    btn.style.backgroundPosition = 'center';
+   } else {
+    btn.style.background = `linear-gradient(180deg, ${palette.table}, ${palette.table2})`;
+   }
   btn.setAttribute("aria-label", `Couleur tapis ${index + 1}`);
   btn.addEventListener("click", () => applyFeltColor(index));
   feltColorOptions.appendChild(btn);
