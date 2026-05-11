@@ -109,10 +109,16 @@ function applyFeltColor(index) {
  // Paysage : applique le fond personnalisé ou remet le dégradé CSS par défaut
  const tableEl = document.querySelector("section.table");
  if (tableEl) {
-   if (palette.bg) {
-    document.documentElement.style.setProperty('--table-bg-override', palette.bg);
-  } else {
-    document.documentElement.style.removeProperty('--table-bg-override');
+   var tableEl2 = document.querySelector('section.table');
+  if (tableEl2) {
+    if (palette.bg) {
+      var imgUrl = palette.bg.split(' ')[0];
+      document.documentElement.style.setProperty('--table-landscape-img', imgUrl);
+      tableEl2.classList.add('has-landscape');
+    } else {
+      tableEl2.classList.remove('has-landscape');
+      document.documentElement.style.removeProperty('--table-landscape-img');
+    }
   }
  }
 
