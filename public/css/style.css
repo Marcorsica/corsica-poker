@@ -160,10 +160,14 @@ html,body{
   border-radius:20px;
   background:radial-gradient(1200px 700px at 50% 40%, var(--table), var(--table2));
 }
-.table.has-landscape{
+.table.has-landscape,
+body.theme-fast .table.has-landscape,
+body.theme-pro .table.has-landscape{
   background-image:var(--table-landscape-img) !important;
   background-size:cover !important;
   background-position:center !important;
+}
+.table{
   border:1px solid rgba(255,255,255,.10);
   overflow:hidden;
 }
