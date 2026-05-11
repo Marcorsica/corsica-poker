@@ -110,13 +110,9 @@ function applyFeltColor(index) {
  const tableEl = document.querySelector("section.table");
  if (tableEl) {
    if (palette.bg) {
-     tableEl.style.backgroundImage = palette.bg.split(' ')[0];
-     tableEl.style.backgroundSize = 'cover';
-     tableEl.style.backgroundPosition = 'center';
+     tableEl.style.background = palette.bg;
    } else {
-     tableEl.style.removeProperty('backgroundImage');
-     tableEl.style.removeProperty('backgroundSize');
-     tableEl.style.removeProperty('backgroundPosition');
+     tableEl.style.removeProperty('background');
    }
  }
 
