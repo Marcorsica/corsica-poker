@@ -158,7 +158,7 @@ html,body{
   height:100%;
   min-height:0;
   border-radius:20px;
-  background:radial-gradient(1200px 700px at 50% 40%, var(--table), var(--table2));
+  background:var(--table-bg-override, radial-gradient(1200px 700px at 50% 40%, var(--table), var(--table2)));
   border:1px solid rgba(255,255,255,.10);
   overflow:hidden;
 }
