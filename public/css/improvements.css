@@ -169,3 +169,131 @@
   display: inline-block;
 }
 /* ── END ANIMATION GAINS NORMAUX ─────────────────────────────── */
+
+/* ── TUTORIEL ────────────────────────────────────────────────────────────── */
+
+/* Bouton tutoriel sur le splash */
+.splash-tutorial {
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .05em;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.18);
+  color: rgba(255,255,255,.65);
+  cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.splash-tutorial:hover {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.35);
+  color: rgba(255,255,255,.9);
+}
+
+/* Bandeau mode tutoriel */
+.tutorial-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #1a3a2a 0%, #14301f 100%);
+  border-top: 1px solid rgba(80,200,120,.25);
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+.tutorial-banner__label {
+  color: rgba(120,220,160,.85);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.tutorial-banner__exit {
+  background: rgba(80,200,120,.12);
+  border: 1px solid rgba(80,200,120,.3);
+  color: rgba(120,220,160,.9);
+  padding: 5px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  white-space: nowrap;
+}
+.tutorial-banner__exit:hover {
+  background: rgba(80,200,120,.22);
+  border-color: rgba(80,200,120,.55);
+  color: #fff;
+}
+
+/* Marge basse pour ne pas cacher le contenu par le bandeau en bas */
+body.tutorial-mode {
+  padding-bottom: 48px;
+}
+
+/* Le bandeau tutoriel passe au-dessus de advanceDock (10080) et abandonDock (10070) */
+.tutorial-banner {
+  z-index: 10100;
+}
+
+/* Les docks remontent pour ne pas chevaucher le bandeau (hauteur ~48px) */
+body.tutorial-mode #advanceDock,
+body.tutorial-mode #abandonDock {
+  bottom: 72px !important; /* 24px position d'origine + 48px bandeau */
+}
+
+/* Tooltip tutoriel — standard */
+.tutorial-tooltip {
+  position: fixed;
+  z-index: 11000;
+  max-width: 280px;
+  padding: 10px 14px;
+  background: rgba(10,20,15,.94);
+  border: 1px solid rgba(80,200,120,.3);
+  border-radius: 10px;
+  color: rgba(220,240,230,.9);
+  font-size: 12px;
+  line-height: 1.55;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,.45);
+  opacity: 0;
+  will-change: transform, opacity;
+  isolation: isolate;
+  transform: translateY(4px) translateZ(0);
+  transition: opacity .18s, transform .18s;
+}
+.tutorial-tooltip--visible {
+  opacity: 1;
+  transform: translateY(0) translateZ(0);
+}
+
+/* Tooltip centré — pour les éléments larges comme handsLayer */
+.tutorial-tooltip--center {
+  position: fixed;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%);
+  max-width: 360px;
+  padding: 16px 20px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  border: 1px solid rgba(80,200,120,.5);
+  box-shadow: 0 8px 40px rgba(0,0,0,.65);
+  text-align: center;
+}
+.tutorial-tooltip--center.tutorial-tooltip--visible {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+/* Mise en évidence des éléments au survol en mode tuto */
+body.tutorial-mode [id]:hover {
+  outline: none;
+}
+/* ── END TUTORIEL ─────────────────────────────────────────────────────────── */

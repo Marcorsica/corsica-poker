@@ -105,6 +105,17 @@ function applyFeltColor(index) {
  document.documentElement.style.setProperty("--post-round-btn-change-bottom", tones.changeBtnBottom);
  document.documentElement.style.setProperty("--post-round-btn-text", tones.buttonText);
  document.documentElement.style.setProperty("--post-round-btn-text-shadow", tones.buttonTextShadow);
+
+ // Paysage : applique le fond personnalisé ou remet le dégradé CSS par défaut
+ const tableEl = document.querySelector("section.table");
+ if (tableEl) {
+   if (palette.bg) {
+     tableEl.style.background = palette.bg;
+   } else {
+     tableEl.style.removeProperty("background");
+   }
+ }
+
  if (feltColorOptions) {
   Array.from(feltColorOptions.children).forEach((btn, i) => {
    btn.classList.toggle("active", i === safeIndex);
@@ -119,7 +130,13 @@ function buildFeltColorOptions() {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "felt-color-btn";
-  btn.style.background = `linear-gradient(180deg, ${palette.table}, ${palette.table2})`;
+  if (palette.bg) {
+   btn.style.backgroundImage = palette.bg.replace("center/cover no-repeat", "").trim();
+   btn.style.backgroundSize = "cover";
+   btn.style.backgroundPosition = "center";
+  } else {
+   btn.style.background = `linear-gradient(180deg, ${palette.table}, ${palette.table2})`;
+  }
   btn.setAttribute("aria-label", `Couleur tapis ${index + 1}`);
   btn.addEventListener("click", () => applyFeltColor(index));
   feltColorOptions.appendChild(btn);
@@ -334,13 +351,7 @@ if (volumeSlider) {
 
 document.addEventListener("click", startAmbience, { once: true });
 
-const settingsLockBtn = document.getElementById("settingsLockBtn");
-if (settingsLockBtn) {
- settingsLockBtn.addEventListener("click", async () => {
-  try { await fetch("/logout", { method: "POST" }); } catch(_){ console.warn("[setup-ui] erreur silencieuse"); }
-  window.location.href = "/login";
- });
-}
+
 document.addEventListener("pointerdown", () => { const ctx = getAudioContext?.(); if (ctx && ctx.state === "suspended") ctx.resume().catch(() => {}); }, { once: true });
 
 

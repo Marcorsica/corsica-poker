@@ -37,7 +37,7 @@
     autoFinishTimer: null,
     lastWinningTargets: [],
     advanceUnlockedForRound: false,
-    currentFeltIndex: 5,  // Gris anthracite par défaut
+    currentFeltIndex: 0,  // Gris anthracite par défaut
     serverGameId: null,
   };
 

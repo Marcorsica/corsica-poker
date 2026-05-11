@@ -120,157 +120,145 @@ const RULES_HTML = {
  fr: `
       <section class="rules-section">
         <h3>Concept</h3>
-        <p>Corsica Poker est une expérience inspirée du Texas Hold’em, avec une approche unique : vous ne jouez pas une main… vous pariez sur celles des autres.</p>
-        <p>Vous observez une table de joueurs virtuels et votre objectif est d’anticiper l’issue de la manche afin de placer vos mises au moment le plus opportun.</p>
-        <p>Chaque décision repose sur un équilibre entre l’intuition, la lecture du jeu et l’analyse des probabilités.</p>
-        <p>Plus vous prenez de risques, plus les cotes sont élevées… et plus les gains peuvent être importants.</p>
-        <p><strong>Attention :</strong> une main est déclarée victorieuse uniquement si elle gagne seule. La case <strong>Égalité</strong> permet de couvrir ce risque.</p>
+        <p>Corsica Poker est une expérience inspirée du Texas Hold'em, avec une approche unique : vous ne jouez pas une main — vous pariez sur celles des autres.</p>
+        <p>Vous observez une table de joueurs virtuels et votre objectif est d'anticiper l'issue de la manche pour placer vos mises au moment le plus opportun.</p>
+        <p>Plus vous prenez de risques, plus les cotes sont élevées — et plus les gains peuvent être importants.</p>
+        <p><em>Important : une main est déclarée victorieuse uniquement si elle gagne seule. La case <strong>Égalité</strong> permet de couvrir les situations de partage.</em></p>
       </section>
 
       <section class="rules-section">
-        <h3>Structure d’une manche</h3>
-        <p>Choisissez le nombre de joueurs, de 4 à 10, ou laissez faire le hasard.</p>
-        <p>Plus il y a de joueurs, plus les cotes sont généralement importantes.</p>
-        <p>Une manche se déroule en plusieurs étapes, chacune influençant les probabilités et vos décisions.</p>
+        <h3>Structure d'une manche</h3>
+        <p>Choisissez de 4 à 10 joueurs, ou laissez faire le hasard. Plus il y a de joueurs, plus les cotes sont généralement élevées.</p>
+        <p>La manche se déroule en quatre phases successives.</p>
       </section>
 
       <section class="rules-section">
         <h3>1. Préflop — Lecture initiale</h3>
         <p>Chaque joueur reçoit 2 cartes privatives visibles.</p>
-        <p>Vous pouvez observer les forces initiales, placer vos premières mises sur une ou plusieurs mains, ou sur l’égalité, et identifier des opportunités à forte valeur.</p>
-        <p>Miser tôt permet souvent d’obtenir les meilleures cotes.</p>
+        <p>Vous pouvez observer les forces initiales et placer vos premières mises. Miser tôt donne accès aux meilleures cotes.</p>
       </section>
 
       <section class="rules-section">
         <h3>2. Flop — Premières tendances</h3>
-        <p>Trois cartes communes sont révélées.</p>
-        <p>Les cotes sont recalculées en temps réel.</p>
-        <p>Vous pouvez de nouveau placer vos mises.</p>
+        <p>Trois cartes communes sont révélées. Les cotes sont recalculées en temps réel.</p>
+        <p>Vous pouvez de nouveau miser.</p>
       </section>
 
       <section class="rules-section">
         <h3>3. Turn — Confirmation</h3>
-        <p>Une quatrième carte commune apparaît.</p>
-        <p>À ce stade, les probabilités deviennent généralement plus faibles et les scénarios se resserrent.</p>
-        <p>C’est souvent la dernière phase stratégique pour miser efficacement : le meilleur compromis entre risque et information.</p>
+        <p>Une quatrième carte commune apparaît. Les probabilités se resserrent.</p>
+        <p>C'est souvent le dernier moment stratégique pour miser efficacement.</p>
       </section>
 
       <section class="rules-section">
-        <h3>4. River — Verdict imminent</h3>
-        <p>La cinquième et dernière carte commune est révélée.</p>
-        <p>À partir de ce moment, aucune mise supplémentaire n’est possible et toutes les mains sont définitivement formées.</p>
-      </section>
-
-      <section class="rules-section">
-        <h3>5. Résultat — Attribution des gains</h3>
+        <h3>4. River — Verdict</h3>
+        <p>La cinquième et dernière carte est révélée. Aucune mise supplémentaire n'est possible.</p>
         <p>La meilleure combinaison de 5 cartes remporte la manche.</p>
-        <p>Vos gains sont calculés en fonction de vos mises et des cotes au moment exact où vous avez parié.</p>
-        <p>Deux joueurs ayant misé sur la même main peuvent donc gagner des montants différents.</p>
       </section>
 
       <section class="rules-section">
-        <h3>Types de mises</h3>
-        <p><strong>Une main spécifique :</strong> pariez sur un joueur précis, ou sur l’égalité, que vous pensez gagnant.</p>
-        <p><strong>Les jackpots :</strong></p>
-        <p>• <strong>Jackpot Bronze</strong> : rareté d’entrée, accessible.</p>
-        <p>• <strong>Jackpot Argent</strong> : niveau intermédiaire.</p>
-        <p>• <strong>Jackpot Or</strong> : niveau premium.</p>
-        <p>• <strong>Jackpot Diamant</strong> : niveau prestige, très rare.</p>
-        <p>Ces paris sont les plus risqués, mais extrêmement rémunérateurs.</p>
+        <h3>Calcul des gains</h3>
+        <p>Vos gains sont calculés selon vos mises et les cotes au moment exact où vous avez parié.</p>
+        <p>Deux joueurs ayant misé sur la même main peuvent donc recevoir des montants différents.</p>
+      </section>
+
+      <section class="rules-section rules-section--jackpot">
+        <h3>Les jackpots progressifs</h3>
+        <p>Ils se déclenchent automatiquement lorsqu'une main atteint un niveau de rareté suffisant. La mise est toujours de <strong>1 jeton</strong>. Une seule mise jackpot est possible par cible et par type.</p>
+        <p>Si la main visée ne gagne pas, la mise est perdue. Si elle gagne, vous remportez l'intégralité du pot correspondant.</p>
+        <p>Il est possible de cumuler des gains jackpot et des gains normaux sur une même manche.</p>
+        <p>Un curseur de "chaleur" vous indique statistiquement si le jackpot risque de tomber, mais c'est toujours le hasard qui décide !</p>
+        <ul class="rules-jackpot-list">
+          <li><span class="jackpot-label jackpot-argent">Jackpot Argent</span> — Le plus accessible des trois. Se déclenche sur des mains peu fréquentes.</li>
+          <li><span class="jackpot-label jackpot-or">Jackpot Or</span> — Rare. Réservé aux configurations inhabituelles.</li>
+          <li><span class="jackpot-label jackpot-diamant">Jackpot Diamant</span> — Exceptionnel. Les situations qui le déclenchent sont très rares — et les gains à la hauteur.</li>
+        </ul>
       </section>
 
       <section class="rules-section">
         <h3>Comprendre les cotes</h3>
-        <p>Les cotes reflètent les probabilités de victoire.</p>
         <p><strong>Cote élevée</strong> → faible probabilité, gain important.</p>
-        <p><strong>Cote faible</strong> → forte probabilité, gain plus modéré.</p>
-        <p>Elles évoluent en permanence en fonction des cartes révélées et de la situation de jeu.</p>
+        <p><strong>Cote faible</strong> → forte probabilité, gain modéré.</p>
+        <p>Elles évoluent en permanence au fil des cartes révélées.</p>
       </section>
 
       <section class="rules-section">
         <h3>Approche stratégique</h3>
-        <p>Corsica Poker est un jeu d’anticipation.</p>
-        <p><strong>Prendre position tôt</strong> permet de maximiser les gains potentiels.</p>
-        <p><strong>Attendre davantage d’informations</strong> réduit le risque, mais fait souvent baisser les cotes.</p>
-        <p>Il faut trouver le bon équilibre entre sécurité et rendement.</p>
+        <p>Prendre position tôt maximise les gains potentiels mais augmente le risque.</p>
+        <p>Attendre réduit le risque mais fait baisser les cotes.</p>
+        <p>L'enjeu est de trouver le bon équilibre entre sécurité et rendement.</p>
       </section>
  `,
  en: `
       <section class="rules-section">
         <h3>Concept</h3>
-        <p>Corsica Poker is inspired by Texas Hold’em, with a distinctive twist: you do not play a hand yourself—you bet on the hands of the players at the table.</p>
+        <p>Corsica Poker is inspired by Texas Hold'em, with a distinctive twist: you do not play a hand yourself — you bet on the hands of the players at the table.</p>
         <p>You observe a table of virtual players and your objective is to anticipate the outcome of the round in order to place bets at the most opportune moment.</p>
-        <p>Each decision balances intuition, game reading and probability analysis.</p>
-        <p>The more risk you take, the higher the odds can become—and the larger the payout may be.</p>
-        <p><strong>Important:</strong> a hand is considered victorious only if it wins outright. The <strong>Tie</strong> box lets you cover split outcomes.</p>
+        <p>The more risk you take, the higher the odds — and the larger the potential payout.</p>
+        <p><em>Important: a hand is considered victorious only if it wins outright. The <strong>Tie</strong> box lets you cover split outcomes.</em></p>
       </section>
 
       <section class="rules-section">
         <h3>Round structure</h3>
-        <p>Choose the number of players, from 4 to 10, or let the game decide randomly.</p>
-        <p>The more players there are, the higher the odds generally become.</p>
-        <p>A round unfolds in several stages, each influencing the probabilities and your decisions.</p>
+        <p>Choose from 4 to 10 players, or let the game decide randomly. The more players there are, the higher the odds generally become.</p>
+        <p>A round unfolds in four successive phases.</p>
       </section>
 
       <section class="rules-section">
         <h3>1. Preflop — Initial read</h3>
         <p>Each player receives 2 visible private cards.</p>
-        <p>You can assess the starting strength, place your first bets on one or several hands or on the tie outcome, and identify high-value opportunities.</p>
-        <p>Betting early often gives access to the best odds.</p>
+        <p>You can assess starting strengths and place your first bets. Betting early gives access to the best odds.</p>
       </section>
 
       <section class="rules-section">
         <h3>2. Flop — Early trends</h3>
-        <p>Three community cards are revealed.</p>
-        <p>Odds are recalculated in real time.</p>
-        <p>You may place bets again during this phase.</p>
+        <p>Three community cards are revealed. Odds are recalculated in real time.</p>
+        <p>You may place bets again.</p>
       </section>
 
       <section class="rules-section">
         <h3>3. Turn — Confirmation</h3>
-        <p>A fourth community card is revealed.</p>
-        <p>At this stage, probabilities usually tighten and the range of scenarios narrows.</p>
-        <p>It is often the last strategic phase to bet efficiently: the best trade-off between risk and information.</p>
+        <p>A fourth community card is revealed. Probabilities tighten.</p>
+        <p>It is often the last strategic phase to bet efficiently.</p>
       </section>
 
       <section class="rules-section">
         <h3>4. River — Final verdict</h3>
-        <p>The fifth and last community card is revealed.</p>
-        <p>From this point on, no further bets can be placed and every hand is fully formed.</p>
+        <p>The fifth and last community card is revealed. No further bets can be placed.</p>
+        <p>The best 5-card combination wins the round.</p>
       </section>
 
       <section class="rules-section">
-        <h3>5. Result — Winnings settlement</h3>
-        <p>The best 5-card combination wins the round.</p>
+        <h3>Winnings settlement</h3>
         <p>Your winnings are calculated from your stakes and the odds at the exact moment you placed each bet.</p>
         <p>Two players who bet on the same hand can therefore receive different payouts.</p>
       </section>
 
-      <section class="rules-section">
-        <h3>Bet types</h3>
-        <p><strong>A specific hand:</strong> bet on a particular player, or on the tie outcome, that you believe will win.</p>
-        <p><strong>Jackpots:</strong></p>
-        <p>• <strong>Bronze Jackpot</strong>: accessible entry rarity.</p>
-        <p>• <strong>Silver Jackpot</strong>: intermediate tier.</p>
-        <p>• <strong>Gold Jackpot</strong>: premium tier.</p>
-        <p>• <strong>Diamond Jackpot</strong>: prestige tier, very rare.</p>
-        <p>These bets are the riskiest, but also the most rewarding.</p>
+      <section class="rules-section rules-section--jackpot">
+        <h3>Progressive jackpots</h3>
+        <p>They trigger automatically when a hand reaches a sufficient rarity threshold. Each jackpot bet costs exactly <strong>1 chip</strong>. Only one jackpot bet per target and per type is allowed.</p>
+        <p>If the targeted hand does not win, the bet is lost. If it wins, you collect the entire corresponding jackpot pool.</p>
+        <p>Jackpot winnings and normal winnings can be combined in the same round.</p>
+        <p>A "heat" indicator gives you a statistical sense of whether a jackpot is likely to hit soon — but it's always chance that has the final word!</p>
+        <ul class="rules-jackpot-list">
+          <li><span class="jackpot-label jackpot-argent">Silver Jackpot</span> — The most accessible of the three. Triggers on uncommon hand configurations.</li>
+          <li><span class="jackpot-label jackpot-or">Gold Jackpot</span> — Rare. Reserved for unusual game situations.</li>
+          <li><span class="jackpot-label jackpot-diamant">Diamond Jackpot</span> — Exceptional. The situations that trigger it are extremely rare — and the rewards match.</li>
+        </ul>
       </section>
 
       <section class="rules-section">
         <h3>Understanding odds</h3>
-        <p>Odds reflect winning probabilities.</p>
         <p><strong>High odds</strong> → low probability, larger payout.</p>
         <p><strong>Low odds</strong> → high probability, more moderate payout.</p>
-        <p>They evolve continuously according to the revealed cards and the game situation.</p>
+        <p>They evolve continuously as cards are revealed.</p>
       </section>
 
       <section class="rules-section">
         <h3>Strategic approach</h3>
-        <p>Corsica Poker is a game of anticipation.</p>
-        <p><strong>Taking a position early</strong> helps maximize potential returns.</p>
-        <p><strong>Waiting for more information</strong> reduces risk, but usually lowers the odds.</p>
-        <p>The challenge is to find the right balance between safety and return.</p>
+        <p>Taking a position early maximises potential returns but increases risk.</p>
+        <p>Waiting reduces risk but lowers the odds.</p>
+        <p>The challenge is finding the right balance between safety and return.</p>
       </section>
  `
 };
@@ -485,23 +473,39 @@ const settingsPanel = el("settingsPanel");
 const feltColorOptions = el("feltColorOptions");
 
 const FELT_COLORS = [
-  { table: "#0b3d2e", table2: "#07281f", text: "#f3fbf5", muted: "#d7eadc" },  // Vert foncé
-  { table: "#556b2f", table2: "#3b4a20", text: "#f8fbe9", muted: "#dde7c8" },  // Vert olive
-  { table: "#7a1c1c", table2: "#541212", text: "#fff7f7", muted: "#f0d2d2" },  // Rouge profond
-  { table: "#4a2c2a", table2: "#321d1b", text: "#fff8f4", muted: "#e7d6d1" },  // Marron cuir
-  { table: "#f5e6ca", table2: "#dcc8a3", text: "#3c2f1d", muted: "#655845" },  // Beige sable
-  { table: "#2b2b2b", table2: "#161616", text: "#fafafa", muted: "#cfcfcf" },  // Gris anthracite
-  { table: "#cfcfcf", table2: "#aaaaaa", text: "#1e1e1e", muted: "#4b4b4b" },  // Gris anthracite clair
-  { table: "#9d4edd", table2: "#6f2dbd", text: "#fcf7ff", muted: "#ead7fb" },  // Violet néon clair
-  { table: "#0b1f3a", table2: "#071325", text: "#f4f8ff", muted: "#d7e3f6" },  // Bleu nuit
-  { table: "#0f5f3c", table2: "#0a4028", text: "#f2fff8", muted: "#d1ecdd" },  // Vert casino
+  // ── Couleurs unies ───────────────────────────────────────────────────────────
+  { table: "#2b2b2b", table2: "#161616", text: "#fafafa", muted: "#cfcfcf" },  // 0  Gris anthracite
+  { table: "#3e424e", table2: "#1e2028", text: "#f4f6fa", muted: "#bbc3d4" },  // 1  Gris acier bleuté
+  { table: "#0b1f3a", table2: "#071325", text: "#f4f8ff", muted: "#d7e3f6" },  // 2  Bleu nuit
+  { table: "#0b1f3a", table2: "#1e5f74", text: "#f4faff", muted: "#d3e8f1" },  // 3  Bleu nuit › mer
+  { table: "#0f5f3c", table2: "#0a4028", text: "#f2fff8", muted: "#d1ecdd" },  // 4  Vert casino
+  { table: "#556b2f", table2: "#3b4a20", text: "#f8fbe9", muted: "#dde7c8" },  // 5  Vert olive
+  { table: "#4a2c2a", table2: "#321d1b", text: "#fff8f4", muted: "#e7d6d1" },  // 6  Marron cuir
+  { table: "#7a1c1c", table2: "#541212", text: "#fff7f7", muted: "#f0d2d2" },  // 7  Rouge profond
+  { table: "#f5e6ca", table2: "#dcc8a3", text: "#3c2f1d", muted: "#655845" },  // 8  Beige sable
+  { table: "#9d4edd", table2: "#6f2dbd", text: "#fcf7ff", muted: "#ead7fb" },  // 9  Violet
 
-  { table: "#0b1f3a", table2: "#1e5f74", text: "#f4faff", muted: "#d3e8f1" },  // Dégradé bleu nuit > mer
-  { table: "#0b3d2e", table2: "#0f5f3c", text: "#f3fff8", muted: "#d4ebdf" },  // Dégradé verts
-  { table: "#5a1f2b", table2: "#7a1c1c", text: "#fff7f8", muted: "#eed1d7" },  // Dégradé bordeaux > rouge
-  { table: "#4a2c2a", table2: "#121212", text: "#fff8f2", muted: "#dccdca" },  // Dégradé marron > noir
-  { table: "#3a0ca3", table2: "#9d4edd", text: "#fcf8ff", muted: "#e6d9fb" },  // Dégradé violet
-  { table: "#f6d36b", table2: "#f5e6ca", text: "#3f2f06", muted: "#6a5724" }   // Dégradé or > sable
+  // ── Paysages (dégradés atmosphériques discrets) ──────────────────────────────
+  {                                                                              // 10 Madagascar (plage)
+    table: "#1e3848", table2: "#2a2210", text: "#faf8f2", muted: "#c4c0b0",
+    bg: "url('/img/mada.jpg') center/cover no-repeat"
+  },
+  {                                                                              // 11 Montagne
+    table: "#1e2840", table2: "#0e1810", text: "#f2f5f8", muted: "#b8c4d0",
+    bg: "url('/img/montagne.jpg') center/cover no-repeat"
+  },
+  {                                                                              // 12 Paris nuit
+    table: "#1a1e14", table2: "#0e1008", text: "#f8f8f0", muted: "#c0c4b0",
+    bg: "url('/img/paris.jpg') center/cover no-repeat"
+  },
+  {                                                                              // 13 Réunion
+    table: "#1a2830", table2: "#0e1418", text: "#f2f8fa", muted: "#b8c8d0",
+    bg: "url('/img/reunion.jpg') center/cover no-repeat"
+  },
+  {                                                                              // 14 Corse
+    table: "#2a1808", table2: "#0e0808", text: "#fff8f2", muted: "#d0b8a8",
+    bg: "url('/img/corse.jpg') center/cover no-repeat"
+  },
 ];
 
 
