@@ -130,13 +130,7 @@ function buildFeltColorOptions() {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "felt-color-btn";
-  if (palette.bg) {
-   btn.style.backgroundImage = palette.bg.replace("center/cover no-repeat", "").trim();
-   btn.style.backgroundSize = "cover";
-   btn.style.backgroundPosition = "center";
-  } else {
-   btn.style.background = `linear-gradient(180deg, ${palette.table}, ${palette.table2})`;
-  }
+  btn.style.background = palette.bg || `linear-gradient(180deg, ${palette.table}, ${palette.table2})`;
   btn.setAttribute("aria-label", `Couleur tapis ${index + 1}`);
   btn.addEventListener("click", () => applyFeltColor(index));
   feltColorOptions.appendChild(btn);
