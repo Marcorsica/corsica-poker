@@ -488,23 +488,23 @@ const FELT_COLORS = [
   // ── Paysages (dégradés atmosphériques discrets) ──────────────────────────────
   {                                                                              // 10 Madagascar (plage)
     table: "#1e3848", table2: "#2a2210", text: "#faf8f2", muted: "#c4c0b0",
-    bg: "url('/img/mada.jpg') center/cover no-repeat"
+    bg: "url('/IMG/mada.jpg') center/cover no-repeat"
   },
   {                                                                              // 11 Montagne
     table: "#1e2840", table2: "#0e1810", text: "#f2f5f8", muted: "#b8c4d0",
-    bg: "url('/img/montagne.jpg') center/cover no-repeat"
+    bg: "url('/IMG/montagne.jpg') center/cover no-repeat"
   },
   {                                                                              // 12 Paris nuit
     table: "#1a1e14", table2: "#0e1008", text: "#f8f8f0", muted: "#c0c4b0",
-    bg: "url('/img/paris.jpg') center/cover no-repeat"
+    bg: "url('/IMG/paris.jpg') center/cover no-repeat"
   },
   {                                                                              // 13 Réunion
     table: "#1a2830", table2: "#0e1418", text: "#f2f8fa", muted: "#b8c8d0",
-    bg: "url('/img/reunion.jpg') center/cover no-repeat"
+    bg: "url('/IMG/reunion.jpg') center/cover no-repeat"
   },
   {                                                                              // 14 Corse
     table: "#2a1808", table2: "#0e0808", text: "#fff8f2", muted: "#d0b8a8",
-    bg: "url('/img/corse.jpg') center/cover no-repeat"
+    bg: "url('/IMG/corse.jpg') center/cover no-repeat"
   },
 ];
 
