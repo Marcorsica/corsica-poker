@@ -228,7 +228,9 @@ function updateJackpotDisplays() {
  for (const type of JACKPOT_TYPES) {
   const valueEl = jackpotValueEls[type];
   const boxEl = jackpotBoxEls[type];
-  if (valueEl) valueEl.textContent = getJackpotValueForType(type).toFixed(2);
+  // Ne pas écraser les valeurs tutoriel
+  var _isTuto = (function(){ try{ return sessionStorage.getItem('corsicaPokerTutorial')==='1'; }catch(e){ return false; } })();
+  if (!_isTuto && valueEl) valueEl.textContent = getJackpotValueForType(type).toFixed(2);
   if (boxEl) {
    const hasBet = getJackpotBetList(type).length > 0;
    const hasLiveBet = hasAnyLiveJackpotBetOfType(type);
@@ -367,11 +369,11 @@ function jackpotSquareText(targetKind, targetIndex, ph) {
 
  if (targetKind === "tie") {
  const normal = tieBet.bets[ph] || 0;
- return normal > 0 ? normal.toFixed(0) : "";
+ return normal > 0 ? normal.toFixed(2) : "";
  } else {
  const h = hands[targetIndex];
  const normal = h?.bets?.[ph] || 0;
- return normal > 0 ? normal.toFixed(0) : "";
+ return normal > 0 ? normal.toFixed(2) : "";
  }
 }
 

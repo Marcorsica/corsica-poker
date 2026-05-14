@@ -429,7 +429,7 @@ html,body{
   font-size:18px;
   font-weight:900;
   color:var(--ok);
-  text-shadow:0 1px 0 rgba(0,0,0,.18);
+  text-shadow:0 1px 3px rgba(0,0,0,.7), 0 0 8px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.6);
   margin-bottom:5px;
   min-height:16px;
   position:relative;
@@ -552,6 +552,7 @@ html,body{
 
 .sq.hasBet{
   animation:betPulse 850ms ease infinite;
+  overflow:visible;
 }
 
 .bet-in-square{

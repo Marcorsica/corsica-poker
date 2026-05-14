@@ -660,8 +660,8 @@ function advanceToShowdown() {
  renderHands();
  };
 
- if (hasCertainWinnerBeforeRiver()) revealRiver();
- else playTensionBeforeRiver(revealRiver);
+ // Son suspense toujours joué avant la river
+ playTensionBeforeRiver(revealRiver);
  return;
  }
 }

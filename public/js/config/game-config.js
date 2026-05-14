@@ -13,7 +13,7 @@ const CONFIG = {
 };
 
 const JACKPOT_TYPES = ["argent","or","diamant"];
-const JACKPOT_RESETS = { argent: 250, or: 850, diamant: 8000 };
+const JACKPOT_RESETS = { argent: 0, or: 0, diamant: 0 };
 const JACKPOT_SPLITS = { argent: 0.40, or: 0.35, diamant: 0.25 };
 
 // ==================================================

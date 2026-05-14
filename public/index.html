@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
  <link rel="stylesheet" href="css/style.css?v=18.16-landscape-bg" />
-  <link rel="stylesheet" href="css/improvements.css" />
+  <link rel="stylesheet" href="css/improvements.css?v=23" />
 
  <script>
   // Bloque le menu navigateur avant même le chargement des modules du jeu.
@@ -64,7 +64,6 @@
     </div>
 
     <button type="button" id="btnStart" class="btn primary splash-start">Jouer</button>
-    <button type="button" id="btnTutorial" class="btn splash-tutorial">🎓 Mode tutoriel</button>
     <div class="splash-demo-label" id="splashDemoLabel">Démo — Pas d'argent réel</div>
 
   </div>
@@ -120,6 +119,7 @@
 
  
  <button type="button" id="toggleLogBtn" class="pill toggle-log-btn" aria-pressed="false">Journal</button>
+ <button type="button" id="btnToggleTutorial" class="pill" aria-label="Mode tutoriel">🎓</button>
  <button type="button" id="settingsBtn" class="settings-btn pill" aria-label="Paramètres">⚙️</button>
 
  <div id="settingsPanel" class="settings-panel hidden" aria-label="Paramètres">
@@ -156,9 +156,6 @@
   <div class="settings-section">
    <div id="settingsFeltLabel" class="settings-label">Couleur du tapis</div>
    <div id="feltColorOptions" class="felt-color-options"></div>
-  </div>
-  <div class="settings-section settings-access-section">
-   <button type="button" id="settingsLockBtn" class="pill settings-lock-btn">🔒 Verrouiller l'accès</button>
   </div>
 
   <div class="settings-section game-style-section">
