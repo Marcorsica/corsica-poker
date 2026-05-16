@@ -3,6 +3,8 @@
 // ── Tutoriel Corsica Poker ────────────────────────────────────────────────────
 
 const TUTORIAL_KEY = 'corsicaPokerTutorial';
+// Toujours démarrer en mode réel — le tuto s'active par le bouton uniquement
+try { sessionStorage.removeItem(TUTORIAL_KEY); } catch(e) {}
 
 const TOOLTIPS = {
   fr: {
@@ -195,31 +197,50 @@ let tooltipEl = null;
 let activeTarget = null;
 let activePos = 'bottom';
 let hideTimer = null;
+let showTimer = null;
 
 function createTooltipEl() {
   const el = document.createElement('div');
   el.id = 'tutorialTooltip';
   el.className = 'tutorial-tooltip';
   el.setAttribute('role', 'tooltip');
+  el.addEventListener('mouseenter', function() { clearTimeout(hideTimer); });
+  el.addEventListener('mouseleave', function() { scheduleHide(); });
   document.body.appendChild(el);
   return el;
+}
+
+function scheduleHide() {
+  clearTimeout(hideTimer);
+  hideTimer = setTimeout(hideTooltip, 350);
 }
 
 function showTooltip(target, text, pos) {
   if (!tooltipEl) tooltipEl = createTooltipEl();
   clearTimeout(hideTimer);
+  clearTimeout(showTimer);
+  // Si même cible déjà active, juste repositionner
+  if (activeTarget === target && tooltipEl.classList.contains('tutorial-tooltip--visible')) {
+    positionTooltip(target, pos);
+    return;
+  }
   activeTarget = target;
   activePos = pos;
-  tooltipEl.textContent = text;
-  if (pos === 'center') {
-    tooltipEl.className = 'tutorial-tooltip tutorial-tooltip--center tutorial-tooltip--visible';
-  } else {
-    tooltipEl.className = 'tutorial-tooltip tutorial-tooltip--visible';
-    positionTooltip(target, pos);
-  }
+  // Petit délai pour éviter le flash quand la souris traverse rapidement
+  showTimer = setTimeout(function() {
+    if (!tooltipEl) return;
+    tooltipEl.textContent = text;
+    if (pos === 'center') {
+      tooltipEl.className = 'tutorial-tooltip tutorial-tooltip--center tutorial-tooltip--visible';
+    } else {
+      tooltipEl.className = 'tutorial-tooltip tutorial-tooltip--visible';
+      positionTooltip(target, pos);
+    }
+  }, 80);
 }
 
 function hideTooltip() {
+  clearTimeout(showTimer);
   if (!tooltipEl) return;
   tooltipEl.classList.remove('tutorial-tooltip--visible');
   activeTarget = null;
@@ -258,7 +279,7 @@ function attachTooltips() {
     });
     el.addEventListener('mouseleave', function() {
       if (!isTutorialMode()) return;
-      hideTimer = setTimeout(hideTooltip, 200);
+      scheduleHide();
     });
     el.addEventListener('focus', function() {
       if (!isTutorialMode()) return;
@@ -294,7 +315,7 @@ function attachTooltips() {
     });
     handsLayerEl.addEventListener('mouseleave', function() {
       if (!isTutorialMode()) return;
-      hideTimer = setTimeout(hideTooltip, 200);
+      scheduleHide();
     });
   }
 
@@ -329,7 +350,7 @@ function attachTooltips() {
     var el = e.target;
     while (el && el !== document.body) {
       if (el.classList && el.classList.contains('jackpot-call')) {
-        hideTimer = setTimeout(hideTooltip, 200);
+        scheduleHide();
         return;
       }
       el = el.parentElement;
@@ -359,6 +380,7 @@ function attachTooltips() {
     document.addEventListener('roundFinished', updateToggleButton);
     document.addEventListener('roundStarted', updateToggleButton);
     setInterval(updateToggleButton, 500); // polling léger
+    updateToggleButton();
 
     if (!isTutorialMode()) return;
 
