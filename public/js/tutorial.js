@@ -1,141 +1,300 @@
 'use strict';
 
-// ── Tutoriel Corsica Poker ────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════
+// TUTORIEL GUIDÉ — Corsica Poker
+// ═══════════════════════════════════════════════════════════════════════
 
 const TUTORIAL_KEY = 'corsicaPokerTutorial';
-// Toujours démarrer en mode réel — le tuto s'active par le bouton uniquement
-try { sessionStorage.removeItem(TUTORIAL_KEY); } catch(e) {}
+let tutoStep = -1;
+let tutoActive = false;
+let bubbleEl = null;
+let badgeEl = null;
+let pollTimer = null;
 
-const TOOLTIPS = {
-  fr: {
-    handsLayer:        { text: 'Chaque carte affiche une cote (ex: 6.83). Plus la cote est haute, plus la main est risquée — mais le gain est multiplié par ce coefficient si elle gagne. Cliquez sur une main pour miser dessus. Elle doit gagner SEULE pour que vous soyez payé.', pos: 'center' },
-    tieBox:            { text: 'Case Égalité : misez ici si vous pensez que deux joueurs ou plus terminent avec la même combinaison.', pos: 'top' },
-    betPanel:          { text: 'Choisissez votre mise en cliquant sur une valeur, puis cliquez sur la main de votre choix ou l\'égalité.', pos: 'right' },
-    boardCards:        { text: 'Les cartes communes, révélées progressivement : Flop (3 cartes), Turn (1), River (1). Elles sont communes à tous les joueurs.', pos: 'bottom' },
-    boardTitle:        { text: 'Phase en cours. Les cotes évoluent à chaque nouvelle carte révélée.', pos: 'bottom' },
-    argentJackpotBox:  { text: 'Jackpot Argent — progressif. Misez 1 jeton pour tenter de remporter ce pot quand une main rare apparaît.', pos: 'bottom' },
-    orJackpotBox:      { text: 'Jackpot Or — progressif et rare. Le pot augmente à chaque manche jouée.', pos: 'bottom' },
-    diamantJackpotBox: { text: 'Jackpot Diamant — exceptionnel. Les situations qui le déclenchent sont très rares, les gains à la hauteur.', pos: 'bottom' },
-    btnAdvance:        { text: 'Révèle la prochaine série de cartes : Flop → Turn → River. Les cotes se recalculent à chaque étape.', pos: 'top' },
-    btnSameTable:      { text: 'Relance une nouvelle manche avec le même nombre de joueurs.', pos: 'top' },
-    btnChangeTable:    { text: 'Relance une nouvelle manche avec un nombre de joueurs différent.', pos: 'top' },
-    toggleLogBtn:      { text: 'Ouvre le journal de la manche : historique de vos mises et gains.', pos: 'bottom' },
-    rulesGameBtn:      { text: 'Consulte les règles complètes du jeu.', pos: 'bottom' },
-    btnAbandon:        { text: 'Ne pas jouer cette partie — relance immédiatement une nouvelle manche.', pos: 'top' },
-    btnToggleTutorial: { text: 'Basculer entre le mode tutoriel (jackpots simulés, explications) et le jeu réel.', pos: 'bottom' },
-    lblTotalBets:      { text: 'Total de vos mises en cours sur cette manche.', pos: 'bottom' },
-    btnManualHands:    { text: 'Valide le nombre de joueurs choisi et lance la manche.', pos: 'top' },
+// ── Étapes du parcours guidé ──────────────────────────────────────────
+const STEPS = [
+  {
+    target: 'roundSetupOverlay',
+    title: '👥 Combien de joueurs ?',
+    text: 'Choisissez le nombre de joueurs à la table (4 à 10) avec le sélecteur, puis validez avec la flèche <strong>➜</strong>. Vous pouvez aussi cliquer sur le bouton pour un nombre aléatoire.',
+    pos: 'center',
+    waitFor: function() {
+      var el = document.getElementById('roundSetupOverlay');
+      return el && el.classList.contains('hidden');
+    }
   },
-  en: {
-    handsLayer:        { text: 'Each hand shows an odds number (e.g. 6.83). The higher the odds, the riskier the hand — but your winnings are multiplied by that number if it wins. Click a hand to bet on it. It must win OUTRIGHT for you to be paid.', pos: 'center' },
-    tieBox:            { text: 'Tie box: bet here if you think two or more players will finish with the same combination.', pos: 'top' },
-    betPanel:          { text: 'Choose your stake by clicking a chip value, then click the hand or tie box of your choice.', pos: 'right' },
-    boardCards:        { text: 'Community cards, revealed progressively: Flop (3), Turn (1), River (1). They belong to all players.', pos: 'bottom' },
-    boardTitle:        { text: 'Current phase. Odds update with every new card revealed.', pos: 'bottom' },
-    argentJackpotBox:  { text: 'Silver Jackpot — progressive. Bet 1 chip to try to win this pot when a rare hand appears.', pos: 'bottom' },
-    orJackpotBox:      { text: 'Gold Jackpot — progressive and rare. The pot grows every round.', pos: 'bottom' },
-    diamantJackpotBox: { text: 'Diamond Jackpot — exceptional. The situations that trigger it are extremely rare — and the rewards match.', pos: 'bottom' },
-    btnAdvance:        { text: 'Reveals the next cards: Flop → Turn → River. Odds recalculate at each step.', pos: 'top' },
-    btnSameTable:      { text: 'Start a new round with the same number of players.', pos: 'top' },
-    btnChangeTable:    { text: 'Start a new round with a different number of players.', pos: 'top' },
-    toggleLogBtn:      { text: 'Open the round log: history of your bets and winnings.', pos: 'bottom' },
-    rulesGameBtn:      { text: 'Read the full game rules.', pos: 'bottom' },
-    btnAbandon:        { text: 'Skip this round — immediately starts a new hand.', pos: 'top' },
-    btnToggleTutorial: { text: 'Switch between tutorial mode (simulated jackpots, tips) and real game.', pos: 'bottom' },
-    lblTotalBets:      { text: 'Total bets placed in the current round.', pos: 'bottom' },
-    btnManualHands:    { text: 'Confirm the selected number of players and start the round.', pos: 'top' },
+  {
+    target: 'handsLayer',
+    title: '🃏 Voici les mains',
+    text: 'Chaque joueur reçoit 2 cartes. Le nombre au-dessus est la <strong>cote</strong> : plus elle est élevée, plus le risque est grand mais le gain aussi. Votre mise sera <strong>multipliée par cette cote</strong> si la main gagne seule.',
+    pos: 'center',
+    advance: 'click'
   },
-};
+  {
+    target: 'betPanel',
+    title: '💰 Choisissez votre mise',
+    text: 'Cliquez sur un jeton (<strong>1, 2, 5, 10 ou 20</strong>) pour sélectionner votre mise. Vous pourrez ensuite cliquer sur les mains pour y placer des jetons.',
+    pos: 'right',
+    advance: 'click'
+  },
+  {
+    target: 'handsLayer',
+    title: '👆 Placez votre mise !',
+    text: 'Cliquez sur une main pour y miser. Vous pouvez miser sur <strong>plusieurs mains</strong>. La <strong>gomme 🧹</strong> sur un jeton posé permet de retirer la mise.',
+    pos: 'center',
+    waitFor: function() {
+      return document.querySelector('.sq.hasBet') !== null;
+    }
+  },
+  {
+    target: 'tieBox',
+    title: '🤝 Case Égalité',
+    text: 'Misez ici si vous pensez que <strong>deux joueurs ou plus</strong> terminent avec la même combinaison. C\'est un pari bonus indépendant des mains.',
+    pos: 'left',
+    advance: 'click'
+  },
+  {
+    target: 'btnAdvance',
+    title: '✅ Validez vos mises',
+    text: 'Cliquez sur <strong>Valider les mises</strong> pour lancer le dévoilement des cartes communes. C\'est parti !',
+    pos: 'top',
+    waitFor: function() {
+      return typeof phase !== 'undefined' && phase !== 'pre';
+    }
+  },
+  {
+    target: 'boardCards',
+    title: '🂠 Le Flop — 3 cartes',
+    text: 'Les 3 premières <strong>cartes communes</strong> sont révélées. Elles sont partagées par tous les joueurs. Les cotes se <strong>recalculent en direct</strong> — certains joueurs sont éliminés !',
+    pos: 'bottom',
+    advance: 'click'
+  },
+  {
+    target: 'btnAdvance',
+    title: '➡️ Turn, puis River',
+    text: 'Cliquez pour révéler la <strong>4ème carte</strong> (Turn) puis la <strong>5ème</strong> (River). Un son de suspense accompagne la dernière carte. Les cotes bougent à chaque révélation.',
+    pos: 'top',
+    waitFor: function() {
+      return typeof roundFinished !== 'undefined' && roundFinished === true;
+    }
+  },
+  {
+    target: 'handsLayer',
+    title: '🏆 Résultat de la manche',
+    text: 'La <strong>main gagnante brille en doré</strong>. Si vous aviez misé dessus, vous remportez <strong>mise × cote</strong> ! Les perdants sont grisés. Votre solde est mis à jour en haut.',
+    pos: 'center',
+    advance: 'click'
+  },
+  {
+    target: 'argentJackpotBox',
+    title: '💎 Les Jackpots Progressifs',
+    text: 'Trois jackpots (<strong>Argent, Or, Diamant</strong>) grossissent à chaque manche. Quand une mention "Tente le Jackpot" apparaît sur une main, misez 1 jeton pour tenter de remporter toute la cagnotte !',
+    pos: 'bottom',
+    advance: 'click'
+  },
+  {
+    target: 'settingsBtn',
+    title: '⚙️ Paramètres',
+    text: 'Ici vous pouvez changer le <strong>thème visuel</strong>, la <strong>couleur du tapis</strong>, l\'<strong>ambiance sonore</strong>, la <strong>langue</strong>... Tout est personnalisable !',
+    pos: 'bottom',
+    advance: 'click'
+  },
+  {
+    target: 'btnSameTable',
+    title: '🔄 Rejouez !',
+    text: '« <strong>Même table</strong> » relance avec le même nombre de joueurs. « <strong>Changer de table</strong> » vous permet d\'en choisir un autre. À vous de jouer !',
+    pos: 'top',
+    advance: 'click'
+  },
+  {
+    target: null,
+    title: '🎉 Tutoriel terminé !',
+    text: 'Vous connaissez maintenant toutes les bases de <strong>Corsica Poker</strong>. Misez sur les cotes, tentez les jackpots et surtout... bonne chance !',
+    pos: 'center',
+    advance: 'click',
+    isFinal: true
+  }
+];
 
+// ── Utilitaires ───────────────────────────────────────────────────────
+function isTutorialMode() { return tutoActive; }
 
-// ── Badge mode tutoriel ───────────────────────────────────────────────────────
+// ── Activation / Désactivation ────────────────────────────────────────
+function activateTutorial() {
+  tutoActive = true;
+  tutoStep = -1;
+  try { sessionStorage.setItem(TUTORIAL_KEY, '1'); } catch(e) {}
+  document.body.classList.add('tutorial-mode');
+  injectBadge();
+  applyTutorialJackpots();
 
-function injectTutorialBadge() {
-  if (document.getElementById('tutorialModeBadge')) return;
-  var badge = document.createElement('div');
-  badge.id = 'tutorialModeBadge';
-  badge.textContent = '🎓 MODE TUTORIEL';
-  document.body.appendChild(badge);
+  var splash = document.getElementById('splashScreen');
+  if (splash) splash.classList.add('hidden');
+  if (typeof showRoundSetup === 'function') showRoundSetup();
+
+  setTimeout(function() { goToStep(0); }, 600);
+
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(pollWaitFor, 350);
 }
 
-// ── Jackpots tutoriel ─────────────────────────────────────────────────────────
+function exitTutorial() {
+  tutoActive = false;
+  tutoStep = -1;
+  try { sessionStorage.removeItem(TUTORIAL_KEY); } catch(e) {}
+  document.body.classList.remove('tutorial-mode');
+  removeBubble();
+  removeBadge();
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
 
-function applyTutorialJackpots() {
-  var map = {
-    argentJackpotValue: '324.26',
-    orJackpotValue: '2 654.78',
-    diamantJackpotValue: '26 314.77',
-    splashJpArgent: '324.26',
-    splashJpOr: '2 654.78',
-    splashJpDiamant: '26 314.77'
-  };
-  for (var id in map) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = map[id];
-  }
-  // Barres de chaleur aléatoires
   ['argentHeatFill','orHeatFill','diamantHeatFill',
    'splashArgentFill','splashOrFill','splashDiamantFill'].forEach(function(id) {
     var el = document.getElementById(id);
-    if (el) el.style.setProperty('--heat-progress', (20 + Math.floor(Math.random()*65)) + '%');
+    if (el) el.style.removeProperty('--heat-progress');
+  });
+  if (typeof updateJackpotHeatBars === 'function') updateJackpotHeatBars();
+  if (typeof updateJackpotDisplays === 'function') updateJackpotDisplays();
+}
+
+// ── Jackpots simulés ──────────────────────────────────────────────────
+function applyTutorialJackpots() {
+  var base = { argent: 324.26, or: 2654.78, diamant: 26314.77 };
+  function rnd(v) { return (v + Math.random()*v*0.08 - v*0.04).toFixed(2); }
+  var vals  = { argent: rnd(base.argent), or: rnd(base.or), diamant: rnd(base.diamant) };
+  var heats = { argent: 35+Math.floor(Math.random()*50), or: 20+Math.floor(Math.random()*45), diamant: 5+Math.floor(Math.random()*30) };
+  var ids = {
+    argent:  { val:['argentJackpotValue','splashJpArgent'],   heat:['argentHeatFill','splashArgentFill'] },
+    or:      { val:['orJackpotValue','splashJpOr'],           heat:['orHeatFill','splashOrFill'] },
+    diamant: { val:['diamantJackpotValue','splashJpDiamant'], heat:['diamantHeatFill','splashDiamantFill'] }
+  };
+  for (var k in ids) {
+    ids[k].val.forEach(function(id)  { var el = document.getElementById(id); if (el) el.textContent = vals[k]; });
+    ids[k].heat.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.setProperty('--heat-progress', heats[k]+'%'); });
+  }
+}
+
+// ── Badge MODE DÉCOUVERTE ─────────────────────────────────────────────
+function injectBadge() {
+  if (document.getElementById('tutorialModeBadge')) return;
+  badgeEl = document.createElement('div');
+  badgeEl.id = 'tutorialModeBadge';
+  badgeEl.textContent = '🎓 MODE DÉCOUVERTE';
+  document.body.appendChild(badgeEl);
+}
+function removeBadge() {
+  var b = document.getElementById('tutorialModeBadge');
+  if (b) b.remove();
+  badgeEl = null;
+}
+
+// ── Navigation entre étapes ───────────────────────────────────────────
+function goToStep(n) {
+  if (!tutoActive) return;
+  if (n >= STEPS.length) { exitTutorial(); return; }
+  tutoStep = n;
+  showBubble(STEPS[n]);
+}
+
+function nextStep() { goToStep(tutoStep + 1); }
+
+function pollWaitFor() {
+  if (!tutoActive || tutoStep < 0 || tutoStep >= STEPS.length) return;
+  var step = STEPS[tutoStep];
+  if (step.waitFor && step.waitFor()) nextStep();
+}
+
+// ── Bulle guidée ──────────────────────────────────────────────────────
+function showBubble(step) {
+  removeBubble();
+
+  var targetEl = step.target ? document.getElementById(step.target) : null;
+  if (step.target && !targetEl) {
+    setTimeout(function() { showBubble(step); }, 400);
+    return;
+  }
+
+  bubbleEl = document.createElement('div');
+  bubbleEl.id = 'tutoBubble';
+  bubbleEl.className = 'tuto-bubble';
+  bubbleEl.innerHTML =
+    '<div class="tuto-bubble-close" id="tutoBubbleClose">✕</div>' +
+    (targetEl ? '<div class="tuto-bubble-arrow" id="tutoBubbleArrow"></div>' : '') +
+    '<div class="tuto-bubble-title">' + step.title + '</div>' +
+    '<div class="tuto-bubble-text">' + step.text + '</div>' +
+    '<div class="tuto-bubble-footer">' +
+      '<span class="tuto-step-count">' + (tutoStep+1) + ' / ' + STEPS.length + '</span>' +
+      (step.isFinal
+        ? '<button class="tuto-btn-next tuto-btn-finish" id="tutoBtnNext">🎉 Commencer à jouer</button>'
+        : step.advance === 'click'
+          ? '<button class="tuto-btn-next" id="tutoBtnNext">Compris ➜</button>'
+          : '<span class="tuto-wait-hint">⏳ Faites l\'action indiquée…</span>') +
+    '</div>';
+
+  document.body.appendChild(bubbleEl);
+  positionBubble(targetEl, step.pos);
+
+  // Listeners
+  var btnNext = document.getElementById('tutoBtnNext');
+  if (btnNext) btnNext.addEventListener('click', function() {
+    if (step.isFinal) exitTutorial();
+    else nextStep();
+  });
+  var btnClose = document.getElementById('tutoBubbleClose');
+  if (btnClose) btnClose.addEventListener('click', exitTutorial);
+
+  // Animation d'entrée
+  requestAnimationFrame(function() {
+    if (bubbleEl) bubbleEl.classList.add('tuto-bubble--visible');
   });
 }
 
+function positionBubble(targetEl, pos) {
+  if (!bubbleEl) return;
+  if (!targetEl || pos === 'center') {
+    bubbleEl.classList.add('tuto-bubble--center');
+    return;
+  }
 
+  var r = targetEl.getBoundingClientRect();
+  var bw = 380, margin = 16;
+  var left, top;
+  var arrowClass = '';
 
-// ── Badge mode tutoriel ───────────────────────────────────────────────────────
+  if (pos === 'bottom') {
+    left = Math.max(margin, Math.min(window.innerWidth - bw - margin, r.left + r.width/2 - bw/2));
+    top = r.bottom + 18;
+    arrowClass = 'arrow-top';
+  } else if (pos === 'top') {
+    left = Math.max(margin, Math.min(window.innerWidth - bw - margin, r.left + r.width/2 - bw/2));
+    top = r.top - 14;
+    arrowClass = 'arrow-bottom';
+    bubbleEl.style.transform = 'translateY(-100%)';
+  } else if (pos === 'right') {
+    left = r.right + 18;
+    top = Math.max(margin, r.top + r.height/2 - 80);
+    arrowClass = 'arrow-left';
+  } else if (pos === 'left') {
+    left = r.left - bw - 18;
+    top = Math.max(margin, r.top + r.height/2 - 80);
+    arrowClass = 'arrow-right';
+    if (left < margin) { left = r.right + 18; arrowClass = 'arrow-left'; }
+  }
 
-function injectTutorialBadge() {
-  if (document.getElementById('tutorialModeBadge')) return;
-  var badge = document.createElement('div');
-  badge.id = 'tutorialModeBadge';
-  badge.textContent = '🎓 MODE TUTORIEL';
-  document.body.appendChild(badge);
+  bubbleEl.style.left = left + 'px';
+  bubbleEl.style.top = top + 'px';
+  bubbleEl.style.width = bw + 'px';
+
+  var arrow = document.getElementById('tutoBubbleArrow');
+  if (arrow) arrow.className = 'tuto-bubble-arrow ' + arrowClass;
 }
 
-// ── Jackpots tutoriel ─────────────────────────────────────────────────────────
-
-function applyTutorialJackpots() {
-  // Valeurs simulées réalistes
-  var base = { argent: 324.26, or: 2654.78, diamant: 26314.77 };
-  // Légère variation aléatoire à chaque passage
-  function randomize(v) {
-    return (v + Math.random() * v * 0.08 - v * 0.04).toFixed(2);
-  }
-  var vals = {
-    argent:  randomize(base.argent),
-    or:      randomize(base.or),
-    diamant: randomize(base.diamant)
-  };
-  // Barres de chaleur aléatoires réalistes :
-  // argent : souvent proche, or : moyen, diamant : bas
-  var heats = {
-    argent:  Math.floor(35 + Math.random() * 50),   // 35-85%
-    or:      Math.floor(20 + Math.random() * 45),   // 20-65%
-    diamant: Math.floor(5  + Math.random() * 30)    // 5-35%
-  };
-  var ids = {
-    argent:  { val: ['argentJackpotValue','splashJpArgent'],   heat: ['argentHeatFill','splashArgentFill'] },
-    or:      { val: ['orJackpotValue',    'splashJpOr'],       heat: ['orHeatFill',    'splashOrFill'] },
-    diamant: { val: ['diamantJackpotValue','splashJpDiamant'], heat: ['diamantHeatFill','splashDiamantFill'] }
-  };
-  for (var k in ids) {
-    var v = vals[k]; var h = heats[k];
-    ids[k].val.forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) el.textContent = v;
-    });
-    ids[k].heat.forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) el.style.setProperty('--heat-progress', h + '%');
-    });
-
-  }
+function removeBubble() {
+  var el = document.getElementById('tutoBubble');
+  if (el) el.remove();
+  bubbleEl = null;
 }
 
-
-// ── Gestion état bouton toggle ────────────────────────────────────────────────
-
+// ── Bouton toggle header ──────────────────────────────────────────────
 function updateToggleButton() {
   var btn = document.getElementById('btnToggleTutorial');
   if (!btn) return;
@@ -144,255 +303,39 @@ function updateToggleButton() {
   var abandon  = document.getElementById('btnAbandon');
   var splashVisible  = splash  && !splash.classList.contains('hidden');
   var setupVisible   = setup   && !setup.classList.contains('hidden');
-  var abandonVisible = abandon && abandon.style.display !== 'none'
-                    && abandon.offsetParent !== null;
-  var roundIsOver    = (typeof roundFinished !== 'undefined') ? roundFinished : true;
+  var abandonVisible = abandon && abandon.style.display!=='none' && abandon.offsetParent!==null;
+  var roundIsOver    = (typeof roundFinished!=='undefined') ? roundFinished : true;
   var canSwitch = splashVisible || setupVisible || roundIsOver || abandonVisible;
   btn.disabled = !canSwitch;
   btn.style.opacity = canSwitch ? '1' : '0.38';
   btn.style.pointerEvents = canSwitch ? 'auto' : 'none';
 }
 
-// ── Détection du mode tutoriel ────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────────
+function onReady() {
+  var btnDiscovery = document.getElementById('btnDiscovery');
+  if (btnDiscovery) {
+    btnDiscovery.addEventListener('click', activateTutorial);
+  }
 
-function isTutorialMode() {
-  try { return sessionStorage.getItem(TUTORIAL_KEY) === '1'; } catch(_) { return false; }
-}
+  var btnToggle = document.getElementById('btnToggleTutorial');
+  if (btnToggle) {
+    btnToggle.addEventListener('click', function() {
+      if (tutoActive) {
+        exitTutorial();
+        if (typeof showRoundSetup === 'function') showRoundSetup();
+      } else {
+        activateTutorial();
+      }
+    });
+  }
 
-function activateTutorial() {
-  try { sessionStorage.setItem(TUTORIAL_KEY, '1'); } catch(_) {}
-  document.body.classList.add('tutorial-mode');
-  attachTooltips();
-  applyTutorialJackpots();
+  setInterval(updateToggleButton, 500);
   updateToggleButton();
-  injectTutorialBadge();
-  // Aller directement au choix des joueurs (pas la page d'accueil du code)
-  if (typeof showRoundSetup === 'function') showRoundSetup();
 }
 
-
-function exitTutorial() {
-  try { sessionStorage.removeItem(TUTORIAL_KEY); } catch(_) {}
-  document.body.classList.remove('tutorial-mode');
-  if (typeof hideTooltip === 'function') hideTooltip();
-  var badge = document.getElementById('tutorialModeBadge');
-  if (badge) badge.remove();
-  updateToggleButton();
-  // Restaurer les barres de chaleur réelles (effacer les valeurs CSS du tutoriel)
-  ['argentHeatFill','orHeatFill','diamantHeatFill',
-   'splashArgentFill','splashOrFill','splashDiamantFill'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.style.removeProperty('--heat-progress');
-  });
-  // Forcer le rafraîchissement avec l'état réel
-  if (typeof updateJackpotHeatBars === 'function') updateJackpotHeatBars();
-  if (typeof updateJackpotDisplays === 'function') updateJackpotDisplays();
-  // Aller au choix des joueurs en mode réel
-  if (typeof showRoundSetup === 'function') showRoundSetup();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', onReady);
+} else {
+  onReady();
 }
-
-// ── Tooltip engine ────────────────────────────────────────────────────────────
-
-let tooltipEl = null;
-let activeTarget = null;
-let activePos = 'bottom';
-let hideTimer = null;
-let showTimer = null;
-
-function createTooltipEl() {
-  const el = document.createElement('div');
-  el.id = 'tutorialTooltip';
-  el.className = 'tutorial-tooltip';
-  el.setAttribute('role', 'tooltip');
-  el.addEventListener('mouseenter', function() { clearTimeout(hideTimer); });
-  el.addEventListener('mouseleave', function() { scheduleHide(); });
-  document.body.appendChild(el);
-  return el;
-}
-
-function scheduleHide() {
-  clearTimeout(hideTimer);
-  hideTimer = setTimeout(hideTooltip, 350);
-}
-
-function showTooltip(target, text, pos) {
-  if (!tooltipEl) tooltipEl = createTooltipEl();
-  clearTimeout(hideTimer);
-  clearTimeout(showTimer);
-  // Si même cible déjà active, juste repositionner
-  if (activeTarget === target && tooltipEl.classList.contains('tutorial-tooltip--visible')) {
-    positionTooltip(target, pos);
-    return;
-  }
-  activeTarget = target;
-  activePos = pos;
-  // Petit délai pour éviter le flash quand la souris traverse rapidement
-  showTimer = setTimeout(function() {
-    if (!tooltipEl) return;
-    tooltipEl.textContent = text;
-    if (pos === 'center') {
-      tooltipEl.className = 'tutorial-tooltip tutorial-tooltip--center tutorial-tooltip--visible';
-    } else {
-      tooltipEl.className = 'tutorial-tooltip tutorial-tooltip--visible';
-      positionTooltip(target, pos);
-    }
-  }, 80);
-}
-
-function hideTooltip() {
-  clearTimeout(showTimer);
-  if (!tooltipEl) return;
-  tooltipEl.classList.remove('tutorial-tooltip--visible');
-  activeTarget = null;
-}
-
-function positionTooltip(target, pos) {
-  const r   = target.getBoundingClientRect();
-  const gap = 10;
-  const tw  = tooltipEl.offsetWidth  || 260;
-  const th  = tooltipEl.offsetHeight || 60;
-  let top, left;
-
-  if      (pos === 'top')    { top = r.top - th - gap;              left = r.left + r.width / 2 - tw / 2; }
-  else if (pos === 'bottom') { top = r.bottom + gap;                 left = r.left + r.width / 2 - tw / 2; }
-  else if (pos === 'right')  { top = r.top + r.height / 2 - th / 2; left = r.right + gap; }
-  else                       { top = r.top + r.height / 2 - th / 2; left = r.left - tw - gap; }
-
-  left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
-  top  = Math.max(8, top);
-
-  tooltipEl.style.top  = top  + 'px';
-  tooltipEl.style.left = left + 'px';
-}
-
-function attachTooltips() {
-  const currentLang = (typeof lang !== 'undefined' ? lang : 'fr');
-  const tips = TOOLTIPS[currentLang] || TOOLTIPS.fr;
-
-  Object.entries(tips).forEach(function(entry) {
-    var id = entry[0], cfg = entry[1];
-    var el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('mouseenter', function() {
-      if (!isTutorialMode()) return;
-      showTooltip(el, cfg.text, cfg.pos);
-    });
-    el.addEventListener('mouseleave', function() {
-      if (!isTutorialMode()) return;
-      scheduleHide();
-    });
-    el.addEventListener('focus', function() {
-      if (!isTutorialMode()) return;
-      showTooltip(el, cfg.text, cfg.pos);
-    });
-    el.addEventListener('blur', function() {
-      if (!isTutorialMode()) return;
-      hideTooltip();
-    });
-  });
-
-  window.addEventListener('scroll', function() { if (activeTarget) positionTooltip(activeTarget, activePos); }, { passive: true });
-  window.addEventListener('resize', function() { if (activeTarget) positionTooltip(activeTarget, activePos); }, { passive: true });
-
-  // Tooltip dynamique sur les mains individuelles
-  var handsLayerEl = document.getElementById('handsLayer');
-  if (handsLayerEl) {
-    handsLayerEl.addEventListener('mouseover', function(e) {
-      if (!isTutorialMode()) return;
-      var handEl = e.target.closest('.hand');
-      if (!handEl) return;
-      var allHands = Array.from(handsLayerEl.querySelectorAll('.hand'));
-      var idx = allHands.indexOf(handEl);
-      var oddsVal = '—';
-      if (typeof hands !== 'undefined' && hands[idx] && hands[idx].oddsStr) {
-        oddsVal = hands[idx].oddsStr;
-      }
-      var currentLang = (typeof lang !== 'undefined' ? lang : 'fr');
-      var text = currentLang === 'en'
-        ? 'Each hand shows an odds number (e.g. ' + oddsVal + '). The higher the odds, the riskier the hand. Your bet is multiplied by that number if the hand wins. Click during the game phase to place a bet. The hand must win OUTRIGHT — otherwise the Tie box wins.'
-        : 'Chaque main affiche une cote (ex : ' + oddsVal + '). Plus la cote est haute, plus la main est risquée. La mise est multipliée par ce coefficient si la main gagne. Cliquez dans la phase de jeu pour miser. La main doit gagner SEULE sinon c\'est la case égalité qui gagne.';
-      showTooltip(handEl, text, 'center');
-    });
-    handsLayerEl.addEventListener('mouseleave', function() {
-      if (!isTutorialMode()) return;
-      scheduleHide();
-    });
-  }
-
-  // Délégation pour les éléments .jackpot-call (créés dynamiquement)
-  var jpTexts = {
-    fr: {
-      argent:  'Tente le Jackpot Argent ! Si cette main gagne, tu remportes le Jackpot Argent.',
-      or:      'Tente le Jackpot Or ! Si cette main gagne, tu remportes le Jackpot Or.',
-      diamant: 'Tente le Jackpot Diamant ! Si cette main gagne, tu remportes le Jackpot Diamant.'
-    },
-    en: {
-      argent:  'Try the Silver Jackpot! If this hand wins, you take the Silver Jackpot.',
-      or:      'Try the Gold Jackpot! If this hand wins, you take the Gold Jackpot.',
-      diamant: 'Try the Diamond Jackpot! If this hand wins, you take the Diamond Jackpot.'
-    }
-  };
-  var jpt = jpTexts[currentLang] || jpTexts.fr;
-  document.addEventListener('mouseover', function(e) {
-    if (!isTutorialMode()) return;
-    var el = e.target;
-    while (el && el !== document.body) {
-      if (el.classList && el.classList.contains('jackpot-call')) {
-        var jtype = (el.dataset.jackpotType || 'argent').toLowerCase();
-        showTooltip(el, jpt[jtype] || jpt.argent, 'top');
-        return;
-      }
-      el = el.parentElement;
-    }
-  });
-  document.addEventListener('mouseout', function(e) {
-    if (!isTutorialMode()) return;
-    var el = e.target;
-    while (el && el !== document.body) {
-      if (el.classList && el.classList.contains('jackpot-call')) {
-        scheduleHide();
-        return;
-      }
-      el = el.parentElement;
-    }
-  });
-}
-
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-
-(function initTutorial() {
-  function onReady() {
-    var btnTutorial = document.getElementById('btnTutorial');
-    if (btnTutorial) {
-      btnTutorial.addEventListener('click', activateTutorial);
-    }
-
-    // Bouton header toggle tutoriel/réel
-    var btnToggle = document.getElementById('btnToggleTutorial');
-    if (btnToggle) {
-      btnToggle.addEventListener('click', function() {
-        if (isTutorialMode()) { exitTutorial(); } else { activateTutorial(); }
-      });
-    }
-
-    // Mettre à jour l'état du bouton toggle au fil du jeu
-    document.addEventListener('roundFinished', updateToggleButton);
-    document.addEventListener('roundStarted', updateToggleButton);
-    setInterval(updateToggleButton, 500); // polling léger
-    updateToggleButton();
-
-    if (!isTutorialMode()) return;
-
-    document.body.classList.add('tutorial-mode');
-    attachTooltips();
-    applyTutorialJackpots();
-    injectTutorialBadge();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', onReady);
-  } else {
-    onReady();
-  }
-})();
