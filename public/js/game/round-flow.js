@@ -431,17 +431,17 @@ function playTensionBeforeRiver(callback) {
  }
 
  stopSuspenseAudio();
+ // Essayer /audio/ d'abord, fallback /external-audio/ uniquement si fichier absent
  suspenseAudio = new Audio("/audio/suspense.mp3");
  suspenseAudio.volume = 0.18;
  suspenseAudio.addEventListener('error', function() {
+  // error = fichier introuvable → essayer le dossier externe (local dev)
   suspenseAudio = new Audio("/external-audio/suspense.mp3");
   suspenseAudio.volume = 0.18;
   suspenseAudio.play().catch(function() {});
  });
  suspenseAudio.play().catch(function() {
-  suspenseAudio = new Audio("/external-audio/suspense.mp3");
-  suspenseAudio.volume = 0.18;
-  suspenseAudio.play().catch(function() {});
+  // catch = autoplay bloqué ou autre — ne PAS remplacer l'audio
  });
 
  const start = performance.now();
