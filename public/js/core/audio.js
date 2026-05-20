@@ -231,7 +231,7 @@ function ensureEffectAudioSource(a) {
 }
 
 function playSound(a) {
- if (!a || !soundEnabled) return;
+ if (!a || !soundEnabled || window._tutoRerolling) return;
  try {
   ensureEffectAudioSource(a);
   a.currentTime = 0;

@@ -96,7 +96,7 @@ function showWinPopup(amount){
  div.textContent = "+" + amount.toFixed(2);
  document.body.appendChild(div);
 
- setTimeout(()=>div.remove(), amount >= 120 ? 2400 : 2000);
+ setTimeout(()=>div.remove(), amount >= 120 ? 6500 : 5500);
 }
 
 function triggerWinEffects(amount){
@@ -227,6 +227,8 @@ function hasCommittedBet() {
 }
 
 function canUseAbandon() {
+ // En mode découverte/tutoriel, Abandonner doit rester non cliquable.
+ if (document.body && document.body.classList.contains("tutorial-mode")) return false;
  const splashVisible = !!(splashScreen && !splashScreen.classList.contains("hidden"));
  const setupVisible = !!(roundSetupOverlay && !roundSetupOverlay.classList.contains("hidden"));
  return !splashVisible && !setupVisible && !roundFinished && phase === "pre" && !hasCommittedBet() && !isCalculating && !isAdvancingPhase;

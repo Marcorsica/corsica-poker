@@ -1,341 +1,392 @@
 'use strict';
+const TUTORIAL_KEY='corsicaPokerTutorial';
+let tutoStep=-1,tutoActive=false,bubbleEl=null,badgeEl=null,pollTimer=null;
+let arrowEls=[],rafId=null;
+var cachedDynTargets=null;
+var jpCallWatcher=null,jpBubbleDismissed=false;
+var blockOverlayEl=null,loadingOverlayEl=null;
+var fixedDealApplied=false;
 
-// ═══════════════════════════════════════════════════════════════════════
-// TUTORIEL GUIDÉ — Corsica Poker
-// ═══════════════════════════════════════════════════════════════════════
-
-const TUTORIAL_KEY = 'corsicaPokerTutorial';
-let tutoStep = -1;
-let tutoActive = false;
-let bubbleEl = null;
-let badgeEl = null;
-let pollTimer = null;
-
-// ── Étapes du parcours guidé ──────────────────────────────────────────
-const STEPS = [
-  {
-    target: 'roundSetupOverlay',
-    title: '👥 Combien de joueurs ?',
-    text: 'Choisissez le nombre de joueurs à la table (4 à 10) avec le sélecteur, puis validez avec la flèche <strong>➜</strong>. Vous pouvez aussi cliquer sur le bouton pour un nombre aléatoire.',
-    pos: 'center',
-    waitFor: function() {
-      var el = document.getElementById('roundSetupOverlay');
-      return el && el.classList.contains('hidden');
-    }
-  },
-  {
-    target: 'handsLayer',
-    title: '🃏 Voici les mains',
-    text: 'Chaque joueur reçoit 2 cartes. Le nombre au-dessus est la <strong>cote</strong> : plus elle est élevée, plus le risque est grand mais le gain aussi. Votre mise sera <strong>multipliée par cette cote</strong> si la main gagne seule.',
-    pos: 'center',
-    advance: 'click'
-  },
-  {
-    target: 'betPanel',
-    title: '💰 Choisissez votre mise',
-    text: 'Cliquez sur un jeton (<strong>1, 2, 5, 10 ou 20</strong>) pour sélectionner votre mise. Vous pourrez ensuite cliquer sur les mains pour y placer des jetons.',
-    pos: 'right',
-    advance: 'click'
-  },
-  {
-    target: 'handsLayer',
-    title: '👆 Placez votre mise !',
-    text: 'Cliquez sur une main pour y miser. Vous pouvez miser sur <strong>plusieurs mains</strong>. La <strong>gomme 🧹</strong> sur un jeton posé permet de retirer la mise.',
-    pos: 'center',
-    waitFor: function() {
-      return document.querySelector('.sq.hasBet') !== null;
-    }
-  },
-  {
-    target: 'tieBox',
-    title: '🤝 Case Égalité',
-    text: 'Misez ici si vous pensez que <strong>deux joueurs ou plus</strong> terminent avec la même combinaison. C\'est un pari bonus indépendant des mains.',
-    pos: 'left',
-    advance: 'click'
-  },
-  {
-    target: 'btnAdvance',
-    title: '✅ Validez vos mises',
-    text: 'Cliquez sur <strong>Valider les mises</strong> pour lancer le dévoilement des cartes communes. C\'est parti !',
-    pos: 'top',
-    waitFor: function() {
-      return typeof phase !== 'undefined' && phase !== 'pre';
-    }
-  },
-  {
-    target: 'boardCards',
-    title: '🂠 Le Flop — 3 cartes',
-    text: 'Les 3 premières <strong>cartes communes</strong> sont révélées. Elles sont partagées par tous les joueurs. Les cotes se <strong>recalculent en direct</strong> — certains joueurs sont éliminés !',
-    pos: 'bottom',
-    advance: 'click'
-  },
-  {
-    target: 'btnAdvance',
-    title: '➡️ Turn, puis River',
-    text: 'Cliquez pour révéler la <strong>4ème carte</strong> (Turn) puis la <strong>5ème</strong> (River). Un son de suspense accompagne la dernière carte. Les cotes bougent à chaque révélation.',
-    pos: 'top',
-    waitFor: function() {
-      return typeof roundFinished !== 'undefined' && roundFinished === true;
-    }
-  },
-  {
-    target: 'handsLayer',
-    title: '🏆 Résultat de la manche',
-    text: 'La <strong>main gagnante brille en doré</strong>. Si vous aviez misé dessus, vous remportez <strong>mise × cote</strong> ! Les perdants sont grisés. Votre solde est mis à jour en haut.',
-    pos: 'center',
-    advance: 'click'
-  },
-  {
-    target: 'argentJackpotBox',
-    title: '💎 Les Jackpots Progressifs',
-    text: 'Trois jackpots (<strong>Argent, Or, Diamant</strong>) grossissent à chaque manche. Quand une mention "Tente le Jackpot" apparaît sur une main, misez 1 jeton pour tenter de remporter toute la cagnotte !',
-    pos: 'bottom',
-    advance: 'click'
-  },
-  {
-    target: 'settingsBtn',
-    title: '⚙️ Paramètres',
-    text: 'Ici vous pouvez changer le <strong>thème visuel</strong>, la <strong>couleur du tapis</strong>, l\'<strong>ambiance sonore</strong>, la <strong>langue</strong>... Tout est personnalisable !',
-    pos: 'bottom',
-    advance: 'click'
-  },
-  {
-    target: 'btnSameTable',
-    title: '🔄 Rejouez !',
-    text: '« <strong>Même table</strong> » relance avec le même nombre de joueurs. « <strong>Changer de table</strong> » vous permet d\'en choisir un autre. À vous de jouer !',
-    pos: 'top',
-    advance: 'click'
-  },
-  {
-    target: null,
-    title: '🎉 Tutoriel terminé !',
-    text: 'Vous connaissez maintenant toutes les bases de <strong>Corsica Poker</strong>. Misez sur les cotes, tentez les jackpots et surtout... bonne chance !',
-    pos: 'center',
-    advance: 'click',
-    isFinal: true
-  }
+// ── Partie fixe pré-codée (9 mains, main 8 = jackpot éligible) ───────
+var FIXED_HANDS=[
+  [{r:14,s:'S'},{r:14,s:'H'}], // AA
+  [{r:13,s:'C'},{r:13,s:'D'}], // KK
+  [{r:12,s:'S'},{r:12,s:'H'}], // QQ
+  [{r:11,s:'C'},{r:11,s:'D'}], // JJ
+  [{r:10,s:'S'},{r:10,s:'H'}], // TT
+  [{r:9,s:'C'},{r:9,s:'D'}],   // 99
+  [{r:8,s:'C'},{r:8,s:'D'}],   // 88
+  [{r:5,s:'S'},{r:5,s:'H'}],   // 55
+  [{r:7,s:'C'},{r:2,s:'D'}]    // 72o → jackpot éligible
 ];
+var FIXED_BOARD=[{r:3,s:'H'},{r:6,s:'S'},{r:13,s:'H'},{r:4,s:'C'},{r:9,s:'H'}];
 
-// ── Utilitaires ───────────────────────────────────────────────────────
-function isTutorialMode() { return tutoActive; }
-
-// ── Activation / Désactivation ────────────────────────────────────────
-function activateTutorial() {
-  tutoActive = true;
-  tutoStep = -1;
-  try { sessionStorage.setItem(TUTORIAL_KEY, '1'); } catch(e) {}
-  document.body.classList.add('tutorial-mode');
-  injectBadge();
-  applyTutorialJackpots();
-
-  var splash = document.getElementById('splashScreen');
-  if (splash) splash.classList.add('hidden');
-  if (typeof showRoundSetup === 'function') showRoundSetup();
-
-  setTimeout(function() { goToStep(0); }, 600);
-
-  if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(pollWaitFor, 350);
-}
-
-function exitTutorial() {
-  tutoActive = false;
-  tutoStep = -1;
-  try { sessionStorage.removeItem(TUTORIAL_KEY); } catch(e) {}
-  document.body.classList.remove('tutorial-mode');
-  removeBubble();
-  removeBadge();
-  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-
-  ['argentHeatFill','orHeatFill','diamantHeatFill',
-   'splashArgentFill','splashOrFill','splashDiamantFill'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.style.removeProperty('--heat-progress');
-  });
-  if (typeof updateJackpotHeatBars === 'function') updateJackpotHeatBars();
-  if (typeof updateJackpotDisplays === 'function') updateJackpotDisplays();
-}
-
-// ── Jackpots simulés ──────────────────────────────────────────────────
-function applyTutorialJackpots() {
-  var base = { argent: 324.26, or: 2654.78, diamant: 26314.77 };
-  function rnd(v) { return (v + Math.random()*v*0.08 - v*0.04).toFixed(2); }
-  var vals  = { argent: rnd(base.argent), or: rnd(base.or), diamant: rnd(base.diamant) };
-  var heats = { argent: 35+Math.floor(Math.random()*50), or: 20+Math.floor(Math.random()*45), diamant: 5+Math.floor(Math.random()*30) };
-  var ids = {
-    argent:  { val:['argentJackpotValue','splashJpArgent'],   heat:['argentHeatFill','splashArgentFill'] },
-    or:      { val:['orJackpotValue','splashJpOr'],           heat:['orHeatFill','splashOrFill'] },
-    diamant: { val:['diamantJackpotValue','splashJpDiamant'], heat:['diamantHeatFill','splashDiamantFill'] }
-  };
-  for (var k in ids) {
-    ids[k].val.forEach(function(id)  { var el = document.getElementById(id); if (el) el.textContent = vals[k]; });
-    ids[k].heat.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.setProperty('--heat-progress', heats[k]+'%'); });
+function applyFixedDeal(){
+  if(fixedDealApplied)return;
+  if(typeof hands==='undefined'||!hands.length)return;
+  if(hands.length!==9)return;
+  // Remplacer les cartes
+  for(var i=0;i<9;i++){
+    hands[i].cards[0]=FIXED_HANDS[i][0];
+    hands[i].cards[1]=FIXED_HANDS[i][1];
   }
+  // Reconstruire le deck avec les cartes restantes + board au sommet
+  var used={};
+  for(var i=0;i<9;i++){
+    used[FIXED_HANDS[i][0].r+'_'+FIXED_HANDS[i][0].s]=true;
+    used[FIXED_HANDS[i][1].r+'_'+FIXED_HANDS[i][1].s]=true;
+  }
+  for(var i=0;i<FIXED_BOARD.length;i++){
+    used[FIXED_BOARD[i].r+'_'+FIXED_BOARD[i].s]=true;
+  }
+  var newDeck=[];
+  var suits=['S','H','D','C'];
+  for(var si=0;si<suits.length;si++){
+    for(var r=2;r<=14;r++){
+      if(!used[r+'_'+suits[si]])newDeck.push({r:r,s:suits[si]});
+    }
+  }
+  // Mélanger les cartes restantes
+  for(var i=newDeck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=newDeck[i];newDeck[i]=newDeck[j];newDeck[j]=tmp;}
+  // Placer les cartes du board à la fin (pop = 3H, 6S, 13H, 4C, 9H)
+  newDeck.push(FIXED_BOARD[4]); // river (popped last during river)
+  newDeck.push(FIXED_BOARD[3]); // turn
+  newDeck.push(FIXED_BOARD[2]); // flop card 3
+  newDeck.push(FIXED_BOARD[1]); // flop card 2
+  newDeck.push(FIXED_BOARD[0]); // flop card 1 (popped first)
+  deck=newDeck;
+  fixedDealApplied=true;
+  // Recalculer les cotes et réafficher
+  if(typeof recalcOdds==='function')recalcOdds();
+  if(typeof renderHands==='function')renderHands();
+  if(typeof renderBoard==='function')renderBoard();
 }
 
-// ── Badge MODE DÉCOUVERTE ─────────────────────────────────────────────
-function injectBadge() {
-  if (document.getElementById('tutorialModeBadge')) return;
-  badgeEl = document.createElement('div');
-  badgeEl.id = 'tutorialModeBadge';
-  badgeEl.textContent = '🎓 MODE DÉCOUVERTE';
-  document.body.appendChild(badgeEl);
+// ── Textes FR/EN ─────────────────────────────────────────────────────
+var T={
+  fr:{
+    s0t:'👥 Combien de joueurs ?',s0:'Choisissez le nombre de mains, aléatoire ou pas. Pour la découverte, la partie se jouera avec <strong>9 joueurs</strong>. Validez avec la flèche <strong>➜</strong>.',
+    s1t:'♠ Les mains et les cotes',s1:'Chaque joueur reçoit 2 cartes. Le nombre au-dessus est la <strong>cote</strong> : plus elle est élevée, plus le gain est important mais le risque aussi. Votre mise sera <strong>multipliée par cette cote</strong> si la main gagne seule. La cote la plus basse clignote en <strong style="color:#ef4444">rouge</strong> (favori), les plus élevées brillent en <strong style="color:#eab308">doré</strong>.',
+    s2t:'💰 Choisissez votre mise',s2:'Cliquez sur un jeton (<strong>1, 2, 5, 10 ou 20</strong>) pour sélectionner le montant de votre mise.',
+    s3t:'🚫 Abandonner la manche',s3:'Si les cartes ne vous inspirent pas, cliquez ici pour <strong>passer votre tour</strong> et relancer une nouvelle manche.',
+    s4t:'👆 Placez votre mise !',s4:'Cliquez sur la case <strong>« Miser »</strong> d\'une main pour y placer votre jeton. Vous pouvez miser sur <strong>plusieurs mains</strong>. La <strong>gomme 🧹</strong> permet de retirer une mise.',
+    jpBubT:'🎰 Tentez le Jackpot !',jpBub:'Cette mention signifie que la main est éligible à un <strong>jackpot</strong>. Misez <strong>1 jeton</strong> sur cette case pour tenter de remporter toute la cagnotte si la main gagne !',
+    s5t:'🤝 Case Égalité',s5:'Misez ici si vous pensez que <strong>deux joueurs ou plus</strong> gagneront avec la même combinaison.',
+    s6t:'✅ Validez vos mises',s6:'Quand vous avez placé toutes vos mises, cliquez sur <strong>Valider les mises</strong> pour dévoiler le flop.',
+    s7t:'🂠 Le Flop — 3 cartes communes',s7:'Les 3 premières cartes communes sont révélées et de nouvelles cotes apparaissent. Certains joueurs peuvent être éliminés.',
+    s8t:'💰 Vous pouvez encore miser !',s8:'Avant la <strong>4ème carte (Turn)</strong>, vous pouvez ajouter de nouvelles mises. Cliquez sur <strong>Valider</strong> quand vous êtes prêt.',
+    s9t:'💰 Dernière chance de miser !',s9:'Avant la <strong>5ème et dernière carte (River)</strong>, vous pouvez encore ajuster vos mises. Après, c\'est fini !',
+    s10t:'🏆 Résultat de la manche',s10:'La <strong>main gagnante est révélée</strong>. Si vous aviez misé dessus, vous remportez <strong>mise × cote</strong>. Les mains perdantes sont grisées.',
+    s11t:'💎 Les Jackpots Progressifs',s11:'Trois jackpots (<strong>Argent, Or, Diamant</strong>) grossissent à chaque manche. Quand <strong>« Tente le Jackpot »</strong> apparaît, misez <strong>1 jeton</strong> pour tenter de remporter toute la cagnotte !',
+    s12t:'⚙️ Paramètres',s12:'Changez le <strong>thème visuel</strong>, la <strong>couleur du tapis</strong>, l\'<strong>ambiance sonore</strong>, la <strong>langue</strong>… Tout est personnalisable !',
+    s13t:'🔄 Rejouez !',s13:'« <strong>Même table</strong> » relance avec le même nombre de joueurs. « <strong>Changer de table</strong> » vous permet d\'en choisir un autre.',
+    s14t:'🎉 Tutoriel terminé !',s14:'Vous connaissez maintenant toutes les bases de <strong>Corsica Poker</strong>. Misez sur les cotes, tentez les jackpots… Bonne chance !',
+    ok:'J\'ai compris ➜',finish:'🎉 Commencer à jouer',wait:'⏳ Faites l\'action indiquée…',drag:'☰ Déplacez cette bulle',loading:'🔍 Préparation…',badge:'🎓 MODE DÉCOUVERTE'
+  },
+  en:{
+    s0t:'👥 How many players?',s0:'Choose the number of hands, random or not. For the tutorial, the game will be played with <strong>9 players</strong>. Press the arrow <strong>➜</strong> to start.',
+    s1t:'♠ Hands & Odds',s1:'Each player receives 2 cards. The number above is the <strong>odds</strong>: the higher, the bigger the reward but also the risk. Your bet is <strong>multiplied by the odds</strong> if the hand wins. The lowest odds blink in <strong style="color:#ef4444">red</strong> (favorite), the highest glow in <strong style="color:#eab308">gold</strong>.',
+    s2t:'💰 Choose your bet',s2:'Click a chip (<strong>1, 2, 5, 10, or 20</strong>) to select your bet amount.',
+    s3t:'🚫 Skip this hand',s3:'If the cards don\'t look promising, click here to <strong>skip</strong> and start a new round.',
+    s4t:'👆 Place your bet!',s4:'Click the <strong>"Bet"</strong> box on a hand to place your chip. You can bet on <strong>multiple hands</strong>. The <strong>eraser 🧹</strong> removes a bet.',
+    jpBubT:'🎰 Try the Jackpot!',jpBub:'This label means the hand is eligible for a <strong>jackpot</strong>. Bet <strong>1 chip</strong> on this square to try to win the entire pot if the hand wins!',
+    s5t:'🤝 Tie bet',s5:'Bet here if you think <strong>two or more players</strong> will win with the same combination.',
+    s6t:'✅ Confirm your bets',s6:'When you\'ve placed all your bets, click <strong>Confirm bets</strong> to reveal the flop.',
+    s7t:'🂠 The Flop — 3 community cards',s7:'The first 3 community cards are revealed and new odds appear. Some players may be eliminated.',
+    s8t:'💰 You can still bet!',s8:'Before the <strong>4th card (Turn)</strong>, you can add new bets. Click <strong>Confirm</strong> when ready.',
+    s9t:'💰 Last chance to bet!',s9:'Before the <strong>5th and final card (River)</strong>, you can still adjust your bets. After that, it\'s over!',
+    s10t:'🏆 Round result',s10:'The <strong>winning hand is revealed</strong>. If you bet on it, you win <strong>bet × odds</strong>. Losing hands are grayed out.',
+    s11t:'💎 Progressive Jackpots',s11:'Three jackpots (<strong>Silver, Gold, Diamond</strong>) grow each round. When <strong>"Try the Jackpot"</strong> appears, bet <strong>1 chip</strong> to try to win the entire pot!',
+    s12t:'⚙️ Settings',s12:'Change the <strong>visual theme</strong>, <strong>table color</strong>, <strong>background music</strong>, <strong>language</strong>… Everything is customizable!',
+    s13t:'🔄 Play again!',s13:'<strong>"Same table"</strong> restarts with the same number of players. <strong>"Change table"</strong> lets you pick a different number.',
+    s14t:'🎉 Tutorial complete!',s14:'You now know all the basics of <strong>Corsica Poker</strong>. Play the odds, try the jackpots… Good luck!',
+    ok:'Got it ➜',finish:'🎉 Start playing',wait:'⏳ Perform the action…',drag:'☰ Drag this bubble',loading:'🔍 Preparing…',badge:'🎓 DISCOVERY MODE'
+  }
+};
+function tx(){return T[typeof lang!=='undefined'?lang:'fr']||T.fr;}
+
+function buildSteps(){var t=tx();return[
+  {id:'s0',staticArrows:['btnRandomHands','handsCountSelect','btnManualHands'],title:t.s0t,text:t.s0,pos:'topright',
+    onEnter:function(){var s=document.getElementById('handsCountSelect');if(s)s.value='9';},
+    waitFor:function(){var el=document.getElementById('roundSetupOverlay');return el&&el.classList.contains('hidden');}},
+  {id:'s1',title:t.s1t,text:t.s1,pos:'center',queryTargets:function(){var h=document.querySelectorAll('#handsLayer .hand:not(.hand-elim)');var a=[];for(var i=0;i<h.length&&i<5;i++)a.push(h[i]);return a;},advance:'click',block:true},
+  {id:'s2',staticArrows:['betPanel'],title:t.s2t,text:t.s2,pos:'right',advance:'click',block:true},
+  {id:'s3',staticArrows:['btnAbandon'],title:t.s3t,text:t.s3,pos:'aboveabandon',advance:'click',block:true,
+    onEnter:function(){document.body.classList.add('tuto-show-abandon');var btn=document.getElementById('btnAbandon');if(btn){btn.style.display='inline-flex';btn.classList.add('show-abandon');btn.disabled=true;btn.style.opacity='0.42';btn.style.pointerEvents='none';}var dock=document.getElementById('abandonDock');if(dock)dock.classList.add('show-abandon-dock');},
+    onExit:function(){document.body.classList.remove('tuto-show-abandon');var btn=document.getElementById('btnAbandon');if(btn){btn.style.opacity='';btn.style.pointerEvents='';btn.disabled=true;}var dock=document.getElementById('abandonDock');if(dock)dock.classList.remove('show-abandon-dock');}},
+  {id:'s4',title:t.s4t,text:t.s4,pos:'center',queryTargets:function(){var all=document.querySelectorAll('.sq[data-phase="pre"]:not(.hasBet):not(.disabled)');if(!all.length)return[];return[all[Math.floor(Math.random()*Math.min(all.length,5))]];},queryOnce:true,waitFor:function(){return !!document.querySelector('.sq.hasBet');}},
+  // Bulle jackpot insérée ici (entre 4 et 5) — gérée par le watcher jpCallWatch
+  {id:'s5',staticArrows:['tieBox'],title:t.s5t,text:t.s5,pos:'left',advance:'click',block:true},
+  {id:'s6',staticArrows:['btnAdvance'],title:t.s6t,text:t.s6,pos:'top',waitFor:function(){return typeof phase!=='undefined'&&phase!=='pre';}},
+  {id:'s7',title:t.s7t,text:t.s7,pos:'topleft',queryTargets:function(){var c=document.querySelectorAll('#boardCards .card');var a=[];for(var i=0;i<c.length&&i<3;i++){if(c[i].offsetParent!==null)a.push(c[i]);}return a;},advance:'click',block:true},
+  {id:'s8',title:t.s8t,text:t.s8,pos:'topleft',queryTargets:function(){var sq=document.querySelector('.sq[data-phase="flop"]:not(.disabled)');return sq?[sq]:[];},waitFor:function(){return typeof phase!=='undefined'&&phase==='turn';}},
+  {id:'s9',title:t.s9t,text:t.s9,pos:'topleft',queryTargets:function(){var sq=document.querySelector('.sq[data-phase="turn"]:not(.disabled)');return sq?[sq]:[];},waitFor:function(){return typeof roundFinished!=='undefined'&&roundFinished===true;}},
+  {id:'s10',title:t.s10t,text:t.s10,pos:'topleft',queryTargets:function(){var w=document.querySelector('#handsLayer .hand.winner');if(w)return[w];var tb=document.querySelector('.tie-box.tie-win');return tb?[tb]:[];},advance:'click',block:true},
+  {id:'s11',staticArrows:['argentJackpotBox','orJackpotBox','diamantJackpotBox'],title:t.s11t,text:t.s11,pos:'underjackpots',advance:'click',block:true},
+  {id:'s12',staticArrows:['settingsBtn'],title:t.s12t,text:t.s12,pos:'undersettings',advance:'click',block:true,
+    onEnter:function(){
+      var panel=document.getElementById('settingsPanel');
+      if(panel)panel.classList.add('hidden');
+    },
+    onExit:function(){
+      var panel=document.getElementById('settingsPanel');
+      if(panel)panel.classList.add('hidden');
+    }},
+  {id:'s13',staticArrows:['btnSameTable'],title:t.s13t,text:t.s13,pos:'top',advance:'click',block:true},
+  {id:'s14',title:t.s14t,text:t.s14,pos:'center',advance:'click',isFinal:true,block:true}
+];}
+var STEPS=[];
+
+function isTutorialMode(){return tutoActive;}
+function showBlockOverlay(){removeBlockOverlay();blockOverlayEl=document.createElement('div');blockOverlayEl.id='tutoBlockOverlay';document.body.appendChild(blockOverlayEl);}
+function removeBlockOverlay(){var el=document.getElementById('tutoBlockOverlay');if(el)el.parentNode.removeChild(el);blockOverlayEl=null;}
+
+function activateTutorial(){
+  tutoActive=true;tutoStep=-1;jpBubbleDismissed=false;fixedDealApplied=false;
+  STEPS=buildSteps();
+  try{sessionStorage.setItem(TUTORIAL_KEY,'1');}catch(e){}
+  document.body.classList.add('tutorial-mode','tuto-hide-abandon');
+  injectBadge();applyTutorialJackpots();
+  var splash=document.getElementById('splashScreen');
+  if(splash)splash.classList.add('hidden');
+  if(typeof showRoundSetup==='function')showRoundSetup();
+  setTimeout(function(){goToStep(0);},600);
+  if(pollTimer)clearInterval(pollTimer);
+  pollTimer=setInterval(pollWaitFor,350);
+  startJpCallWatch();startArrowTracking();
+  // Appliquer la partie fixe dès que les mains sont prêtes
+  startFixedDealWatch();
+  // Désactiver abandonner en découverte (visible mais grisé)
 }
-function removeBadge() {
-  var b = document.getElementById('tutorialModeBadge');
-  if (b) b.remove();
-  badgeEl = null;
+
+function exitTutorial(){
+  tutoActive=false;tutoStep=-1;window._tutoRerolling=false;
+  try{sessionStorage.removeItem(TUTORIAL_KEY);}catch(e){}
+  document.body.classList.remove('tutorial-mode','tuto-rerolling','tuto-hide-abandon','tuto-settings-step');
+  removeBubble();removeAllArrows();removeBadge();closeJpBubble();
+  var settBtn=document.getElementById('settingsBtn');if(settBtn)settBtn.style.pointerEvents='';
+  removeBlockOverlay();stopArrowTracking();
+  if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
+  if(jpCallWatcher){clearInterval(jpCallWatcher);jpCallWatcher=null;}
+
+  ['argentHeatFill','orHeatFill','diamantHeatFill','splashArgentFill','splashOrFill','splashDiamantFill'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.removeProperty('--heat-progress');});
+
+  if(typeof updateJackpotHeatBars==='function')updateJackpotHeatBars();
+  if(typeof updateJackpotDisplays==='function')updateJackpotDisplays();
 }
 
-// ── Navigation entre étapes ───────────────────────────────────────────
-function goToStep(n) {
-  if (!tutoActive) return;
-  if (n >= STEPS.length) { exitTutorial(); return; }
-  tutoStep = n;
-  showBubble(STEPS[n]);
+// ── Appliquer la partie fixe après newRound ──────────────────────────
+function startFixedDealWatch(){
+  var w=setInterval(function(){
+    if(!tutoActive){clearInterval(w);return;}
+    if(typeof hands!=='undefined'&&hands.length===9&&typeof phase!=='undefined'&&phase==='pre'){
+      applyFixedDeal();
+      clearInterval(w);
+    }
+  },300);
 }
 
-function nextStep() { goToStep(tutoStep + 1); }
+// ── Forcer 9 joueurs ─────────────────────────────────────────────────
+(function(){var orig=null;function patch(){if(typeof launchNewRoundWithCount==='function'&&!orig){orig=launchNewRoundWithCount;window.launchNewRoundWithCount=function(c){if(tutoActive)c=9;orig(c);};}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patch);else setTimeout(patch,500);})();
 
-function pollWaitFor() {
-  if (!tutoActive || tutoStep < 0 || tutoStep >= STEPS.length) return;
-  var step = STEPS[tutoStep];
-  if (step.waitFor && step.waitFor()) nextStep();
+function applyTutorialJackpots(){
+  var base={argent:324.26,or:2654.78,diamant:26314.77};function rnd(v){return(v+Math.random()*v*0.08-v*0.04).toFixed(2);}
+  var vals={argent:rnd(base.argent),or:rnd(base.or),diamant:rnd(base.diamant)};
+  var heats={argent:35+Math.floor(Math.random()*50),or:20+Math.floor(Math.random()*45),diamant:5+Math.floor(Math.random()*30)};
+  var ids={argent:{val:['argentJackpotValue','splashJpArgent'],heat:['argentHeatFill','splashArgentFill']},or:{val:['orJackpotValue','splashJpOr'],heat:['orHeatFill','splashOrFill']},diamant:{val:['diamantJackpotValue','splashJpDiamant'],heat:['diamantHeatFill','splashDiamantFill']}};
+  for(var k in ids){ids[k].val.forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=vals[k];});ids[k].heat.forEach(function(id){var el=document.getElementById(id);if(el)el.style.setProperty('--heat-progress',heats[k]+'%');});}
 }
 
-// ── Bulle guidée ──────────────────────────────────────────────────────
-function showBubble(step) {
-  removeBubble();
+function injectBadge(){if(document.getElementById('tutorialModeBadge'))return;var b=document.createElement('div');b.id='tutorialModeBadge';b.textContent=tx().badge;document.body.appendChild(b);}
+function removeBadge(){var b=document.getElementById('tutorialModeBadge');if(b)b.remove();}
 
-  var targetEl = step.target ? document.getElementById(step.target) : null;
-  if (step.target && !targetEl) {
-    setTimeout(function() { showBubble(step); }, 400);
+function goToStep(n){
+  if(!tutoActive)return;if(n>=STEPS.length){exitTutorial();return;}
+  tutoStep=n;cachedDynTargets=null;
+  var step=STEPS[n];
+  // TOUTES les étapes bloquent sauf les waitFor sans block
+  if(step.block||step.advance==='click')showBlockOverlay();else removeBlockOverlay();
+  // Bloquer settings sauf à l'étape 12 (13/15 Paramètres)
+  var settBtn=document.getElementById('settingsBtn');
+  document.body.classList.toggle('tuto-settings-step', n===12);
+  if(settBtn)settBtn.style.pointerEvents=(n===12)?'auto':'none';
+  if(step.onEnter)step.onEnter();
+  showBubble(step);
+}
+function nextStep(){
+  removeBlockOverlay();
+  // Call onExit of current step if exists
+  if(tutoStep>=0&&tutoStep<STEPS.length&&STEPS[tutoStep].onExit)STEPS[tutoStep].onExit();
+  goToStep(tutoStep+1);
+}
+function pollWaitFor(){if(!tutoActive||tutoStep<0||tutoStep>=STEPS.length)return;var step=STEPS[tutoStep];if(step.waitFor&&step.waitFor())nextStep();}
+function forceSettingsPanelOpen(){var panel=document.getElementById('settingsPanel');if(panel){panel.classList.remove('hidden');panel.style.display='';panel.style.pointerEvents='auto';}var btn=document.getElementById('settingsBtn');if(btn)btn.style.pointerEvents='auto';}
+
+// ── Flèches ──────────────────────────────────────────────────────────
+function resolveTargets(step){var t=[];if(step.staticArrows)step.staticArrows.forEach(function(id){var el=document.getElementById(id);if(el&&el.offsetParent!==null)t.push(el);});if(step.queryTargets){if(step.queryOnce&&cachedDynTargets){var ok=cachedDynTargets.every(function(el){return document.contains(el)&&el.offsetParent!==null;});if(ok)t=t.concat(cachedDynTargets);else{cachedDynTargets=step.queryTargets();t=t.concat(cachedDynTargets);}}else{var f=step.queryTargets();if(step.queryOnce)cachedDynTargets=f;t=t.concat(f);}}return t;}
+function syncArrows(targets){while(arrowEls.length>targets.length){var x=arrowEls.pop();if(x&&x.parentNode)x.parentNode.removeChild(x);}while(arrowEls.length<targets.length){var a=document.createElement('div');a.className='tuto-arrow';document.body.appendChild(a);arrowEls.push(a);}for(var i=0;i<targets.length;i++)posArrow(arrowEls[i],targets[i]);}
+function posArrow(ad,te){if(!te||!ad)return;var r=te.getBoundingClientRect();if(r.width===0&&r.height===0){ad.style.display='none';return;}ad.style.display='';var aw=ad.offsetWidth||42;var ah=ad.offsetHeight||66;var l=r.left+r.width/2-aw/2,tp=r.bottom+8;ad.classList.remove('tuto-arrow--above');if(tp+ah>window.innerHeight){tp=r.top-ah-8;ad.classList.add('tuto-arrow--above');}ad.style.left=Math.max(6,Math.min(window.innerWidth-aw-6,l))+'px';ad.style.top=Math.max(6,tp)+'px';}
+function removeAllArrows(){arrowEls.forEach(function(a){if(a&&a.parentNode)a.parentNode.removeChild(a);});arrowEls=[];}
+function startArrowTracking(){stopArrowTracking();function tick(){if(!tutoActive)return;if(tutoStep>=0&&tutoStep<STEPS.length)syncArrows(resolveTargets(STEPS[tutoStep]));rafId=requestAnimationFrame(tick);}rafId=requestAnimationFrame(tick);}
+function stopArrowTracking(){if(rafId){cancelAnimationFrame(rafId);rafId=null;}}
+
+// ── Bulle jackpot (apparaît entre step 4 et step 5) ──────────────────
+function getVisibleJpCallTarget(){
+  var calls=document.querySelectorAll('.hand-odds.jackpot-call, .tie-value.jackpot-call');
+  for(var i=0;i<calls.length;i++){
+    var el=calls[i];
+    if(!document.contains(el))continue;
+    var r=el.getBoundingClientRect();
+    if(el.offsetParent!==null&&r.width>0&&r.height>0)return el;
+  }
+  return null;
+}
+function positionJpBubble(target){
+  var bub=document.getElementById('jpCallBubble');
+  if(!bub||!target)return;
+  var r=target.getBoundingClientRect();
+  var margin=16;
+  var gap=28;
+  var vw=window.innerWidth;
+  var vh=window.innerHeight;
+  var bw=Math.min(320,vw-(margin*2));
+  bub.style.width=bw+'px';
+
+  // Important : la bulle explicative ne doit jamais recouvrir
+  // le petit rectangle doré/argent/diamant "Tentez le jackpot" qu'elle désigne.
+  // On privilégie donc un placement latéral, puis on bascule au-dessus/dessous
+  // uniquement si l'écran est trop étroit.
+  var bh=bub.offsetHeight||170;
+  var candidates=[];
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  function add(left,top,name){
+    left=clamp(left,margin,vw-bw-margin);
+    top=clamp(top,margin,vh-bh-margin);
+    var overlap=!(left+bw<r.left-gap||left>r.right+gap||top+bh<r.top-gap||top>r.bottom+gap);
+    candidates.push({left:left,top:top,name:name,overlap:overlap});
+  }
+
+  add(r.left-bw-gap,r.top+(r.height/2)-(bh/2),'left');
+  add(r.right+gap,r.top+(r.height/2)-(bh/2),'right');
+  add(r.left+(r.width/2)-(bw/2),r.top-bh-gap,'above');
+  add(r.left+(r.width/2)-(bw/2),r.bottom+gap,'below');
+
+  var chosen=candidates.find(function(c){return !c.overlap;})||candidates[candidates.length-1];
+  bub.style.left=chosen.left+'px';
+  bub.style.top=chosen.top+'px';
+}
+function startJpCallWatch(){
+  if(jpCallWatcher)clearInterval(jpCallWatcher);
+  jpCallWatcher=setInterval(function(){
+    if(!tutoActive){clearInterval(jpCallWatcher);closeJpBubble();return;}
+    if(tutoStep<4){closeJpBubble();return;}
+    var target=getVisibleJpCallTarget();
+    if(!target){closeJpBubble();jpBubbleDismissed=false;return;}
+    if(jpBubbleDismissed)return;
+    var bub=document.getElementById('jpCallBubble');
+    if(!bub)showJpBubble(target);
+    else positionJpBubble(target);
+  },350);
+}
+function showJpBubble(target){closeJpBubble();var t=tx();var bub=document.createElement('div');bub.id='jpCallBubble';bub.className='tuto-bubble tuto-bubble--visible tuto-jp-call-bubble';bub.style.cssText='position:fixed;z-index:10100;width:320px;';bub.innerHTML='<div class="tuto-bubble-drag-handle">☰</div><div class="tuto-bubble-title">'+t.jpBubT+'</div><div class="tuto-bubble-text">'+t.jpBub+'</div><div style="text-align:center;margin-top:10px"><button class="tuto-btn-next" id="jpDismissBtn">'+t.ok+'</button></div>';document.body.appendChild(bub);positionJpBubble(target);makeDraggable(bub);setTimeout(function(){var btn=document.getElementById('jpDismissBtn');if(btn)btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();jpBubbleDismissed=true;closeJpBubble();},true);},200);}
+function closeJpBubble(){var el=document.getElementById('jpCallBubble');if(el&&el.parentNode)el.parentNode.removeChild(el);}
+
+// ── Bulle principale ─────────────────────────────────────────────────
+function showBubble(step){
+  removeBubble();removeAllArrows();var t=tx();
+  var ft=step.staticArrows&&step.staticArrows[0]?document.getElementById(step.staticArrows[0]):null;
+  if(step.staticArrows&&step.staticArrows[0]&&!ft){setTimeout(function(){showBubble(step);},400);return;}
+  bubbleEl=document.createElement('div');bubbleEl.id='tutoBubble';bubbleEl.className='tuto-bubble';
+  bubbleEl.innerHTML='<div class="tuto-bubble-drag-handle">'+t.drag+'</div><div class="tuto-bubble-title">'+step.title+'</div><div class="tuto-bubble-text">'+step.text+'</div><div class="tuto-bubble-footer"><span class="tuto-step-count">'+(tutoStep+1)+' / '+STEPS.length+'</span>'+(step.isFinal?'<button class="tuto-btn-next tuto-btn-finish" id="tutoBtnNext">'+t.finish+'</button>':step.advance==='click'?'<button class="tuto-btn-next" id="tutoBtnNext">'+t.ok+'</button>':'<span class="tuto-wait-hint">'+t.wait+'</span>')+'</div>';
+  document.body.appendChild(bubbleEl);positionBubble(ft,step.pos);makeDraggable(bubbleEl);
+  var bn=document.getElementById('tutoBtnNext');
+  if(bn)bn.addEventListener('click',function(){if(step.isFinal){exitTutorial();if(typeof showRoundSetup==='function')showRoundSetup();}else nextStep();});
+  requestAnimationFrame(function(){if(bubbleEl)bubbleEl.classList.add('tuto-bubble--visible');});
+}
+function positionBubble(te,pos){
+  if(!bubbleEl)return;var vw=window.innerWidth,bw=Math.min(380,vw-32);
+  // Positions fixes — ne dépendent PAS de la cible
+  if(pos==='underjackpots'){
+    bubbleEl.style.cssText='position:fixed;top:150px;left:50%;transform:translateX(-50%);width:'+bw+'px;z-index:10095;';
     return;
   }
-
-  bubbleEl = document.createElement('div');
-  bubbleEl.id = 'tutoBubble';
-  bubbleEl.className = 'tuto-bubble';
-  bubbleEl.innerHTML =
-    '<div class="tuto-bubble-close" id="tutoBubbleClose">✕</div>' +
-    (targetEl ? '<div class="tuto-bubble-arrow" id="tutoBubbleArrow"></div>' : '') +
-    '<div class="tuto-bubble-title">' + step.title + '</div>' +
-    '<div class="tuto-bubble-text">' + step.text + '</div>' +
-    '<div class="tuto-bubble-footer">' +
-      '<span class="tuto-step-count">' + (tutoStep+1) + ' / ' + STEPS.length + '</span>' +
-      (step.isFinal
-        ? '<button class="tuto-btn-next tuto-btn-finish" id="tutoBtnNext">🎉 Commencer à jouer</button>'
-        : step.advance === 'click'
-          ? '<button class="tuto-btn-next" id="tutoBtnNext">Compris ➜</button>'
-          : '<span class="tuto-wait-hint">⏳ Faites l\'action indiquée…</span>') +
-    '</div>';
-
-  document.body.appendChild(bubbleEl);
-  positionBubble(targetEl, step.pos);
-
-  // Listeners
-  var btnNext = document.getElementById('tutoBtnNext');
-  if (btnNext) btnNext.addEventListener('click', function() {
-    if (step.isFinal) exitTutorial();
-    else nextStep();
-  });
-  var btnClose = document.getElementById('tutoBubbleClose');
-  if (btnClose) btnClose.addEventListener('click', exitTutorial);
-
-  // Animation d'entrée
-  requestAnimationFrame(function() {
-    if (bubbleEl) bubbleEl.classList.add('tuto-bubble--visible');
-  });
-}
-
-function positionBubble(targetEl, pos) {
-  if (!bubbleEl) return;
-  if (!targetEl || pos === 'center') {
-    bubbleEl.classList.add('tuto-bubble--center');
+  if(pos==='undersettings'){
+    var sBtn=document.querySelector('.settings-btn');
+    if(sBtn){
+      var sr=sBtn.getBoundingClientRect();
+      var arrowH=72;
+      var top=Math.min(window.innerHeight-120, sr.bottom+8+arrowH+8);
+      bubbleEl.style.cssText='position:fixed;top:'+top+'px;right:'+(window.innerWidth-sr.right)+'px;width:'+bw+'px;z-index:10095;';
+    }
+    else{bubbleEl.style.cssText='position:fixed;top:150px;right:12px;width:'+bw+'px;z-index:10095;';}
     return;
   }
-
-  var r = targetEl.getBoundingClientRect();
-  var bw = 380, margin = 16;
-  var left, top;
-  var arrowClass = '';
-
-  if (pos === 'bottom') {
-    left = Math.max(margin, Math.min(window.innerWidth - bw - margin, r.left + r.width/2 - bw/2));
-    top = r.bottom + 18;
-    arrowClass = 'arrow-top';
-  } else if (pos === 'top') {
-    left = Math.max(margin, Math.min(window.innerWidth - bw - margin, r.left + r.width/2 - bw/2));
-    top = r.top - 14;
-    arrowClass = 'arrow-bottom';
-    bubbleEl.style.transform = 'translateY(-100%)';
-  } else if (pos === 'right') {
-    left = r.right + 18;
-    top = Math.max(margin, r.top + r.height/2 - 80);
-    arrowClass = 'arrow-left';
-  } else if (pos === 'left') {
-    left = r.left - bw - 18;
-    top = Math.max(margin, r.top + r.height/2 - 80);
-    arrowClass = 'arrow-right';
-    if (left < margin) { left = r.right + 18; arrowClass = 'arrow-left'; }
-  }
-
-  bubbleEl.style.left = left + 'px';
-  bubbleEl.style.top = top + 'px';
-  bubbleEl.style.width = bw + 'px';
-
-  var arrow = document.getElementById('tutoBubbleArrow');
-  if (arrow) arrow.className = 'tuto-bubble-arrow ' + arrowClass;
+  if(pos==='aboveabandon'){var ab=document.getElementById('btnAbandon');var dock=document.getElementById('abandonDock');var target=ab||dock;if(target){var ar=target.getBoundingClientRect();var left=Math.max(12,Math.min(vw-bw-12,ar.left+(ar.width/2)-bw/2));var bh=bubbleEl.offsetHeight||190;var arrowH=72;var top=Math.max(72,ar.top-arrowH-bh-18);bubbleEl.style.cssText='position:fixed;left:'+left+'px;top:'+top+'px;width:'+bw+'px;z-index:10095;';}else{bubbleEl.style.cssText='position:fixed;left:12px;bottom:170px;width:'+bw+'px;z-index:10095;';}return;}
+  if(pos==='bottomcenter'){bubbleEl.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);width:'+bw+'px;z-index:10095;';return;}
+  if(pos==='topleft'){bubbleEl.style.cssText='position:fixed;top:86px;left:12px;width:'+bw+'px;z-index:10095;max-height:calc(100vh - 100px);overflow-y:auto;';return;}
+  if(pos==='topright'){bubbleEl.style.cssText='position:fixed;top:86px;right:'+Math.max(12,vw>600?16:8)+'px;width:'+bw+'px;z-index:10095;';return;}
+  if(!te||pos==='center'){bubbleEl.classList.add('tuto-bubble--center');bubbleEl.style.width=bw+'px';return;}
+  var r=te.getBoundingClientRect(),m=12,left,top;
+  if(pos==='bottom'){left=Math.max(m,Math.min(vw-bw-m,r.left+r.width/2-bw/2));top=r.bottom+14;}
+  else if(pos==='top'){left=Math.max(m,Math.min(vw-bw-m,r.left+r.width/2-bw/2));top=Math.max(m,r.top-220);}
+  else if(pos==='right'){left=r.right+14;top=Math.max(m,r.top);if(left+bw>vw-m)left=Math.max(m,r.left-bw-14);}
+  else if(pos==='left'){left=Math.max(m,r.left-bw-14);top=Math.max(m,r.top);if(left<m)left=r.right+14;}
+  bubbleEl.style.cssText='position:fixed;left:'+left+'px;top:'+top+'px;width:'+bw+'px;z-index:10095;';
 }
+function removeBubble(){var el=document.getElementById('tutoBubble');if(el)el.remove();bubbleEl=null;}
 
-function removeBubble() {
-  var el = document.getElementById('tutoBubble');
-  if (el) el.remove();
-  bubbleEl = null;
-}
+function makeDraggable(el){var h=el.querySelector('.tuto-bubble-drag-handle');if(!h)return;var ox=0,oy=0,sx=0,sy=0,d=false;function dn(e){d=true;var t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;var r=el.getBoundingClientRect();ox=r.left;oy=r.top;el.classList.remove('tuto-bubble--center');el.style.right='auto';el.style.bottom='auto';el.style.transform='none';e.preventDefault();}function mv(e){if(!d)return;var t=e.touches?e.touches[0]:e;el.style.left=(ox+t.clientX-sx)+'px';el.style.top=(oy+t.clientY-sy)+'px';}function up(){d=false;}h.addEventListener('mousedown',dn);document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);h.addEventListener('touchstart',dn,{passive:false});document.addEventListener('touchmove',mv,{passive:false});document.addEventListener('touchend',up);}
 
-// ── Bouton toggle header ──────────────────────────────────────────────
-function updateToggleButton() {
-  var btn = document.getElementById('btnToggleTutorial');
-  if (!btn) return;
-  var splash   = document.getElementById('splashScreen');
-  var setup    = document.getElementById('roundSetupOverlay');
-  var abandon  = document.getElementById('btnAbandon');
-  var splashVisible  = splash  && !splash.classList.contains('hidden');
-  var setupVisible   = setup   && !setup.classList.contains('hidden');
-  var abandonVisible = abandon && abandon.style.display!=='none' && abandon.offsetParent!==null;
-  var roundIsOver    = (typeof roundFinished!=='undefined') ? roundFinished : true;
-  var canSwitch = splashVisible || setupVisible || roundIsOver || abandonVisible;
-  btn.disabled = !canSwitch;
-  btn.style.opacity = canSwitch ? '1' : '0.38';
-  btn.style.pointerEvents = canSwitch ? 'auto' : 'none';
-}
+function updateToggleButton(){var btn=document.getElementById('btnToggleTutorial');if(!btn)return;var ok=false,sp=document.getElementById('splashScreen'),su=document.getElementById('roundSetupOverlay'),ab=document.getElementById('btnAbandon');if(sp&&!sp.classList.contains('hidden'))ok=true;if(su&&!su.classList.contains('hidden'))ok=true;if(typeof roundFinished!=='undefined'&&roundFinished)ok=true;if(ab&&ab.style.display!=='none'&&ab.offsetParent!==null)ok=true;btn.disabled=!ok;btn.style.opacity=ok?'1':'0.38';btn.style.pointerEvents=ok?'auto':'none';}
 
-// ── Init ──────────────────────────────────────────────────────────────
-function onReady() {
-  var btnDiscovery = document.getElementById('btnDiscovery');
-  if (btnDiscovery) {
-    btnDiscovery.addEventListener('click', activateTutorial);
-  }
-
-  var btnToggle = document.getElementById('btnToggleTutorial');
-  if (btnToggle) {
-    btnToggle.addEventListener('click', function() {
-      if (tutoActive) {
-        exitTutorial();
-        if (typeof showRoundSetup === 'function') showRoundSetup();
-      } else {
-        activateTutorial();
-      }
+// ── Sélecteur de langue splash ───────────────────────────────────────
+function initSplashLang(){
+  var sel=document.getElementById('splashLangSelector');
+  if(!sel)return;
+  sel.addEventListener('click',function(e){
+    var btn=e.target.closest('[data-lang]');
+    if(!btn)return;
+    var newLang=btn.dataset.lang;
+    if(typeof setLang==='function')setLang(newLang);
+    // Mettre à jour le tagline
+    var tag=document.querySelector('.splash-tagline');
+    if(tag)tag.textContent=newLang==='en'?'Play the odds':'Jouez la cote';
+    // Mettre à jour le bouton découverte
+    var disc=document.getElementById('btnDiscovery');
+    if(disc)disc.textContent=newLang==='en'?'🎓 First visit — Discovery':'🎓 Première visite — Découverte';
+    // Mettre à jour le bouton jouer
+    var play=document.getElementById('btnStart');
+    if(play)play.textContent=newLang==='en'?'Play':'Jouer';
+    // Jackpot labels on splash
+    var jpN=newLang==='en'?{a:'SILVER',o:'GOLD',d:'DIAMOND'}:{a:'ARGENT',o:'OR',d:'DIAMANT'};
+    ['splashLblArgent','splashLblOr','splashLblDiamant'].forEach(function(id,i){
+      var el=document.getElementById(id);
+      if(el){var n=['a','o','d'][i];el.innerHTML='<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>'+jpN[n]+'</span></span><span class="jackpot-diamond right">◆</span>';}
     });
-  }
-
-  setInterval(updateToggleButton, 500);
-  updateToggleButton();
+    // Jackpot names on splash
+    var jpN=newLang==='en'?{a:'SILVER',o:'GOLD',d:'DIAMOND'}:{a:'ARGENT',o:'OR',d:'DIAMANT'};
+    function updateSplashJpLabels(){
+      ['splashLblArgent','splashLblOr','splashLblDiamant'].forEach(function(id,i){
+        var el=document.getElementById(id);
+        if(el){var n=[jpN.a,jpN.o,jpN.d][i];el.innerHTML='<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>'+n+'</span></span><span class="jackpot-diamond right">◆</span>';}
+      });
+    }
+    updateSplashJpLabels();
+    setTimeout(updateSplashJpLabels,100);
+    // Highlight
+    sel.querySelectorAll('.splash-lang-btn').forEach(function(b){b.classList.toggle('active',b.dataset.lang===newLang);});
+  });
+  // Init highlight
+  var cur=typeof lang!=='undefined'?lang:'fr';
+  sel.querySelectorAll('.splash-lang-btn').forEach(function(b){b.classList.toggle('active',b.dataset.lang===cur);});
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', onReady);
-} else {
-  onReady();
+function onReady(){
+  try{if(!localStorage.getItem('tutoSoundFix2')&&typeof soundEnabled!=='undefined'&&!soundEnabled){soundEnabled=true;if(typeof saveSettings==='function')saveSettings();}localStorage.setItem('tutoSoundFix2','1');}catch(e){}
+  initSplashLang();
+  var btnDisc=document.getElementById('btnDiscovery');if(btnDisc)btnDisc.addEventListener('click',activateTutorial);
+  var btnToggle=document.getElementById('btnToggleTutorial');if(btnToggle)btnToggle.addEventListener('click',function(){if(tutoActive){exitTutorial();if(typeof showRoundSetup==='function')showRoundSetup();}else activateTutorial();});
+  setInterval(updateToggleButton,500);updateToggleButton();
 }
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',onReady);
+else onReady();

@@ -302,7 +302,12 @@ btnAdvance.addEventListener("click", () => {
 
 
 if (btnAbandon) {
- btnAbandon.addEventListener("click", () => {
+ btnAbandon.addEventListener("click", (event) => {
+  if (document.body && document.body.classList.contains("tutorial-mode")) {
+   event.preventDefault();
+   event.stopPropagation();
+   return;
+  }
   startAmbience();
   if (!canUseAbandon()) return;
 

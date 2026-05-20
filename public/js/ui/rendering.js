@@ -1,10 +1,11 @@
 
 
 function forceJackpotVisualsV1815(){
+  var _n = (typeof lang !== 'undefined' && lang === 'en') ? {a:'SILVER',o:'GOLD',d:'DIAMOND'} : {a:'ARGENT',o:'OR',d:'DIAMANT'};
   const config = [
-    ["argentJackpotBox", "lblArgentJackpot", "ARGENT"],
-    ["orJackpotBox", "lblOrJackpot", "OR"],
-    ["diamantJackpotBox", "lblDiamantJackpot", "DIAMANT"]
+    ["argentJackpotBox", "lblArgentJackpot", _n.a],
+    ["orJackpotBox", "lblOrJackpot", _n.o],
+    ["diamantJackpotBox", "lblDiamantJackpot", _n.d]
   ];
   for (const [boxId, labelId, name] of config) {
     const box = el(boxId);
@@ -282,9 +283,10 @@ function setLang(newLang) {
  if (lblTotalBets) lblTotalBets.textContent = t.totalBets;
  if (lblTotalWins) lblTotalWins.textContent = t.totalWins;
  if (el("lblBronzeJackpot")) el("lblBronzeJackpot").innerHTML = '<span class="jackpot-name-line">Jackpot</span><span class="jackpot-name-line">Bronze</span>';
- if (el("lblArgentJackpot")) el("lblArgentJackpot").innerHTML = '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>ARGENT</span></span><span class="jackpot-diamond right">◆</span>';
- if (el("lblOrJackpot")) el("lblOrJackpot").innerHTML = '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>OR</span></span><span class="jackpot-diamond right">◆</span>';
- if (el("lblDiamantJackpot")) el("lblDiamantJackpot").innerHTML = '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>DIAMANT</span></span><span class="jackpot-diamond right">◆</span>';
+ var _jpNames = lang === 'en' ? {a:'SILVER',o:'GOLD',d:'DIAMOND'} : {a:'ARGENT',o:'OR',d:'DIAMANT'};
+ if (el("lblArgentJackpot")) el("lblArgentJackpot").innerHTML = '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>'+_jpNames.a+'</span></span><span class="jackpot-diamond right">◆</span>';
+ if (el("lblOrJackpot")) el("lblOrJackpot").innerHTML = '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>'+_jpNames.o+'</span></span><span class="jackpot-diamond right">◆</span>';
+ if (el("lblDiamantJackpot")) el("lblDiamantJackpot").innerHTML = '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>'+_jpNames.d+'</span></span><span class="jackpot-diamond right">◆</span>';
  forceJackpotVisualsV1815();
 
  if (boardTitle) boardTitle.textContent = t.board + " – " + t.phase[phase];
@@ -296,6 +298,7 @@ function setLang(newLang) {
   btnAdvance.title = t.clearBetsTitle;
 }
  if (btnAbandon) btnAbandon.textContent = t.abandon;
+ if (typeof stylizeAbandonButtonPremium === 'function') stylizeAbandonButtonPremium();
 
  if (betTitle) betTitle.textContent = t.betTitle;
  if (logTitle) logTitle.textContent = t.logTitle;
@@ -341,6 +344,12 @@ function setLang(newLang) {
  updateTotalWinsDisplay();
  updateJackpotDisplays();
  refreshActionButtons();
+}
+
+
+function getBetSquareLabel() {
+ const dictionary = (typeof I18N !== 'undefined' && I18N && I18N[lang]) ? I18N[lang] : null;
+ return (dictionary && dictionary.betSquare) || ((typeof lang !== 'undefined' && lang === 'en') ? 'Bet' : 'Miser');
 }
 
 function makeEraser(onClick) {
@@ -534,8 +543,9 @@ function buildHandsUI() {
  });
 
  const betText = document.createElement("div");
- betText.className = "bet-in-square";
+ betText.className = "bet-in-square bet-placeholder";
  betText.dataset.betSquare = `${i}:${ph}`;
+ betText.textContent = getBetSquareLabel();
  sq.appendChild(betText);
 
  sq.appendChild(makeEraser(() => undoHandBet(i, ph)));
@@ -816,6 +826,9 @@ function renderHands() {
  ? (lostJackpotText || jackpotSquareText("hand", i, ph))
  : (jackpotEligibleCurrentPhase ? jackpotSquareText("hand", i, ph) || "1" : jackpotSquareText("hand", i, ph));
  betSquare.textContent = squareText;
+ if (squareText) { betSquare.classList.remove('bet-placeholder'); }
+ else if (!sq.classList.contains('disabled')) { betSquare.classList.add('bet-placeholder'); betSquare.textContent = getBetSquareLabel(); }
+ else { betSquare.classList.remove('bet-placeholder'); betSquare.textContent = ''; }
  betSquare.classList.toggle("jackpot-lost", !!lostJackpotText);
  }
 
@@ -922,6 +935,9 @@ if (tieOddsEl) {
  ? (lostJackpotText || jackpotSquareText("tie", -1, ph))
  : (jackpotEligibleCurrentPhase ? jackpotSquareText("tie", -1, ph) || "1" : jackpotSquareText("tie", -1, ph));
  betSquare.textContent = squareText;
+ if (squareText) { betSquare.classList.remove('bet-placeholder'); }
+ else if (!sq.classList.contains('disabled')) { betSquare.classList.add('bet-placeholder'); betSquare.textContent = getBetSquareLabel(); }
+ else { betSquare.classList.remove('bet-placeholder'); betSquare.textContent = ''; }
  betSquare.classList.toggle("jackpot-lost", !!lostJackpotText);
  }
 
