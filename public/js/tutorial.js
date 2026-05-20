@@ -3,7 +3,7 @@ const TUTORIAL_KEY='corsicaPokerTutorial';
 let tutoStep=-1,tutoActive=false,bubbleEl=null,badgeEl=null,pollTimer=null;
 let arrowEls=[],rafId=null;
 var cachedDynTargets=null;
-var jpCallWatcher=null,jpBubbleDismissed=false;
+var jpCallWatcher=null,jpBubbleDismissed=false,jpBubbleManuallyMoved=false;
 var blockOverlayEl=null,loadingOverlayEl=null;
 var fixedDealApplied=false;
 
@@ -60,6 +60,49 @@ function applyFixedDeal(){
   if(typeof recalcOdds==='function')recalcOdds();
   if(typeof renderHands==='function')renderHands();
   if(typeof renderBoard==='function')renderBoard();
+  enforceDiscoveryDemoOdds();
+  startDiscoveryDemoOddsWatch();
+}
+
+// ── Démonstration forcée des cotes en mode découverte ────────────────
+// Objectif validé : au lancement du mode découverte, montrer toujours :
+// - une cote dorée supérieure à 100 ;
+// - une main éligible au jackpot.
+// Cette surcharge reste limitée au mode tutoriel et ne touche jamais le mode réel.
+function enforceDiscoveryDemoOdds(){
+  if(!tutoActive)return;
+  if(typeof phase==='undefined'||phase!=='pre')return;
+  if(typeof hands==='undefined'||!hands||hands.length<9)return;
+
+  // Main 8 : exemple de cote dorée (>100) sans remplacer le nombre par le label jackpot.
+  if(hands[7]){
+    hands[7].status='active';
+    hands[7].soloProb=1/150;
+    hands[7].tieProb=0;
+    hands[7].oddsStr='150.00';
+    hands[7].preflopOddsStr='150.00';
+  }
+
+  // Main 9 : exemple jackpot Argent. getTargetOddsValue utilise soloProb en fair odds : 1/(1/250)=250.
+  if(hands[8]){
+    hands[8].status='active';
+    hands[8].soloProb=1/250;
+    hands[8].tieProb=0;
+    hands[8].oddsStr='250.00';
+    hands[8].preflopOddsStr='250.00';
+  }
+
+  if(typeof renderHands==='function')renderHands();
+  if(typeof highlightLowestDisplayedOdds==='function')highlightLowestDisplayedOdds();
+}
+
+function startDiscoveryDemoOddsWatch(){
+  var tries=0;
+  var w=setInterval(function(){
+    tries++;
+    if(!tutoActive||tries>40){clearInterval(w);return;}
+    enforceDiscoveryDemoOdds();
+  },150);
 }
 
 // ── Textes FR/EN ─────────────────────────────────────────────────────
@@ -109,7 +152,7 @@ function buildSteps(){var t=tx();return[
   {id:'s0',staticArrows:['btnRandomHands','handsCountSelect','btnManualHands'],title:t.s0t,text:t.s0,pos:'topright',
     onEnter:function(){var s=document.getElementById('handsCountSelect');if(s)s.value='9';},
     waitFor:function(){var el=document.getElementById('roundSetupOverlay');return el&&el.classList.contains('hidden');}},
-  {id:'s1',title:t.s1t,text:t.s1,pos:'center',queryTargets:function(){var h=document.querySelectorAll('#handsLayer .hand:not(.hand-elim)');var a=[];for(var i=0;i<h.length&&i<5;i++)a.push(h[i]);return a;},advance:'click',block:true},
+  {id:'s1',title:t.s1t,text:t.s1,pos:'center',queryTargets:function(){var h=document.querySelectorAll('#handsLayer .hand:not(.hand-elim)');var a=[];for(var i=0;i<h.length&&i<5;i++)a.push(h[i]);return a;},advance:'click',block:true,onEnter:function(){enforceDiscoveryDemoOdds();startDiscoveryDemoOddsWatch();}},
   {id:'s2',staticArrows:['betPanel'],title:t.s2t,text:t.s2,pos:'right',advance:'click',block:true},
   {id:'s3',staticArrows:['btnAbandon'],title:t.s3t,text:t.s3,pos:'aboveabandon',advance:'click',block:true,
     onEnter:function(){document.body.classList.add('tuto-show-abandon');var btn=document.getElementById('btnAbandon');if(btn){btn.style.display='inline-flex';btn.classList.add('show-abandon');btn.disabled=true;btn.style.opacity='0.42';btn.style.pointerEvents='none';}var dock=document.getElementById('abandonDock');if(dock)dock.classList.add('show-abandon-dock');},
@@ -142,7 +185,7 @@ function showBlockOverlay(){removeBlockOverlay();blockOverlayEl=document.createE
 function removeBlockOverlay(){var el=document.getElementById('tutoBlockOverlay');if(el)el.parentNode.removeChild(el);blockOverlayEl=null;}
 
 function activateTutorial(){
-  tutoActive=true;tutoStep=-1;jpBubbleDismissed=false;fixedDealApplied=false;
+  tutoActive=true;tutoStep=-1;jpBubbleDismissed=false;jpBubbleManuallyMoved=false;fixedDealApplied=false;
   STEPS=buildSteps();
   try{sessionStorage.setItem(TUTORIAL_KEY,'1');}catch(e){}
   document.body.classList.add('tutorial-mode','tuto-hide-abandon');
@@ -186,8 +229,39 @@ function startFixedDealWatch(){
   },300);
 }
 
-// ── Forcer 9 joueurs ─────────────────────────────────────────────────
-(function(){var orig=null;function patch(){if(typeof launchNewRoundWithCount==='function'&&!orig){orig=launchNewRoundWithCount;window.launchNewRoundWithCount=function(c){if(tutoActive)c=9;orig(c);};}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patch);else setTimeout(patch,500);})();
+// ── Forcer 9 joueurs + partie fixe à chaque manche découverte ──────────
+(function(){
+  var origLaunch=null,origNewRound=null;
+  function scheduleFixedDeal(){
+    if(!tutoActive)return;
+    fixedDealApplied=false;
+    setTimeout(function(){startFixedDealWatch();},80);
+  }
+  function patch(){
+    if(typeof launchNewRoundWithCount==='function'&&!origLaunch){
+      origLaunch=launchNewRoundWithCount;
+      window.launchNewRoundWithCount=function(c){
+        if(tutoActive)c=9;
+        var r=origLaunch(c);
+        if(tutoActive)scheduleFixedDeal();
+        return r;
+      };
+      try{launchNewRoundWithCount=window.launchNewRoundWithCount;}catch(e){}
+    }
+    if(typeof newRound==='function'&&!origNewRound){
+      origNewRound=newRound;
+      window.newRound=function(){
+        if(tutoActive){currentHandsCount=9;fixedDealApplied=false;}
+        var r=origNewRound();
+        if(tutoActive)scheduleFixedDeal();
+        return r;
+      };
+      try{newRound=window.newRound;}catch(e){}
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){patch();setTimeout(patch,600);});
+  else {setTimeout(patch,100);setTimeout(patch,800);}
+})();
 
 function applyTutorialJackpots(){
   var base={argent:324.26,or:2654.78,diamant:26314.77};function rnd(v){return(v+Math.random()*v*0.08-v*0.04).toFixed(2);}
@@ -224,8 +298,19 @@ function forceSettingsPanelOpen(){var panel=document.getElementById('settingsPan
 
 // ── Flèches ──────────────────────────────────────────────────────────
 function resolveTargets(step){var t=[];if(step.staticArrows)step.staticArrows.forEach(function(id){var el=document.getElementById(id);if(el&&el.offsetParent!==null)t.push(el);});if(step.queryTargets){if(step.queryOnce&&cachedDynTargets){var ok=cachedDynTargets.every(function(el){return document.contains(el)&&el.offsetParent!==null;});if(ok)t=t.concat(cachedDynTargets);else{cachedDynTargets=step.queryTargets();t=t.concat(cachedDynTargets);}}else{var f=step.queryTargets();if(step.queryOnce)cachedDynTargets=f;t=t.concat(f);}}return t;}
-function syncArrows(targets){while(arrowEls.length>targets.length){var x=arrowEls.pop();if(x&&x.parentNode)x.parentNode.removeChild(x);}while(arrowEls.length<targets.length){var a=document.createElement('div');a.className='tuto-arrow';document.body.appendChild(a);arrowEls.push(a);}for(var i=0;i<targets.length;i++)posArrow(arrowEls[i],targets[i]);}
-function posArrow(ad,te){if(!te||!ad)return;var r=te.getBoundingClientRect();if(r.width===0&&r.height===0){ad.style.display='none';return;}ad.style.display='';var aw=ad.offsetWidth||42;var ah=ad.offsetHeight||66;var l=r.left+r.width/2-aw/2,tp=r.bottom+8;ad.classList.remove('tuto-arrow--above');if(tp+ah>window.innerHeight){tp=r.top-ah-8;ad.classList.add('tuto-arrow--above');}ad.style.left=Math.max(6,Math.min(window.innerWidth-aw-6,l))+'px';ad.style.top=Math.max(6,tp)+'px';}
+function syncArrows(targets){while(arrowEls.length>targets.length){var x=arrowEls.pop();if(x&&x.parentNode)x.parentNode.removeChild(x);}while(arrowEls.length<targets.length){var a=document.createElement('div');a.className='tuto-arrow';document.body.appendChild(a);arrowEls.push(a);}for(var i=0;i<targets.length;i++){var a=arrowEls[i];a.classList.toggle('tuto-arrow--settings',!!(targets[i]&&targets[i].id==='settingsBtn'));posArrow(a,targets[i]);}}
+function posArrow(ad,te){if(!te||!ad)return;var r=te.getBoundingClientRect();if(r.width===0&&r.height===0){ad.style.display='none';return;}ad.style.display='';var aw=ad.offsetWidth||42;var ah=ad.offsetHeight||66;ad.classList.remove('tuto-arrow--above');
+  if(te.id==='settingsBtn'){
+    // La flèche paramètres doit viser exactement le centre du logo ⚙️.
+    // On supprime le décalage visuel dû à la rotation standard.
+    var lset=r.left+r.width/2-aw/2;
+    var tset=r.bottom+10;
+    if(tset+ah>window.innerHeight){tset=r.top-ah-10;ad.classList.add('tuto-arrow--above');}
+    ad.style.left=Math.max(6,Math.min(window.innerWidth-aw-6,lset))+'px';
+    ad.style.top=Math.max(6,tset)+'px';
+    return;
+  }
+  var l=r.left+r.width/2-aw/2,tp=r.bottom+8;if(tp+ah>window.innerHeight){tp=r.top-ah-8;ad.classList.add('tuto-arrow--above');}ad.style.left=Math.max(6,Math.min(window.innerWidth-aw-6,l))+'px';ad.style.top=Math.max(6,tp)+'px';}
 function removeAllArrows(){arrowEls.forEach(function(a){if(a&&a.parentNode)a.parentNode.removeChild(a);});arrowEls=[];}
 function startArrowTracking(){stopArrowTracking();function tick(){if(!tutoActive)return;if(tutoStep>=0&&tutoStep<STEPS.length)syncArrows(resolveTargets(STEPS[tutoStep]));rafId=requestAnimationFrame(tick);}rafId=requestAnimationFrame(tick);}
 function stopArrowTracking(){if(rafId){cancelAnimationFrame(rafId);rafId=null;}}
@@ -281,14 +366,14 @@ function startJpCallWatch(){
     if(!tutoActive){clearInterval(jpCallWatcher);closeJpBubble();return;}
     if(tutoStep<4){closeJpBubble();return;}
     var target=getVisibleJpCallTarget();
-    if(!target){closeJpBubble();jpBubbleDismissed=false;return;}
+    if(!target){closeJpBubble();jpBubbleDismissed=false;jpBubbleManuallyMoved=false;return;}
     if(jpBubbleDismissed)return;
     var bub=document.getElementById('jpCallBubble');
     if(!bub)showJpBubble(target);
-    else positionJpBubble(target);
+    else if(!jpBubbleManuallyMoved)positionJpBubble(target);
   },350);
 }
-function showJpBubble(target){closeJpBubble();var t=tx();var bub=document.createElement('div');bub.id='jpCallBubble';bub.className='tuto-bubble tuto-bubble--visible tuto-jp-call-bubble';bub.style.cssText='position:fixed;z-index:10100;width:320px;';bub.innerHTML='<div class="tuto-bubble-drag-handle">☰</div><div class="tuto-bubble-title">'+t.jpBubT+'</div><div class="tuto-bubble-text">'+t.jpBub+'</div><div style="text-align:center;margin-top:10px"><button class="tuto-btn-next" id="jpDismissBtn">'+t.ok+'</button></div>';document.body.appendChild(bub);positionJpBubble(target);makeDraggable(bub);setTimeout(function(){var btn=document.getElementById('jpDismissBtn');if(btn)btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();jpBubbleDismissed=true;closeJpBubble();},true);},200);}
+function showJpBubble(target){closeJpBubble();jpBubbleManuallyMoved=false;var t=tx();var bub=document.createElement('div');bub.id='jpCallBubble';bub.className='tuto-bubble tuto-bubble--visible tuto-jp-call-bubble';bub.style.cssText='position:fixed;z-index:10100;width:320px;';bub.innerHTML='<div class="tuto-bubble-drag-handle">☰</div><div class="tuto-bubble-title">'+t.jpBubT+'</div><div class="tuto-bubble-text">'+t.jpBub+'</div><div style="text-align:center;margin-top:10px"><button class="tuto-btn-next" id="jpDismissBtn">'+t.ok+'</button></div>';document.body.appendChild(bub);positionJpBubble(target);makeDraggable(bub);setTimeout(function(){var btn=document.getElementById('jpDismissBtn');if(btn)btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();jpBubbleDismissed=true;closeJpBubble();},true);},200);}
 function closeJpBubble(){var el=document.getElementById('jpCallBubble');if(el&&el.parentNode)el.parentNode.removeChild(el);}
 
 // ── Bulle principale ─────────────────────────────────────────────────
@@ -335,7 +420,7 @@ function positionBubble(te,pos){
 }
 function removeBubble(){var el=document.getElementById('tutoBubble');if(el)el.remove();bubbleEl=null;}
 
-function makeDraggable(el){var h=el.querySelector('.tuto-bubble-drag-handle');if(!h)return;var ox=0,oy=0,sx=0,sy=0,d=false;function dn(e){d=true;var t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;var r=el.getBoundingClientRect();ox=r.left;oy=r.top;el.classList.remove('tuto-bubble--center');el.style.right='auto';el.style.bottom='auto';el.style.transform='none';e.preventDefault();}function mv(e){if(!d)return;var t=e.touches?e.touches[0]:e;el.style.left=(ox+t.clientX-sx)+'px';el.style.top=(oy+t.clientY-sy)+'px';}function up(){d=false;}h.addEventListener('mousedown',dn);document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);h.addEventListener('touchstart',dn,{passive:false});document.addEventListener('touchmove',mv,{passive:false});document.addEventListener('touchend',up);}
+function makeDraggable(el){var h=el.querySelector('.tuto-bubble-drag-handle');if(!h)return;var ox=0,oy=0,sx=0,sy=0,d=false;function dn(e){d=true;if(el&&el.id==='jpCallBubble')jpBubbleManuallyMoved=true;var t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;var r=el.getBoundingClientRect();ox=r.left;oy=r.top;el.classList.remove('tuto-bubble--center');el.style.right='auto';el.style.bottom='auto';el.style.transform='none';e.preventDefault();e.stopPropagation();}function mv(e){if(!d)return;var t=e.touches?e.touches[0]:e;var bw=el.offsetWidth||320,bh=el.offsetHeight||160;var left=ox+t.clientX-sx,top=oy+t.clientY-sy;left=Math.max(6,Math.min(window.innerWidth-bw-6,left));top=Math.max(6,Math.min(window.innerHeight-bh-6,top));el.style.left=left+'px';el.style.top=top+'px';e.preventDefault();}function up(){d=false;}h.addEventListener('mousedown',dn);document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);h.addEventListener('touchstart',dn,{passive:false});document.addEventListener('touchmove',mv,{passive:false});document.addEventListener('touchend',up);}
 
 function updateToggleButton(){var btn=document.getElementById('btnToggleTutorial');if(!btn)return;var ok=false,sp=document.getElementById('splashScreen'),su=document.getElementById('roundSetupOverlay'),ab=document.getElementById('btnAbandon');if(sp&&!sp.classList.contains('hidden'))ok=true;if(su&&!su.classList.contains('hidden'))ok=true;if(typeof roundFinished!=='undefined'&&roundFinished)ok=true;if(ab&&ab.style.display!=='none'&&ab.offsetParent!==null)ok=true;btn.disabled=!ok;btn.style.opacity=ok?'1':'0.38';btn.style.pointerEvents=ok?'auto':'none';}
 

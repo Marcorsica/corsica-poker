@@ -822,3 +822,46 @@ body.tutorial-mode #btnAbandon.show-abandon:hover {
   background: linear-gradient(180deg, #8b8b8b, #555555) !important;
   transform: none !important;
 }
+
+
+/* === PATCH v5-4-param-arrow-jp-drag ===
+   - La flèche paramètres vise exactement le centre du logo ⚙️.
+   - La bulle jackpot reste déplaçable au-dessus de l’overlay du tutoriel. */
+.tuto-arrow.tuto-arrow--settings{
+  transform:rotate(0deg) scale(1.15)!important;
+  animation:arrowSettingsExact .58s ease-in-out infinite!important;
+}
+.tuto-arrow.tuto-arrow--settings::after{
+  left:50%!important;
+  transform:translateX(-50%)!important;
+}
+.tuto-arrow.tuto-arrow--settings::before{
+  left:50%!important;
+  transform:translateX(-50%)!important;
+}
+.tuto-arrow.tuto-arrow--settings.tuto-arrow--above{
+  transform:rotate(0deg) scaleY(-1) scale(1.15)!important;
+  animation:arrowSettingsExactAbove .58s ease-in-out infinite!important;
+}
+@keyframes arrowSettingsExact{
+  0%,100%{transform:rotate(0deg) translateY(0) scale(1.15);}
+  50%{transform:rotate(0deg) translateY(14px) scale(1.25);}
+}
+@keyframes arrowSettingsExactAbove{
+  0%,100%{transform:rotate(0deg) scaleY(-1) translateY(0) scale(1.15);}
+  50%{transform:rotate(0deg) scaleY(-1) translateY(14px) scale(1.25);}
+}
+#jpCallBubble{
+  z-index:10120!important;
+  pointer-events:auto!important;
+}
+#jpCallBubble .tuto-bubble-drag-handle{
+  cursor:grab!important;
+  color:rgba(255,255,255,.72)!important;
+  background:rgba(255,255,255,.06)!important;
+  border-radius:10px!important;
+  margin-bottom:6px!important;
+  touch-action:none!important;
+}
+#jpCallBubble .tuto-bubble-drag-handle:active{cursor:grabbing!important;}
+/* === FIN PATCH v5-4-param-arrow-jp-drag === */
