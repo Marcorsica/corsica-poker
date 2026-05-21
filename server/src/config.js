@@ -4,9 +4,9 @@ const MARGIN_NORMAL  = 0.05;   // marge maison sur mises normales (5%)
 const MARGIN_JACKPOT = 0.015;  // prélèvement sur mises jackpot (1,5%)
 
 const jackpotConfig = {
-  argent:  { reset: 0,  color: '#C0C0C0' },
-  or:      { reset: 0,  color: '#FFD700' },
-  diamant: { reset: 0, color: '#7dd3fc' },
+  argent:  { reset: 250,  color: '#C0C0C0' },
+  or:      { reset: 850,  color: '#FFD700' },
+  diamant: { reset: 8000, color: '#7dd3fc' },
 };
 
 const ECONOMY_SPLITS = {

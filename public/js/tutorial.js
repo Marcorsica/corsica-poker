@@ -4,7 +4,7 @@ let tutoStep=-1,tutoActive=false,bubbleEl=null,badgeEl=null,pollTimer=null;
 let arrowEls=[],rafId=null;
 var cachedDynTargets=null;
 var jpCallWatcher=null,jpBubbleDismissed=false,jpBubbleManuallyMoved=false;
-var blockOverlayEl=null,loadingOverlayEl=null;
+var blockOverlayEl=null,jpBlockOverlayEl=null,loadingOverlayEl=null;
 var fixedDealApplied=false;
 
 // ── Partie fixe pré-codée (9 mains, main 8 = jackpot éligible) ───────
@@ -22,46 +22,10 @@ var FIXED_HANDS=[
 var FIXED_BOARD=[{r:3,s:'H'},{r:6,s:'S'},{r:13,s:'H'},{r:4,s:'C'},{r:9,s:'H'}];
 
 function applyFixedDeal(){
-  if(fixedDealApplied)return;
-  if(typeof hands==='undefined'||!hands.length)return;
-  if(hands.length!==9)return;
-  // Remplacer les cartes
-  for(var i=0;i<9;i++){
-    hands[i].cards[0]=FIXED_HANDS[i][0];
-    hands[i].cards[1]=FIXED_HANDS[i][1];
-  }
-  // Reconstruire le deck avec les cartes restantes + board au sommet
-  var used={};
-  for(var i=0;i<9;i++){
-    used[FIXED_HANDS[i][0].r+'_'+FIXED_HANDS[i][0].s]=true;
-    used[FIXED_HANDS[i][1].r+'_'+FIXED_HANDS[i][1].s]=true;
-  }
-  for(var i=0;i<FIXED_BOARD.length;i++){
-    used[FIXED_BOARD[i].r+'_'+FIXED_BOARD[i].s]=true;
-  }
-  var newDeck=[];
-  var suits=['S','H','D','C'];
-  for(var si=0;si<suits.length;si++){
-    for(var r=2;r<=14;r++){
-      if(!used[r+'_'+suits[si]])newDeck.push({r:r,s:suits[si]});
-    }
-  }
-  // Mélanger les cartes restantes
-  for(var i=newDeck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=newDeck[i];newDeck[i]=newDeck[j];newDeck[j]=tmp;}
-  // Placer les cartes du board à la fin (pop = 3H, 6S, 13H, 4C, 9H)
-  newDeck.push(FIXED_BOARD[4]); // river (popped last during river)
-  newDeck.push(FIXED_BOARD[3]); // turn
-  newDeck.push(FIXED_BOARD[2]); // flop card 3
-  newDeck.push(FIXED_BOARD[1]); // flop card 2
-  newDeck.push(FIXED_BOARD[0]); // flop card 1 (popped first)
-  deck=newDeck;
+  // La distribution fixe est maintenant appliquée côté serveur (/start?discovery=1).
+  // Ne jamais modifier les cartes côté client : sinon les cartes affichées et les cotes serveur divergent.
   fixedDealApplied=true;
-  // Recalculer les cotes et réafficher
-  if(typeof recalcOdds==='function')recalcOdds();
-  if(typeof renderHands==='function')renderHands();
-  if(typeof renderBoard==='function')renderBoard();
-  enforceDiscoveryDemoOdds();
-  startDiscoveryDemoOddsWatch();
+  return;
 }
 
 // ── Démonstration forcée des cotes en mode découverte ────────────────
@@ -70,30 +34,9 @@ function applyFixedDeal(){
 // - une main éligible au jackpot.
 // Cette surcharge reste limitée au mode tutoriel et ne touche jamais le mode réel.
 function enforceDiscoveryDemoOdds(){
-  if(!tutoActive)return;
-  if(typeof phase==='undefined'||phase!=='pre')return;
-  if(typeof hands==='undefined'||!hands||hands.length<9)return;
-
-  // Main 8 : exemple de cote dorée (>100) sans remplacer le nombre par le label jackpot.
-  if(hands[7]){
-    hands[7].status='active';
-    hands[7].soloProb=1/150;
-    hands[7].tieProb=0;
-    hands[7].oddsStr='150.00';
-    hands[7].preflopOddsStr='150.00';
-  }
-
-  // Main 9 : exemple jackpot Argent. getTargetOddsValue utilise soloProb en fair odds : 1/(1/250)=250.
-  if(hands[8]){
-    hands[8].status='active';
-    hands[8].soloProb=1/250;
-    hands[8].tieProb=0;
-    hands[8].oddsStr='250.00';
-    hands[8].preflopOddsStr='250.00';
-  }
-
-  if(typeof renderHands==='function')renderHands();
-  if(typeof highlightLowestDisplayedOdds==='function')highlightLowestDisplayedOdds();
+  // Les cotes du mode découverte ne sont plus forcées côté interface.
+  // Elles viennent du serveur après calcul exact sur la configuration fixe.
+  return;
 }
 
 function startDiscoveryDemoOddsWatch(){
@@ -164,7 +107,7 @@ function buildSteps(){var t=tx();return[
   {id:'s7',title:t.s7t,text:t.s7,pos:'topleft',queryTargets:function(){var c=document.querySelectorAll('#boardCards .card');var a=[];for(var i=0;i<c.length&&i<3;i++){if(c[i].offsetParent!==null)a.push(c[i]);}return a;},advance:'click',block:true},
   {id:'s8',title:t.s8t,text:t.s8,pos:'topleft',queryTargets:function(){var sq=document.querySelector('.sq[data-phase="flop"]:not(.disabled)');return sq?[sq]:[];},waitFor:function(){return typeof phase!=='undefined'&&phase==='turn';}},
   {id:'s9',title:t.s9t,text:t.s9,pos:'topleft',queryTargets:function(){var sq=document.querySelector('.sq[data-phase="turn"]:not(.disabled)');return sq?[sq]:[];},waitFor:function(){return typeof roundFinished!=='undefined'&&roundFinished===true;}},
-  {id:'s10',title:t.s10t,text:t.s10,pos:'topleft',queryTargets:function(){var w=document.querySelector('#handsLayer .hand.winner');if(w)return[w];var tb=document.querySelector('.tie-box.tie-win');return tb?[tb]:[];},advance:'click',block:true},
+  {id:'s10',title:t.s10t,text:t.s10,pos:'topleft',queryTargets:function(){var tb=document.querySelector('.tie-box.tie-win');if(tb)return[tb];var w=document.querySelector('#handsLayer .hand.winner');return w?[w]:[];},advance:'click',block:true},
   {id:'s11',staticArrows:['argentJackpotBox','orJackpotBox','diamantJackpotBox'],title:t.s11t,text:t.s11,pos:'underjackpots',advance:'click',block:true},
   {id:'s12',staticArrows:['settingsBtn'],title:t.s12t,text:t.s12,pos:'undersettings',advance:'click',block:true,
     onEnter:function(){
@@ -181,8 +124,11 @@ function buildSteps(){var t=tx();return[
 var STEPS=[];
 
 function isTutorialMode(){return tutoActive;}
+window.isTutorialMode=isTutorialMode;
 function showBlockOverlay(){removeBlockOverlay();blockOverlayEl=document.createElement('div');blockOverlayEl.id='tutoBlockOverlay';document.body.appendChild(blockOverlayEl);}
 function removeBlockOverlay(){var el=document.getElementById('tutoBlockOverlay');if(el)el.parentNode.removeChild(el);blockOverlayEl=null;}
+function showJpBlockOverlay(){removeJpBlockOverlay();jpBlockOverlayEl=document.createElement('div');jpBlockOverlayEl.id='jpCallBlockOverlay';document.body.appendChild(jpBlockOverlayEl);}
+function removeJpBlockOverlay(){var el=document.getElementById('jpCallBlockOverlay');if(el)el.parentNode.removeChild(el);jpBlockOverlayEl=null;}
 
 function activateTutorial(){
   tutoActive=true;tutoStep=-1;jpBubbleDismissed=false;jpBubbleManuallyMoved=false;fixedDealApplied=false;
@@ -206,7 +152,7 @@ function exitTutorial(){
   tutoActive=false;tutoStep=-1;window._tutoRerolling=false;
   try{sessionStorage.removeItem(TUTORIAL_KEY);}catch(e){}
   document.body.classList.remove('tutorial-mode','tuto-rerolling','tuto-hide-abandon','tuto-settings-step');
-  removeBubble();removeAllArrows();removeBadge();closeJpBubble();
+  removeBubble();removeAllArrows();removeBadge();closeJpBubble();removeJpBlockOverlay();
   var settBtn=document.getElementById('settingsBtn');if(settBtn)settBtn.style.pointerEvents='';
   removeBlockOverlay();stopArrowTracking();
   if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
@@ -363,17 +309,23 @@ function positionJpBubble(target){
 function startJpCallWatch(){
   if(jpCallWatcher)clearInterval(jpCallWatcher);
   jpCallWatcher=setInterval(function(){
-    if(!tutoActive){clearInterval(jpCallWatcher);closeJpBubble();return;}
-    if(tutoStep<4){closeJpBubble();return;}
+    if(!tutoActive){clearInterval(jpCallWatcher);closeJpBubble();removeJpBlockOverlay();return;}
+    if(tutoStep<4){closeJpBubble();removeJpBlockOverlay();return;}
     var target=getVisibleJpCallTarget();
-    if(!target){closeJpBubble();jpBubbleDismissed=false;jpBubbleManuallyMoved=false;return;}
-    if(jpBubbleDismissed)return;
+    if(!target){closeJpBubble();removeJpBlockOverlay();jpBubbleDismissed=false;jpBubbleManuallyMoved=false;return;}
+    if(jpBubbleDismissed){removeJpBlockOverlay();return;}
+
+    // La bulle jackpot est prioritaire : tant qu'elle n'a pas été validée,
+    // aucune action de jeu ne doit passer, même si la bulle principale 5/15
+    // demande déjà de miser. Seule la bulle jackpot reste cliquable/déplaçable.
+    if(!document.getElementById('jpCallBlockOverlay'))showJpBlockOverlay();
+
     var bub=document.getElementById('jpCallBubble');
     if(!bub)showJpBubble(target);
     else if(!jpBubbleManuallyMoved)positionJpBubble(target);
-  },350);
+  },150);
 }
-function showJpBubble(target){closeJpBubble();jpBubbleManuallyMoved=false;var t=tx();var bub=document.createElement('div');bub.id='jpCallBubble';bub.className='tuto-bubble tuto-bubble--visible tuto-jp-call-bubble';bub.style.cssText='position:fixed;z-index:10100;width:320px;';bub.innerHTML='<div class="tuto-bubble-drag-handle">☰</div><div class="tuto-bubble-title">'+t.jpBubT+'</div><div class="tuto-bubble-text">'+t.jpBub+'</div><div style="text-align:center;margin-top:10px"><button class="tuto-btn-next" id="jpDismissBtn">'+t.ok+'</button></div>';document.body.appendChild(bub);positionJpBubble(target);makeDraggable(bub);setTimeout(function(){var btn=document.getElementById('jpDismissBtn');if(btn)btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();jpBubbleDismissed=true;closeJpBubble();},true);},200);}
+function showJpBubble(target){closeJpBubble();jpBubbleManuallyMoved=false;var t=tx();var bub=document.createElement('div');bub.id='jpCallBubble';bub.className='tuto-bubble tuto-bubble--visible tuto-jp-call-bubble';bub.style.cssText='position:fixed;z-index:10120;width:320px;';bub.innerHTML='<div class="tuto-bubble-drag-handle">☰</div><div class="tuto-bubble-title">'+t.jpBubT+'</div><div class="tuto-bubble-text">'+t.jpBub+'</div><div style="text-align:center;margin-top:10px"><button class="tuto-btn-next" id="jpDismissBtn">'+t.ok+'</button></div>';document.body.appendChild(bub);positionJpBubble(target);makeDraggable(bub);setTimeout(function(){var btn=document.getElementById('jpDismissBtn');if(btn)btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();jpBubbleDismissed=true;closeJpBubble();removeJpBlockOverlay();},true);},50);}
 function closeJpBubble(){var el=document.getElementById('jpCallBubble');if(el&&el.parentNode)el.parentNode.removeChild(el);}
 
 // ── Bulle principale ─────────────────────────────────────────────────

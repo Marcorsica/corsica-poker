@@ -12,7 +12,10 @@ async function serverStartRound(players) {
     : null;
   log("Demande serveur : nouvelle manche", { event: "client.server.start.request", data: { players, extremeCaseId } });
   const query = new URLSearchParams({ players: String(players) });
-  if (extremeCaseId) query.set("testCaseId", String(extremeCaseId));
+  const discoveryMode = (typeof window.isTutorialMode === "function" && window.isTutorialMode())
+    || !!(document.body && document.body.classList.contains("tutorial-mode"));
+  if (discoveryMode) query.set("discovery", "1");
+  else if (extremeCaseId) query.set("testCaseId", String(extremeCaseId));
   const res = await fetch(`/start?${query.toString()}`);
   if (!res.ok) {
     log("Erreur serveur au démarrage", { level: "error", event: "client.server.start.error", data: { status: res.status } });

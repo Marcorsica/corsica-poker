@@ -249,8 +249,10 @@ function refreshActionButtons() {
  }
 
  if (btnAbandon) {
-  const visible = canUseAbandon();
-  btnAbandon.disabled = !visible;
+  const tutorialActive = !!(document.body && document.body.classList.contains("tutorial-mode"));
+  const forcedTutorialVisible = !!(document.body && document.body.classList.contains("tuto-show-abandon"));
+  const visible = canUseAbandon() || forcedTutorialVisible;
+  btnAbandon.disabled = tutorialActive ? true : !visible;
   btnAbandon.classList.toggle("show-abandon", visible);
  }
  updateJackpotDisplays();

@@ -987,9 +987,12 @@ function syncAbandonDockVisibility(){
   const dock = document.getElementById("abandonDock");
   if (!dock) return;
 
-  const visible = canUseAbandon();
+  const tutorialActive = !!(document.body && document.body.classList.contains("tutorial-mode"));
+  const forcedTutorialVisible = !!(document.body && document.body.classList.contains("tuto-show-abandon"));
+  const visible = canUseAbandon() || forcedTutorialVisible;
   dock.classList.toggle("show-abandon-dock", visible);
   btnAbandon.classList.toggle("show-abandon", visible);
+  if (tutorialActive) btnAbandon.disabled = true;
 }
 
 

@@ -865,3 +865,66 @@ body.tutorial-mode #btnAbandon.show-abandon:hover {
 }
 #jpCallBubble .tuto-bubble-drag-handle:active{cursor:grabbing!important;}
 /* === FIN PATCH v5-4-param-arrow-jp-drag === */
+
+
+/* === PATCH abandon découverte bordeaux grisé ===
+   En mode découverte, quand Abandonner apparaît, il reste couleur rouge bordeaux,
+   mais désactivé visuellement et non cliquable. Ce bloc est volontairement en fin
+   de fichier pour écraser les anciens correctifs qui le rendaient gris. */
+body.tutorial-mode.tuto-show-abandon #abandonDock{
+  display:flex!important;
+}
+body.tutorial-mode.tuto-show-abandon #abandonDock #btnAbandon,
+body.tutorial-mode.tuto-show-abandon #btnAbandon.show-abandon,
+body.tutorial-mode #abandonDock #btnAbandon:disabled,
+body.tutorial-mode #btnAbandon.show-abandon:disabled{
+  display:inline-flex!important;
+  background:linear-gradient(180deg,#7f1230,#4b0018)!important;
+  border-color:rgba(255,155,180,.58)!important;
+  color:rgba(255,255,255,.74)!important;
+  box-shadow:0 6px 14px rgba(0,0,0,.22)!important;
+  opacity:.58!important;
+  filter:saturate(.72) brightness(.82)!important;
+  cursor:not-allowed!important;
+  pointer-events:none!important;
+  transform:none!important;
+}
+body.tutorial-mode.tuto-show-abandon #abandonDock #btnAbandon:hover,
+body.tutorial-mode.tuto-show-abandon #btnAbandon.show-abandon:hover,
+body.tutorial-mode #abandonDock #btnAbandon:disabled:hover,
+body.tutorial-mode #btnAbandon.show-abandon:disabled:hover{
+  background:linear-gradient(180deg,#7f1230,#4b0018)!important;
+  filter:saturate(.72) brightness(.82)!important;
+  transform:none!important;
+}
+/* === FIN PATCH abandon découverte bordeaux grisé === */
+
+
+/* === PATCH bulle jackpot bloquante : seule cette bulle reste cliquable === */
+#jpCallBlockOverlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10110 !important;
+  background: transparent !important;
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
+}
+#jpCallBubble {
+  z-index: 10120 !important;
+  pointer-events: auto !important;
+}
+
+
+/* FIX égalité : la cote Égalité ne prend le visuel doré que si sa valeur réelle est > 100. */
+.tie-value:not(.extreme-odds):not(.jackpot-call),
+.tie-win .tie-value:not(.extreme-odds):not(.jackpot-call) {
+  color: var(--ok) !important;
+  text-shadow: none !important;
+  animation: none !important;
+}
+
+.tie-value.extreme-odds,
+.tie-value.extreme-odds .odds-main {
+  animation: goldShimmer 2s ease-in-out infinite !important;
+  font-weight: 900 !important;
+}

@@ -683,7 +683,7 @@ function highlightLowestDisplayedOdds() {
  }
 
  const value = parseOddsNumber(phase === "river" ? (h.oddsStr || "—") : (h.oddsStr || "—"));
- if (value >= 100) oddsNode.classList.add("extreme-odds");
+ if (value > 100) oddsNode.classList.add("extreme-odds");
  if (value && !oddsNode.classList.contains("jackpot-call")) {
  oddsNodes.push({ node: oddsNode, value });
  }
@@ -691,7 +691,9 @@ function highlightLowestDisplayedOdds() {
 
  if (tieOddsEl) {
  tieOddsEl.classList.remove("lowest-odds");
+ tieOddsEl.classList.remove("extreme-odds");
  const tieValue = parseOddsNumber(phase === "river" ? (tieBet.oddsStr || "—") : (tieBet.oddsStr || "—"));
+ if (tieValue > 100) tieOddsEl.classList.add("extreme-odds");
  if (tieValue && !tieOddsEl.classList.contains("jackpot-call")) {
  oddsNodes.push({ node: tieOddsEl, value: tieValue });
  }
@@ -874,6 +876,7 @@ if (tieOddsEl) {
 
  tieOddsEl.onclick = null;
  tieOddsEl.classList.remove("jackpot-call", "jackpot-locked");
+ delete tieOddsEl.dataset.jackpotType;
  tieOddsEl.classList.toggle("low", false);
 
  const tieJackpotLockedByBet = !!currentTieJackpotType && isJackpotTypeLockedForTarget(currentTieJackpotType, "tie", -1);
