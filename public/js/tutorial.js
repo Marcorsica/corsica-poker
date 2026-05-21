@@ -217,7 +217,16 @@ function applyTutorialJackpots(){
   for(var k in ids){ids[k].val.forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=vals[k];});ids[k].heat.forEach(function(id){var el=document.getElementById(id);if(el)el.style.setProperty('--heat-progress',heats[k]+'%');});}
 }
 
-function injectBadge(){if(document.getElementById('tutorialModeBadge'))return;var b=document.createElement('div');b.id='tutorialModeBadge';b.textContent=tx().badge;document.body.appendChild(b);}
+function injectBadge(){
+  // Sécurité : le badge "MODE DÉCOUVERTE" ne doit exister qu'en mode découverte réel.
+  if(!tutoActive){removeBadge();return;}
+  var existing=document.getElementById('tutorialModeBadge');
+  if(existing){existing.textContent=tx().badge;return;}
+  var b=document.createElement('div');
+  b.id='tutorialModeBadge';
+  b.textContent=tx().badge;
+  document.body.appendChild(b);
+}
 function removeBadge(){var b=document.getElementById('tutorialModeBadge');if(b)b.remove();}
 
 function goToStep(n){
@@ -385,6 +394,10 @@ function initSplashLang(){
     if(!btn)return;
     var newLang=btn.dataset.lang;
     if(typeof setLang==='function')setLang(newLang);
+    try{
+      localStorage.setItem('lang',newLang);
+      localStorage.setItem('corsicaLang',newLang);
+    }catch(e){}
     // Mettre à jour le tagline
     var tag=document.querySelector('.splash-tagline');
     if(tag)tag.textContent=newLang==='en'?'Play the odds':'Jouez la cote';
@@ -417,6 +430,29 @@ function initSplashLang(){
   var cur=typeof lang!=='undefined'?lang:'fr';
   sel.querySelectorAll('.splash-lang-btn').forEach(function(b){b.classList.toggle('active',b.dataset.lang===cur);});
 }
+
+
+function refreshTutorialLanguage(){
+  try{
+    if(tutoActive){
+      STEPS=buildSteps();
+      var step=STEPS[tutoStep];
+      if(step) showBubble(step);
+      var jp=document.getElementById('jpCallBubble');
+      if(jp){
+        var target=document.querySelector('.jackpot-callout, .jackpot-try, .sq-jackpot, .jackpot-eligible, .sq:not(.disabled) .jackpot-mini');
+        showJpBubble(target || document.body);
+      }
+    }
+    if(tutoActive){
+      injectBadge();
+    }else{
+      removeBadge();
+    }
+    updateToggleButton();
+  }catch(e){ console.warn('[tutorial] refresh language failed', e); }
+}
+window.refreshTutorialLanguage=refreshTutorialLanguage;
 
 function onReady(){
   try{if(!localStorage.getItem('tutoSoundFix2')&&typeof soundEnabled!=='undefined'&&!soundEnabled){soundEnabled=true;if(typeof saveSettings==='function')saveSettings();}localStorage.setItem('tutoSoundFix2','1');}catch(e){}

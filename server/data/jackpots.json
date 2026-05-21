@@ -1,14 +1,14 @@
 {
   "argent": {
-    "value": 251.95,
-    "relay": 0.41
+    "value": 252.79,
+    "relay": 0.57
   },
   "or": {
-    "value": 851.8,
-    "relay": 0.6
+    "value": 852.4,
+    "relay": 0.8
   },
   "diamant": {
-    "value": 8003.85,
-    "relay": 2.16
+    "value": 8004.29,
+    "relay": 2.4
   }
 }

@@ -261,9 +261,31 @@ function launchNewRoundWithCount(count) {
  });
 }
 
+
+function applyLanguageToStaticScreens() {
+ const isEn = lang === "en";
+ const setText = (id, text) => { const n = el(id); if (n) n.textContent = text; };
+ const setHtml = (id, html) => { const n = el(id); if (n) n.innerHTML = html; };
+ const jackpotNames = isEn ? { argent: "SILVER", or: "GOLD", diamant: "DIAMOND" } : { argent: "ARGENT", or: "OR", diamant: "DIAMANT" };
+ const jackpotLabel = (name) => '<span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>' + name + '</span></span><span class="jackpot-diamond right">◆</span>';
+
+ setText("btnStart", isEn ? "Play" : "Jouer");
+ setText("btnDiscovery", isEn ? "🎓 First visit — Discovery" : "🎓 Première visite — Découverte");
+ setText("splashDemoLabel", isEn ? "Demo — No real money" : "Démo — Pas d'argent réel");
+ const tagline = document.querySelector(".splash-tagline");
+ if (tagline) tagline.textContent = isEn ? "Play the odds" : "Jouez la cote";
+ setHtml("splashLblArgent", jackpotLabel(jackpotNames.argent));
+ setHtml("splashLblOr", jackpotLabel(jackpotNames.or));
+ setHtml("splashLblDiamant", jackpotLabel(jackpotNames.diamant));
+ const splashLangSelector = el("splashLangSelector");
+ if (splashLangSelector) splashLangSelector.querySelectorAll(".splash-lang-btn").forEach((btn) => btn.classList.toggle("active", btn.dataset.lang === lang));
+}
+
 function setLang(newLang) {
  lang = newLang;
  document.documentElement.lang = lang;
+ try { if (typeof saveSettings === "function") saveSettings(); } catch(_){ }
+ applyLanguageToStaticScreens();
 
  if (btnFR) btnFR.classList.toggle("active", lang === "fr");
  if (btnEN) btnEN.classList.toggle("active", lang === "en");
@@ -344,6 +366,7 @@ function setLang(newLang) {
  updateTotalWinsDisplay();
  updateJackpotDisplays();
  refreshActionButtons();
+ if (typeof refreshTutorialLanguage === "function") refreshTutorialLanguage();
 }
 
 
