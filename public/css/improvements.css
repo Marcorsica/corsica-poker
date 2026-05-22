@@ -928,3 +928,33 @@ body.tutorial-mode #btnAbandon.show-abandon:disabled:hover{
   animation: goldShimmer 2s ease-in-out infinite !important;
   font-weight: 900 !important;
 }
+
+
+/* === PATCH retour tutoriel découverte === */
+.tuto-step-count--back{
+  appearance:none!important;
+  border:1px solid rgba(160,255,185,0.28)!important;
+  border-radius:999px!important;
+  padding:5px 10px!important;
+  background:rgba(40,120,60,0.18)!important;
+  color:rgba(190,255,205,0.82)!important;
+  cursor:pointer!important;
+  transition:background .15s,transform .1s,border-color .15s!important;
+}
+.tuto-step-count--back:hover{
+  background:rgba(60,180,90,0.30)!important;
+  border-color:rgba(160,255,185,0.55)!important;
+  transform:translateX(-2px)!important;
+}
+/* === FIN PATCH retour tutoriel découverte === */
+
+
+/* === PATCH cartes perdantes grisées persistantes === */
+.hand.final-loser .hand-inner{
+  opacity:.18!important;
+  filter:grayscale(1) saturate(.25) brightness(.72)!important;
+}
+.hand.final-loser:not(.winner) .hand-cards .card{
+  filter:grayscale(1) saturate(.20) brightness(.70)!important;
+}
+/* === FIN PATCH cartes perdantes grisées persistantes === */

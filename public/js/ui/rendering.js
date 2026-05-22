@@ -744,6 +744,10 @@ function renderHands() {
 
  wrap.classList.toggle("hand-elim", h.status === "elim");
  wrap.classList.toggle("hand-splitOnly", h.status === "splitOnly");
+ // Résultat final : les cartes perdantes restent grisées après chaque rendu,
+ // dans tous les modes et à toutes les étapes post-résultat.
+ const isFinalLoser = !!roundFinished && !wrap.classList.contains("winner");
+ wrap.classList.toggle("final-loser", isFinalLoser);
 
  // Detect top/bottom from actual on-screen position, not raw style.top, because layout uses pixel values.
  const layerRect = handsLayer ? handsLayer.getBoundingClientRect() : null;

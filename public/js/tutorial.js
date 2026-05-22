@@ -55,10 +55,10 @@ var T={
     s1t:'♠ Les mains et les cotes',s1:'Chaque joueur reçoit 2 cartes. Le nombre au-dessus est la <strong>cote</strong> : plus elle est élevée, plus le gain est important mais le risque aussi. Votre mise sera <strong>multipliée par cette cote</strong> si la main gagne seule. La cote la plus basse clignote en <strong style="color:#ef4444">rouge</strong> (favori), les plus élevées brillent en <strong style="color:#eab308">doré</strong>.',
     s2t:'💰 Choisissez votre mise',s2:'Cliquez sur un jeton (<strong>1, 2, 5, 10 ou 20</strong>) pour sélectionner le montant de votre mise.',
     s3t:'🚫 Abandonner la manche',s3:'Si les cartes ne vous inspirent pas, cliquez ici pour <strong>passer votre tour</strong> et relancer une nouvelle manche.',
-    s4t:'👆 Placez votre mise !',s4:'Cliquez sur la case <strong>« Miser »</strong> d\'une main pour y placer votre jeton. Vous pouvez miser sur <strong>plusieurs mains</strong>. La <strong>gomme 🧹</strong> permet de retirer une mise.',
+    s4t:'👆 Placez votre mise !',s4:'Cliquez sur la case <strong>« Miser »</strong> d\'une main pour y placer votre jeton. Vous pouvez miser sur <strong>plusieurs mains</strong>.',
     jpBubT:'🎰 Tentez le Jackpot !',jpBub:'Cette mention signifie que la main est éligible à un <strong>jackpot</strong>. Misez <strong>1 jeton</strong> sur cette case pour tenter de remporter toute la cagnotte si la main gagne !',
     s5t:'🤝 Case Égalité',s5:'Misez ici si vous pensez que <strong>deux joueurs ou plus</strong> gagneront avec la même combinaison.',
-    s6t:'✅ Validez vos mises',s6:'Quand vous avez placé toutes vos mises, cliquez sur <strong>Valider les mises</strong> pour dévoiler le flop.',
+    s6t:'✅ Validez vos mises',s6:'Amusez-vous à miser où vous le souhaitez. Quand vous avez placé tous vos paris, cliquez sur <strong>Valider les mises</strong> pour dévoiler le flop.',
     s7t:'🂠 Le Flop — 3 cartes communes',s7:'Les 3 premières cartes communes sont révélées et de nouvelles cotes apparaissent. Certains joueurs peuvent être éliminés.',
     s8t:'💰 Vous pouvez encore miser !',s8:'Avant la <strong>4ème carte (Turn)</strong>, vous pouvez ajouter de nouvelles mises. Cliquez sur <strong>Valider</strong> quand vous êtes prêt.',
     s9t:'💰 Dernière chance de miser !',s9:'Avant la <strong>5ème et dernière carte (River)</strong>, vous pouvez encore ajuster vos mises. Après, c\'est fini !',
@@ -74,10 +74,10 @@ var T={
     s1t:'♠ Hands & Odds',s1:'Each player receives 2 cards. The number above is the <strong>odds</strong>: the higher, the bigger the reward but also the risk. Your bet is <strong>multiplied by the odds</strong> if the hand wins. The lowest odds blink in <strong style="color:#ef4444">red</strong> (favorite), the highest glow in <strong style="color:#eab308">gold</strong>.',
     s2t:'💰 Choose your bet',s2:'Click a chip (<strong>1, 2, 5, 10, or 20</strong>) to select your bet amount.',
     s3t:'🚫 Skip this hand',s3:'If the cards don\'t look promising, click here to <strong>skip</strong> and start a new round.',
-    s4t:'👆 Place your bet!',s4:'Click the <strong>"Bet"</strong> box on a hand to place your chip. You can bet on <strong>multiple hands</strong>. The <strong>eraser 🧹</strong> removes a bet.',
+    s4t:'👆 Place your bet!',s4:'Click the <strong>"Bet"</strong> box on a hand to place your chip. You can bet on <strong>multiple hands</strong>.',
     jpBubT:'🎰 Try the Jackpot!',jpBub:'This label means the hand is eligible for a <strong>jackpot</strong>. Bet <strong>1 chip</strong> on this square to try to win the entire pot if the hand wins!',
     s5t:'🤝 Tie bet',s5:'Bet here if you think <strong>two or more players</strong> will win with the same combination.',
-    s6t:'✅ Confirm your bets',s6:'When you\'ve placed all your bets, click <strong>Confirm bets</strong> to reveal the flop.',
+    s6t:'✅ Confirm your bets',s6:'Have fun betting wherever you want. When you have placed all your bets, click <strong>Confirm bets</strong> to reveal the flop.',
     s7t:'🂠 The Flop — 3 community cards',s7:'The first 3 community cards are revealed and new odds appear. Some players may be eliminated.',
     s8t:'💰 You can still bet!',s8:'Before the <strong>4th card (Turn)</strong>, you can add new bets. Click <strong>Confirm</strong> when ready.',
     s9t:'💰 Last chance to bet!',s9:'Before the <strong>5th and final card (River)</strong>, you can still adjust your bets. After that, it\'s over!',
@@ -100,15 +100,14 @@ function buildSteps(){var t=tx();return[
   {id:'s3',staticArrows:['btnAbandon'],title:t.s3t,text:t.s3,pos:'aboveabandon',advance:'click',block:true,
     onEnter:function(){document.body.classList.add('tuto-show-abandon');var btn=document.getElementById('btnAbandon');if(btn){btn.style.display='inline-flex';btn.classList.add('show-abandon');btn.disabled=true;btn.style.opacity='0.42';btn.style.pointerEvents='none';}var dock=document.getElementById('abandonDock');if(dock)dock.classList.add('show-abandon-dock');},
     onExit:function(){document.body.classList.remove('tuto-show-abandon');var btn=document.getElementById('btnAbandon');if(btn){btn.style.opacity='';btn.style.pointerEvents='';btn.disabled=true;}var dock=document.getElementById('abandonDock');if(dock)dock.classList.remove('show-abandon-dock');}},
+  {id:'jpCall',title:t.jpBubT,text:t.jpBub,pos:'underjackpotcall',advance:'click',block:true,queryTargets:function(){var target=getVisibleJpCallTarget();return target?[target]:[];}},
   {id:'s4',title:t.s4t,text:t.s4,pos:'center',queryTargets:function(){var all=document.querySelectorAll('.sq[data-phase="pre"]:not(.hasBet):not(.disabled)');if(!all.length)return[];return[all[Math.floor(Math.random()*Math.min(all.length,5))]];},queryOnce:true,waitFor:function(){return !!document.querySelector('.sq.hasBet');}},
-  // Bulle jackpot insérée ici (entre 4 et 5) — gérée par le watcher jpCallWatch
   {id:'s5',staticArrows:['tieBox'],title:t.s5t,text:t.s5,pos:'left',advance:'click',block:true},
   {id:'s6',staticArrows:['btnAdvance'],title:t.s6t,text:t.s6,pos:'top',waitFor:function(){return typeof phase!=='undefined'&&phase!=='pre';}},
   {id:'s7',title:t.s7t,text:t.s7,pos:'topleft',queryTargets:function(){var c=document.querySelectorAll('#boardCards .card');var a=[];for(var i=0;i<c.length&&i<3;i++){if(c[i].offsetParent!==null)a.push(c[i]);}return a;},advance:'click',block:true},
   {id:'s8',title:t.s8t,text:t.s8,pos:'topleft',queryTargets:function(){var sq=document.querySelector('.sq[data-phase="flop"]:not(.disabled)');return sq?[sq]:[];},waitFor:function(){return typeof phase!=='undefined'&&phase==='turn';}},
   {id:'s9',title:t.s9t,text:t.s9,pos:'topleft',queryTargets:function(){var sq=document.querySelector('.sq[data-phase="turn"]:not(.disabled)');return sq?[sq]:[];},waitFor:function(){return typeof roundFinished!=='undefined'&&roundFinished===true;}},
   {id:'s10',title:t.s10t,text:t.s10,pos:'topleft',queryTargets:function(){var tb=document.querySelector('.tie-box.tie-win');if(tb)return[tb];var w=document.querySelector('#handsLayer .hand.winner');return w?[w]:[];},advance:'click',block:true},
-  {id:'s11',staticArrows:['argentJackpotBox','orJackpotBox','diamantJackpotBox'],title:t.s11t,text:t.s11,pos:'underjackpots',advance:'click',block:true},
   {id:'s12',staticArrows:['settingsBtn'],title:t.s12t,text:t.s12,pos:'undersettings',advance:'click',block:true,
     onEnter:function(){
       var panel=document.getElementById('settingsPanel');
@@ -142,7 +141,7 @@ function activateTutorial(){
   setTimeout(function(){goToStep(0);},600);
   if(pollTimer)clearInterval(pollTimer);
   pollTimer=setInterval(pollWaitFor,350);
-  startJpCallWatch();startArrowTracking();
+  startArrowTracking();
   // Appliquer la partie fixe dès que les mains sont prêtes
   startFixedDealWatch();
   // Désactiver abandonner en découverte (visible mais grisé)
@@ -248,6 +247,16 @@ function nextStep(){
   if(tutoStep>=0&&tutoStep<STEPS.length&&STEPS[tutoStep].onExit)STEPS[tutoStep].onExit();
   goToStep(tutoStep+1);
 }
+function previousStep(){
+  if(!tutoActive||tutoStep<=0)return;
+  removeBlockOverlay();
+  closeJpBubble();
+  removeJpBlockOverlay();
+  jpBubbleDismissed=false;
+  jpBubbleManuallyMoved=false;
+  if(tutoStep>=0&&tutoStep<STEPS.length&&STEPS[tutoStep].onExit)STEPS[tutoStep].onExit();
+  goToStep(tutoStep-1);
+}
 function pollWaitFor(){if(!tutoActive||tutoStep<0||tutoStep>=STEPS.length)return;var step=STEPS[tutoStep];if(step.waitFor&&step.waitFor())nextStep();}
 function forceSettingsPanelOpen(){var panel=document.getElementById('settingsPanel');if(panel){panel.classList.remove('hidden');panel.style.display='';panel.style.pointerEvents='auto';}var btn=document.getElementById('settingsBtn');if(btn)btn.style.pointerEvents='auto';}
 
@@ -316,7 +325,10 @@ function positionJpBubble(target){
   bub.style.top=chosen.top+'px';
 }
 function startJpCallWatch(){
-  if(jpCallWatcher)clearInterval(jpCallWatcher);
+  if(jpCallWatcher){clearInterval(jpCallWatcher);jpCallWatcher=null;}
+  closeJpBubble();
+  removeJpBlockOverlay();
+  return;
   jpCallWatcher=setInterval(function(){
     if(!tutoActive){clearInterval(jpCallWatcher);closeJpBubble();removeJpBlockOverlay();return;}
     if(tutoStep<4){closeJpBubble();removeJpBlockOverlay();return;}
@@ -343,8 +355,17 @@ function showBubble(step){
   var ft=step.staticArrows&&step.staticArrows[0]?document.getElementById(step.staticArrows[0]):null;
   if(step.staticArrows&&step.staticArrows[0]&&!ft){setTimeout(function(){showBubble(step);},400);return;}
   bubbleEl=document.createElement('div');bubbleEl.id='tutoBubble';bubbleEl.className='tuto-bubble';
-  bubbleEl.innerHTML='<div class="tuto-bubble-drag-handle">'+t.drag+'</div><div class="tuto-bubble-title">'+step.title+'</div><div class="tuto-bubble-text">'+step.text+'</div><div class="tuto-bubble-footer"><span class="tuto-step-count">'+(tutoStep+1)+' / '+STEPS.length+'</span>'+(step.isFinal?'<button class="tuto-btn-next tuto-btn-finish" id="tutoBtnNext">'+t.finish+'</button>':step.advance==='click'?'<button class="tuto-btn-next" id="tutoBtnNext">'+t.ok+'</button>':'<span class="tuto-wait-hint">'+t.wait+'</span>')+'</div>';
-  document.body.appendChild(bubbleEl);positionBubble(ft,step.pos);makeDraggable(bubbleEl);
+  var stepNumber=tutoStep+1;
+  var noBackSteps={2:true,7:true,9:true,11:true,12:true};
+  var canGoBack=tutoActive&&tutoStep>0&&!noBackSteps[stepNumber];
+  var stepCounter=canGoBack?'<button type="button" class="tuto-step-count tuto-step-count--back" id="tutoBtnPrev" title="Retour">← '+stepNumber+' / '+STEPS.length+'</button>':'<span class="tuto-step-count">'+stepNumber+' / '+STEPS.length+'</span>';
+  bubbleEl.innerHTML='<div class="tuto-bubble-drag-handle">'+t.drag+'</div><div class="tuto-bubble-title">'+step.title+'</div><div class="tuto-bubble-text">'+step.text+'</div><div class="tuto-bubble-footer">'+stepCounter+(step.isFinal?'<button class="tuto-btn-next tuto-btn-finish" id="tutoBtnNext">'+t.finish+'</button>':step.advance==='click'?'<button class="tuto-btn-next" id="tutoBtnNext">'+t.ok+'</button>':'<span class="tuto-wait-hint">'+t.wait+'</span>')+'</div>';
+  document.body.appendChild(bubbleEl);
+  var posTarget=ft;
+  if(!posTarget&&step.queryTargets){var rt=resolveTargets(step);if(rt&&rt.length)posTarget=rt[0];}
+  positionBubble(posTarget,step.pos);makeDraggable(bubbleEl);
+  var bp=document.getElementById('tutoBtnPrev');
+  if(bp)bp.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();previousStep();});
   var bn=document.getElementById('tutoBtnNext');
   if(bn)bn.addEventListener('click',function(){if(step.isFinal){exitTutorial();if(typeof showRoundSetup==='function')showRoundSetup();}else nextStep();});
   requestAnimationFrame(function(){if(bubbleEl)bubbleEl.classList.add('tuto-bubble--visible');});
@@ -354,6 +375,13 @@ function positionBubble(te,pos){
   // Positions fixes — ne dépendent PAS de la cible
   if(pos==='underjackpots'){
     bubbleEl.style.cssText='position:fixed;top:150px;left:50%;transform:translateX(-50%);width:'+bw+'px;z-index:10095;';
+    return;
+  }
+  if(pos==='underjackpotcall'&&te){
+    var jr=te.getBoundingClientRect();
+    var left=Math.max(12,Math.min(vw-bw-12,jr.left+(jr.width/2)-bw/2));
+    var top=Math.min(window.innerHeight-120,jr.bottom+18);
+    bubbleEl.style.cssText='position:fixed;left:'+left+'px;top:'+top+'px;width:'+bw+'px;z-index:10095;';
     return;
   }
   if(pos==='undersettings'){

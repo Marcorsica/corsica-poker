@@ -582,6 +582,7 @@ function advanceToShowdown() {
 
  const winners = settleWinners();
  const isTie = winners.length >= 2;
+ window.lastFinalWinnerHands = winners.slice();
  lastWinningTargets = isTie ? [{ targetKind: "tie", targetIndex: -1 }] : winners.map((w) => ({ targetKind: "hand", targetIndex: w }));
 
  const tieBox = document.getElementById("tieBox");
@@ -593,10 +594,12 @@ function advanceToShowdown() {
  if (handsLayer) {
  handsLayer.querySelectorAll(".hand").forEach((node, i) => {
  if (!winners.includes(i)) {
- node.style.opacity = "0.12";
+ node.style.opacity = "";
+ node.classList.add("hand-final-loser");
  node.classList.remove("winner");
  } else {
  node.style.opacity = "";
+ node.classList.remove("hand-final-loser");
  node.classList.add("winner");
  }
  });

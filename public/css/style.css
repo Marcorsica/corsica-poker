@@ -9969,3 +9969,26 @@ body.theme-fast .hand.details-open .hand-details-panel {
   pointer-events: auto !important;
   cursor: pointer !important;
 }
+
+/* === PATCH : grisé persistant des cartes perdantes au résultat === */
+.hand.hand-final-loser .hand-inner,
+.hand.hand-final-loser .hand-main,
+.hand.hand-final-loser .hand-cards,
+.hand.hand-final-loser .card{
+  opacity:.28 !important;
+  filter:grayscale(1) saturate(.25) brightness(.70) !important;
+}
+.hand.hand-final-loser .squares,
+.hand.hand-final-loser .hand-odds,
+.hand.hand-final-loser .hand-sub{
+  opacity:.38 !important;
+  filter:grayscale(1) saturate(.35) !important;
+}
+.hand.winner,
+.hand.winner .hand-inner,
+.hand.winner .hand-main,
+.hand.winner .hand-cards,
+.hand.winner .card{
+  opacity:1 !important;
+  filter:none !important;
+}

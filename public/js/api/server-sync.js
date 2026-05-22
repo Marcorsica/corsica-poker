@@ -71,6 +71,7 @@ async function finalizeRiverFromServerResult() {
   const result = await serverGetResult();
   const winners = Array.isArray(result.winners) ? result.winners : [];
   const isTie = result.winnerType === "tie" || winners.length > 1;
+  window.lastFinalWinnerHands = winners.slice();
 
   for (const h of hands) {
     h.finalOddsStr = (h.oddsStr || "—") + " | pre " + (h.preflopOddsStr || "—");
@@ -90,10 +91,12 @@ async function finalizeRiverFromServerResult() {
   if (handsLayer) {
     handsLayer.querySelectorAll(".hand").forEach((node, i) => {
       if (!winners.includes(i)) {
-        node.style.opacity = "0.12";
+        node.style.opacity = "";
+        node.classList.add("hand-final-loser");
         node.classList.remove("winner");
       } else {
         node.style.opacity = "";
+        node.classList.remove("hand-final-loser");
         node.classList.add("winner");
       }
     });
@@ -444,6 +447,7 @@ finalizeRiverFromServerResult = async function finalizeRiverFromServerResultServ
   const settlement = await serverSettleRound();
   const winners = Array.isArray(settlement.winners) ? settlement.winners : [];
   const isTie = settlement.winnerType === "tie" || winners.length > 1;
+  window.lastFinalWinnerHands = winners.slice();
 
   for (const h of hands) {
     h.finalOddsStr = (h.oddsStr || "—") + " | pre " + (h.preflopOddsStr || "—");
@@ -463,10 +467,12 @@ finalizeRiverFromServerResult = async function finalizeRiverFromServerResultServ
   if (handsLayer) {
     handsLayer.querySelectorAll(".hand").forEach((node, i) => {
       if (!winners.includes(i)) {
-        node.style.opacity = "0.12";
+        node.style.opacity = "";
+        node.classList.add("hand-final-loser");
         node.classList.remove("winner");
       } else {
         node.style.opacity = "";
+        node.classList.remove("hand-final-loser");
         node.classList.add("winner");
       }
     });
