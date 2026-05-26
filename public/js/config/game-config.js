@@ -274,6 +274,7 @@ const I18N = {
  totalBets: "Mises en cours",
  totalWins: "Gains",
  board: "Board",
+ roundEnded: "Manche terminée",
  sameTable: "Même table",
  changeTable: "Changer de table",
  abandon: "Abandonner",
@@ -326,10 +327,15 @@ const I18N = {
  settingsAudio3: "Beats",
  settingsAudio4: "RNB",
  settingsAudio5: "Relax",
- settingsAudio6: "Casino",
+ settingsAudio6: "Ambiance casino",
+ settingsCustomAudio: "Son personnalisé",
+ settingsNoCustomAudio: "Aucun fichier",
+ settingsCustomBg: "Fond personnalisé",
+ settingsCardBack: "Dos des cartes du board",
  styleClassic: "Classique",
  styleMetal: "Métal",
  stylePremium: "Premium",
+ styleNuit: "Nuit",
  validateBets: "Valider les mises",
  clearBetsTitle: "Effacer les mises",
  rulesTitle: "Règles du jeu",
@@ -346,6 +352,7 @@ const I18N = {
  totalBets: "Current bets",
  totalWins: "Winnings",
  board: "Board",
+ roundEnded: "Round over",
  sameTable: "Same table",
  changeTable: "Change table",
  abandon: "Abandon",
@@ -399,10 +406,15 @@ const I18N = {
  settingsAudio3: "Beats",
  settingsAudio4: "RNB",
  settingsAudio5: "Relax",
- settingsAudio6: "Casino",
+ settingsAudio6: "Casino ambience",
+ settingsCustomAudio: "Custom sound",
+ settingsNoCustomAudio: "No file",
+ settingsCustomBg: "Custom background",
+ settingsCardBack: "Board card backs",
  styleClassic: "Classic",
  styleMetal: "Metal",
  stylePremium: "Premium",
+ styleNuit: "Night",
  validateBets: "Confirm my bets",
  clearBetsTitle: "Clear bets",
  rulesTitle: "Game rules",
@@ -473,6 +485,34 @@ const settingsBtn = el("settingsBtn");
 const settingsPanel = el("settingsPanel");
 const feltColorOptions = el("feltColorOptions");
 
+
+const BOARD_CARD_BACK_STYLES = [
+ { name: "Classique", legacy: true },
+ { name: "Bleu", bg: "#102a55", accent: "#67e8f9", pattern: "waves" },
+ { name: "Rouge", bg: "#4a0f16", accent: "#f5c2c7", pattern: "stars" },
+ { name: "Vert", bg: "#083d2b", accent: "#7cf7b4", pattern: "clubs" },
+ { name: "Violet", bg: "#2d145f", accent: "#d8b4fe", pattern: "grid" },
+ { name: "Noir & or", bg: "#111318", accent: "#f6d36b", pattern: "spades" }
+];
+
+function clampBoardCardBackStyle(styleIndex) {
+ const max = Math.max(0, (typeof BOARD_CARD_BACK_STYLES !== "undefined" ? BOARD_CARD_BACK_STYLES.length : 1) - 1);
+ return Math.max(0, Math.min(max, Number(styleIndex) || 0));
+}
+
+function cardBackSvg(styleIndex) {
+ const idx = clampBoardCardBackStyle(styleIndex);
+ const style = BOARD_CARD_BACK_STYLES[idx] || BOARD_CARD_BACK_STYLES[0];
+ if (style.legacy) return CARD_BACK_URL;
+ const symbol = style.pattern === "clubs" ? "♣" : style.pattern === "spades" ? "♠" : style.pattern === "stars" ? "★" : style.pattern === "waves" ? "≈" : style.pattern === "grid" ? "◆" : "♦";
+ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 109" width="78" height="109"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${style.bg}"/><stop offset="1" stop-color="#05070b"/></linearGradient><pattern id="p" width="16" height="16" patternUnits="userSpaceOnUse"><text x="8" y="12" text-anchor="middle" font-size="10" fill="${style.accent}" opacity=".32">${symbol}</text></pattern></defs><rect width="78" height="109" rx="9" fill="url(#g)"/><rect x="4" y="4" width="70" height="101" rx="6" fill="url(#p)" stroke="${style.accent}" stroke-width="1.4" opacity=".95"/><rect x="10" y="10" width="58" height="89" rx="5" fill="none" stroke="${style.accent}" stroke-width="1" opacity=".5"/><text x="39" y="61" text-anchor="middle" font-size="32" fill="${style.accent}" opacity=".9">${symbol}</text></svg>`;
+ return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+}
+
+function getBoardCardBackUrl() {
+ return cardBackSvg(typeof boardBackStyle !== "undefined" ? boardBackStyle : 0);
+}
+
 const FELT_COLORS = [
   // ── Couleurs unies ───────────────────────────────────────────────────────────
   { table: "#2b2b2b", table2: "#161616", text: "#fafafa", muted: "#cfcfcf" },  // 0  Gris anthracite
@@ -484,7 +524,7 @@ const FELT_COLORS = [
   { table: "#4a2c2a", table2: "#321d1b", text: "#fff8f4", muted: "#e7d6d1" },  // 6  Marron cuir
   { table: "#7a1c1c", table2: "#541212", text: "#fff7f7", muted: "#f0d2d2" },  // 7  Rouge profond
   { table: "#f5e6ca", table2: "#dcc8a3", text: "#3c2f1d", muted: "#655845" },  // 8  Beige sable
-  { table: "#9d4edd", table2: "#6f2dbd", text: "#fcf7ff", muted: "#ead7fb" },  // 9  Violet
+  { table: "#0b4a52", table2: "#062e35", text: "#f0fbfc", muted: "#b8dde2" },  // 9  Teal sombre
 
   // ── Paysages (dégradés atmosphériques discrets) ──────────────────────────────
   {                                                                              // 10 Madagascar (plage)

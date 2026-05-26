@@ -86,13 +86,21 @@ function feltToneSet(palette) {
  };
 }
 
-function applyFeltColor(index) {
+function applyFeltColor(index, options = {}) {
  const safeIndex = Math.max(0, Math.min(FELT_COLORS.length - 1, Number(index) || 0));
+ const preserveCustomBackground = !!options.preserveCustomBackground;
+ if (!preserveCustomBackground && customBackgroundDataUrl) {
+  customBackgroundDataUrl = '';
+  const input = document.getElementById('customBgInput');
+  if (input) input.value = '';
+ }
  const palette = FELT_COLORS[safeIndex] || FELT_COLORS[0];
  const tones = feltToneSet(palette);
  currentFeltIndex = safeIndex;
- document.documentElement.style.setProperty("--table", palette.table);
+ document.documentElement.style.setProperty("--table",  palette.table);
  document.documentElement.style.setProperty("--table2", palette.table2);
+ document.documentElement.style.setProperty("--table-highlight", mixColors(palette.table,  "#ffffff", 0.32));
+ document.documentElement.style.setProperty("--table-shadow",    mixColors(palette.table2, "#000000", 0.40));
  document.documentElement.style.setProperty("--felt-text", palette.text || "#F5FBFF");
  document.documentElement.style.setProperty("--felt-muted", palette.muted || "#D7E8F3");
  document.documentElement.style.setProperty("--post-round-panel-bg", tones.panelBg);
@@ -106,19 +114,20 @@ function applyFeltColor(index) {
  document.documentElement.style.setProperty("--post-round-btn-text", tones.buttonText);
  document.documentElement.style.setProperty("--post-round-btn-text-shadow", tones.buttonTextShadow);
 
- // Paysage : applique le fond personnalisé ou remet le dégradé CSS par défaut
+ // Paysage : le fond personnalisé doit toujours être prioritaire.
+ // Sinon, on applique l'image du tapis choisi ou le dégradé CSS par défaut.
  const tableEl = document.querySelector("section.table");
  if (tableEl) {
-   var tableEl2 = document.querySelector('section.table');
-  if (tableEl2) {
-    if (palette.bg) {
-      var imgUrl = palette.bg.split(' ')[0];
-      document.documentElement.style.setProperty('--table-landscape-img', imgUrl);
-      tableEl2.classList.add('has-landscape');
-    } else {
-      tableEl2.classList.remove('has-landscape');
-      document.documentElement.style.removeProperty('--table-landscape-img');
-    }
+  if (customBackgroundDataUrl) {
+   document.documentElement.style.setProperty('--table-landscape-img', `url("${customBackgroundDataUrl}")`);
+   tableEl.classList.add('has-landscape');
+  } else if (palette.bg) {
+   const imgUrl = palette.bg.split(' ')[0];
+   document.documentElement.style.setProperty('--table-landscape-img', imgUrl);
+   tableEl.classList.add('has-landscape');
+  } else {
+   tableEl.classList.remove('has-landscape');
+   document.documentElement.style.removeProperty('--table-landscape-img');
   }
  }
 
@@ -130,8 +139,11 @@ function applyFeltColor(index) {
  saveSettings();
 }
 
-function buildFeltColorOptions() {
- if (!feltColorOptions || feltColorOptions.childElementCount) return;
+function buildFeltColorOptions(options = {}) {
+ if (!feltColorOptions) return;
+ const forceRebuild = !!options.forceRebuild;
+ if (feltColorOptions.childElementCount && !forceRebuild) return;
+ if (forceRebuild) feltColorOptions.innerHTML = "";
  FELT_COLORS.forEach((palette, index) => {
   const btn = document.createElement("button");
   btn.type = "button";
@@ -141,12 +153,132 @@ function buildFeltColorOptions() {
     btn.style.backgroundSize = 'cover';
     btn.style.backgroundPosition = 'center';
    } else {
-    btn.style.background = `linear-gradient(180deg, ${palette.table}, ${palette.table2})`;
+    const highlight = mixColors(palette.table, '#ffffff', 0.20);
+    const shadow    = mixColors(palette.table2, '#000000', 0.18);
+    btn.style.background = `linear-gradient(155deg, ${highlight} 0%, ${palette.table} 42%, ${shadow} 100%)`;
    }
-  btn.setAttribute("aria-label", `Couleur tapis ${index + 1}`);
+  btn.setAttribute("aria-label", palette.label || `Couleur tapis ${index + 1}`);
+  btn.title = palette.label || `Couleur tapis ${index + 1}`;
   btn.addEventListener("click", () => applyFeltColor(index));
   feltColorOptions.appendChild(btn);
  });
+ if (typeof currentFeltIndex !== "undefined") {
+  Array.from(feltColorOptions.children).forEach((btn, i) => btn.classList.toggle("active", i === Number(currentFeltIndex || 0)));
+ }
+}
+
+function backgroundUrlFromCssBg(bg) {
+ const match = String(bg || "").match(/url\(["']?([^"')]+)["']?\)/i);
+ return match ? decodeURIComponent(match[1]) : "";
+}
+
+function niceImageLabel(fileName) {
+ return String(fileName || "")
+  .replace(/\.[a-z0-9]+$/i, "")
+  .replace(/[-_]+/g, " ")
+  .replace(/\s+/g, " ")
+  .trim()
+  .replace(/\b\w/g, (char) => char.toUpperCase()) || "Fond";
+}
+
+function registerFeltImageBackgrounds(files) {
+ if (!Array.isArray(files) || !files.length || typeof FELT_COLORS === "undefined") return false;
+ const knownUrls = new Set(FELT_COLORS.map(palette => backgroundUrlFromCssBg(palette.bg)).filter(Boolean));
+ let added = false;
+ files.forEach((file, idx) => {
+  const url = typeof file === "string" ? file : file?.url;
+  const name = typeof file === "string" ? file.split('/').pop() : (file?.name || String(url || '').split('/').pop());
+  if (!url || knownUrls.has(url)) return;
+  knownUrls.add(url);
+  const shade = idx % 3;
+  FELT_COLORS.push({
+   table: shade === 0 ? "#1a2830" : (shade === 1 ? "#251a30" : "#302618"),
+   table2: shade === 0 ? "#0e1418" : (shade === 1 ? "#130e18" : "#161008"),
+   text: "#f8f8f2",
+   muted: "#c8c8bc",
+   bg: `url('${url}') center/cover no-repeat`,
+   label: niceImageLabel(name),
+  });
+  added = true;
+ });
+ return added;
+}
+
+async function loadServerFeltBackgrounds() {
+ try {
+  const response = await fetch('/img-backgrounds', { cache: 'no-store' });
+  if (!response.ok) return;
+  const payload = await response.json();
+  if (registerFeltImageBackgrounds(payload.files || [])) {
+   buildFeltColorOptions({ forceRebuild: true });
+   applyFeltColor(currentFeltIndex, { preserveCustomBackground: true });
+  }
+ } catch (error) {
+  console.warn('Liste des fonds public/img indisponible', error);
+ }
+}
+
+
+function buildCardBackOptions() {
+ if (!cardBackOptions || cardBackOptions.childElementCount) return;
+ const styles = typeof BOARD_CARD_BACK_STYLES !== 'undefined' ? BOARD_CARD_BACK_STYLES : [];
+ styles.forEach((style, index) => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'card-back-btn';
+  btn.dataset.cardBackStyle = String(index);
+  btn.setAttribute('aria-label', `Dos de carte ${index + 1}`);
+  btn.style.backgroundImage = `url("${typeof cardBackSvg === 'function' ? cardBackSvg(index) : CARD_BACK_URL}")`;
+  btn.addEventListener('click', () => {
+   boardBackStyle = index;
+   updateCardBackUI();
+   renderBoard();
+   saveSettings();
+  });
+  cardBackOptions.appendChild(btn);
+ });
+}
+
+function updateCardBackUI() {
+ if (!cardBackOptions) return;
+ Array.from(cardBackOptions.children).forEach((btn, i) => btn.classList.toggle('active', i === Number(boardBackStyle || 0)));
+}
+
+async function normalizeCustomBackgroundFile(file) {
+ if (!file) return '';
+ const type = String(file.type || '').toLowerCase();
+ const name = String(file.name || '').toLowerCase();
+ const looksLikeImage = type.startsWith('image/') || /\.(jpe?g|png|webp|gif)$/i.test(name);
+ if (!looksLikeImage) throw new Error('INVALID_IMAGE_FILE');
+
+ const objectUrl = URL.createObjectURL(file);
+ try {
+  const img = await new Promise((resolve, reject) => {
+   const image = new Image();
+   image.onload = () => resolve(image);
+   image.onerror = () => reject(new Error('IMAGE_LOAD_FAILED'));
+   image.src = objectUrl;
+  });
+
+  const maxSide = 1920;
+  const sourceWidth = Math.max(1, Number(img.naturalWidth || img.width || 1));
+  const sourceHeight = Math.max(1, Number(img.naturalHeight || img.height || 1));
+  const ratio = Math.min(1, maxSide / Math.max(sourceWidth, sourceHeight));
+  const width = Math.max(1, Math.round(sourceWidth * ratio));
+  const height = Math.max(1, Math.round(sourceHeight * ratio));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('CANVAS_UNAVAILABLE');
+  ctx.drawImage(img, 0, 0, width, height);
+
+  // Conversion interne : évite les JPG progressifs, métadonnées EXIF ou profils couleur qui bloquent certains navigateurs.
+  return canvas.toDataURL('image/jpeg', 0.86);
+ } finally {
+  URL.revokeObjectURL(objectUrl);
+ }
 }
 
 
@@ -227,6 +359,8 @@ function setupSettingsPanel() {
  }
 
  buildFeltColorOptions();
+ loadServerFeltBackgrounds();
+ buildCardBackOptions();
  const savedSettings = typeof loadSettings === "function" ? (loadSettings() || {}) : {};
  const savedFeltIndex = Number.isFinite(Number(savedSettings.feltIndex)) ? Number(savedSettings.feltIndex) : currentFeltIndex;
  currentFeltIndex = Math.max(0, Math.min(FELT_COLORS.length - 1, savedFeltIndex));
@@ -235,7 +369,14 @@ function setupSettingsPanel() {
  if (Number.isFinite(Number(savedSettings.ambienceVolume))) ambienceVolume = Math.max(0, Math.min(1, Number(savedSettings.ambienceVolume)));
  currentAudioStyle = Number.isFinite(Number(savedSettings.currentAudioStyle)) ? Number(savedSettings.currentAudioStyle) : 0;
  if (typeof savedSettings.casinoLayerEnabled === "boolean") casinoLayerEnabled = savedSettings.casinoLayerEnabled;
- applyFeltColor(currentFeltIndex);
+ if (typeof savedSettings.customAudioName === "string") customAudioName = savedSettings.customAudioName;
+ if (typeof savedSettings.customBackgroundDataUrl === "string") customBackgroundDataUrl = savedSettings.customBackgroundDataUrl;
+ boardBackStyle = Number.isFinite(Number(savedSettings.boardBackStyle))
+  ? (typeof clampBoardCardBackStyle === 'function' ? clampBoardCardBackStyle(savedSettings.boardBackStyle) : Math.max(0, Number(savedSettings.boardBackStyle)))
+  : 0;
+ applyFeltColor(currentFeltIndex, { preserveCustomBackground: true });
+ updateCardBackUI();
+ if (typeof updateCustomAudioUI === 'function') updateCustomAudioUI();
 }
 
 document.querySelectorAll(".chip").forEach(btn => {
@@ -253,6 +394,9 @@ document.querySelectorAll(".chip").forEach(btn => {
 const settingsLangFR = el("settingsLangFR");
 const settingsLangEN = el("settingsLangEN");
 const settingsAudioButtons = Array.from(document.querySelectorAll(".settings-audio-btn"));
+const customAudioInput = el("customAudioInput");
+const customBgInput = el("customBgInput");
+const cardBackOptions = el("cardBackOptions");
 
 if (settingsLangFR) settingsLangFR.addEventListener("click", () => setLang("fr"));
 if (settingsLangEN) settingsLangEN.addEventListener("click", () => setLang("en"));
@@ -267,6 +411,33 @@ settingsAudioButtons.forEach((btn) => {
   if (soundEnabled && Number(ambienceVolume) > 0) startAmbience();
  });
 });
+
+if (customAudioInput) {
+ customAudioInput.addEventListener('change', () => {
+  const file = customAudioInput.files && customAudioInput.files[0];
+  if (file && typeof applyCustomAudioFile === 'function') applyCustomAudioFile(file);
+ });
+}
+
+if (customBgInput) {
+ customBgInput.addEventListener('change', async () => {
+  const file = customBgInput.files && customBgInput.files[0];
+  if (!file) {
+   customBgInput.value = '';
+   return;
+  }
+  try {
+   customBackgroundDataUrl = await normalizeCustomBackgroundFile(file);
+   applyFeltColor(currentFeltIndex, { preserveCustomBackground: true });
+   saveSettings();
+  } catch (error) {
+   console.warn('Image de fond non chargee', error);
+  } finally {
+   // Permet de rechoisir immédiatement la même image ou une autre image sans blocage du champ file.
+   customBgInput.value = '';
+  }
+ });
+}
 
 
 if (btnSameTable) {
@@ -440,7 +611,7 @@ function renderBoard() {
  if (phase === "river" && i === 4) d.classList.add("card-river");
  }
  if (board[i]) d.style.backgroundImage = `url("${cardImage(board[i])}")`;
- else d.style.backgroundImage = `url("${CARD_BACK_URL}")`;
+ else d.style.backgroundImage = `url("${typeof getBoardCardBackUrl === 'function' ? getBoardCardBackUrl() : CARD_BACK_URL}")`;
  boardCards.appendChild(d);
  }
 
@@ -707,6 +878,13 @@ function syncPostRoundControls(){
   const canShowPostRound = !!roundFinished && !splashVisible && !setupVisible;
 
   document.body.classList.toggle("round-ended", canShowPostRound);
+
+  const banner = document.getElementById("roundEndBanner");
+  if (banner) {
+    const t = (typeof I18N !== 'undefined' && I18N[lang]) ? I18N[lang] : {};
+    banner.textContent = canShowPostRound ? (t.roundEnded || "Manche terminée") : "";
+    banner.classList.toggle("visible", canShowPostRound);
+  }
 
   if (controlsWrap){
     controlsWrap.style.display = canShowPostRound ? "flex" : "none";

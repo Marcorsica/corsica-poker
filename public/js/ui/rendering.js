@@ -337,11 +337,16 @@ function setLang(newLang) {
  if (el("rulesGameBtn")) el("rulesGameBtn").textContent = t.rulesButton;
  if (el("settingsLanguageLabel")) el("settingsLanguageLabel").textContent = t.settingsLanguage;
  if (el("settingsSoundLabel")) el("settingsSoundLabel").textContent = t.settingsSound;
+ if (el("settingsCustomAudioLabel")) el("settingsCustomAudioLabel").textContent = t.settingsCustomAudio || "Son personnalisé";
  if (el("settingsFeltLabel")) el("settingsFeltLabel").textContent = t.settingsFelt;
+ if (el("settingsCustomBgLabel")) el("settingsCustomBgLabel").textContent = t.settingsCustomBg || "Fond personnalisé";
+ if (el("settingsCardBackLabel")) el("settingsCardBackLabel").textContent = t.settingsCardBack || "Dos des cartes du board";
+ if (typeof updateCustomAudioUI === 'function') updateCustomAudioUI();
  if (el("settingsStyleLabel")) el("settingsStyleLabel").textContent = t.settingsStyle;
  if (el("gameStyleClassicBtn")) el("gameStyleClassicBtn").textContent = t.styleClassic;
  if (el("gameStyleMetalBtn")) el("gameStyleMetalBtn").textContent = t.styleMetal;
  if (el("gameStylePremiumBtn")) el("gameStylePremiumBtn").textContent = t.stylePremium;
+ if (el("gameStyleNuitBtn")) el("gameStyleNuitBtn").textContent = t.styleNuit || "Nuit";
  const audioLabels = [t.settingsAudio1, t.settingsAudio2, t.settingsAudio3, t.settingsAudio4, t.settingsAudio5, t.settingsAudio6];
  document.querySelectorAll('.settings-audio-btn').forEach((btn, index) => {
   if (audioLabels[index]) btn.textContent = audioLabels[index];
@@ -682,7 +687,7 @@ function renderBoard() {
  const d = document.createElement("div");
  d.className = "card";
  if (board[i]) d.style.backgroundImage = `url("${cardImage(board[i])}")`;
- else d.style.backgroundImage = `url("${CARD_BACK_URL}")`;
+ else d.style.backgroundImage = `url("${typeof getBoardCardBackUrl === 'function' ? getBoardCardBackUrl() : CARD_BACK_URL}")`;
  boardCards.appendChild(d);
  }
  if (boardTitle) boardTitle.textContent = I18N[lang].board + " – " + I18N[lang].phase[phase];

@@ -10,7 +10,10 @@ function saveSettings() {
    soundEnabled,
    lang,
    currentAudioStyle,
-   casinoLayerEnabled
+   casinoLayerEnabled,
+   customAudioName,
+   customBackgroundDataUrl,
+   boardBackStyle
   };
   localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(payload));
  } catch(_){ console.warn("[runtime] erreur silencieuse:", _); }

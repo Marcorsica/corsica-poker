@@ -38,6 +38,10 @@
     lastWinningTargets: [],
     advanceUnlockedForRound: false,
     currentFeltIndex: 0,  // Gris anthracite par défaut
+    customAudioUrl: '',
+    customAudioName: '',
+    customBackgroundDataUrl: '',
+    boardBackStyle: 0,
     serverGameId: null,
   };
 
@@ -120,33 +124,10 @@
     console.info('[jackpot] mises reinitialisees via ' + (source || 'inconnu'));
   }
 
-  function addToTotalWins(amount, source) {
-    if (!amount || amount <= 0) return;
-    state.totalWins += amount;
-    console.info('[gains] +' + amount.toFixed(2) + ' via ' + (source || 'inconnu') + ' -> total: ' + state.totalWins.toFixed(2));
-  }
-  function resetTotalWins(source) {
-    console.info('[gains] remise a zero via ' + (source || 'inconnu'));
-    state.totalWins = 0;
-  }
-  function setRoundFinished(value, source) {
-    console.info('[manche] roundFinished = ' + value + ' via ' + (source || 'inconnu'));
-    state.roundFinished = value;
-  }
-  function resetJackpotRound(source) {
-    state.jackpotBets = { argent: [], or: [], diamant: [] };
-    state.jackpotRoundStake = { argent: 0, or: 0, diamant: 0 };
-    console.info('[jackpot] mises reinitialisees via ' + (source || 'inconnu'));
-  }
-
   global.CorsicaState = state;
   global.setStateValue = setStateValue;
   global.patchState = patchState;
   global.resetRoundState = resetRoundState;
-  global.addToTotalWins = addToTotalWins;
-  global.resetTotalWins = resetTotalWins;
-  global.setRoundFinished = setRoundFinished;
-  global.resetJackpotRound = resetJackpotRound;
   global.addToTotalWins = addToTotalWins;
   global.resetTotalWins = resetTotalWins;
   global.setRoundFinished = setRoundFinished;
@@ -158,6 +139,6 @@
     'roundFinished', 'tieBet', 'soundEnabled', 'ambienceStarted', 'isCalculating',
     'ambienceVolume', 'currentAudioStyle', 'casinoLayerEnabled', 'ambienceFadeFrame', 'suspenseAudio', 'suspenseDuckTimer',
     'isAdvancingPhase', 'autoFinishTimer', 'lastWinningTargets', 'advanceUnlockedForRound',
-    'currentFeltIndex', 'serverGameId'
+    'currentFeltIndex', 'customAudioUrl', 'customAudioName', 'customBackgroundDataUrl', 'boardBackStyle', 'serverGameId'
   ].forEach(defineStateAlias);
 })(window);

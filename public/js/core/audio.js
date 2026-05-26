@@ -13,6 +13,12 @@ const MAIN_AUDIO_TRACKS = {
 const CASINO_AUDIO_TRACKS = ["/audio/audio_6_casino.mp3", "/external-audio/audio_6_casino.mp3"];
 const AUDIO_FALLBACK_TRACKS = ["/audio/audio_1_jazz.mp3", "/external-audio/audio_1_jazz.mp3"];
 
+// Effets sonores : local en priorité, externe en recours
+const EFFECT_AUDIO_SOURCES = {
+  sndDeal: ["/audio/snd_deal.mp3", "/external-audio/snd_deal.mp3"],
+  sndCard: ["/audio/snd_card.mp3", "/external-audio/snd_card.mp3"],
+};
+
 function assetExists(url) {
  return fetch(url, { method: "HEAD", cache: "no-store" })
   .then((response) => response.ok)
@@ -29,6 +35,7 @@ async function resolvePlayableFromList(candidates) {
 }
 
 async function resolvePlayableTrack(styleIndex) {
+ if (customAudioUrl) return customAudioUrl;
  const normalized = Number.isFinite(Number(styleIndex)) ? Number(styleIndex) : 0;
  const candidates = MAIN_AUDIO_TRACKS[normalized] || MAIN_AUDIO_TRACKS[0] || AUDIO_FALLBACK_TRACKS;
  return (await resolvePlayableFromList(candidates)) || AUDIO_FALLBACK_TRACKS[0];
@@ -122,7 +129,7 @@ function updateAudioStyleUI() {
   const isCasinoBtn = styleIndex === 5;
   const isActive = isCasinoBtn
    ? !!casinoLayerEnabled
-   : styleIndex === Number(currentAudioStyle || 0);
+   : (!customAudioUrl && styleIndex === Number(currentAudioStyle || 0));
   btn.classList.toggle("active", isActive);
   btn.setAttribute("aria-pressed", isActive ? "true" : "false");
  });
@@ -131,9 +138,33 @@ function updateAudioStyleUI() {
 function applyAudioStyle(styleIndex) {
  const normalized = Number.isFinite(Number(styleIndex)) ? Number(styleIndex) : 0;
  currentAudioStyle = Math.max(0, Math.min(4, normalized));
+ customAudioUrl = '';
+ customAudioName = '';
  setMainTrackSource(currentAudioStyle);
+ updateCustomAudioUI();
  updateAudioStyleUI();
  saveSettings();
+}
+
+function updateCustomAudioUI() {
+ const nameEl = document.getElementById('customAudioName');
+ if (!nameEl) return;
+ const t = I18N[lang] || I18N.fr;
+ nameEl.textContent = customAudioName || t.settingsNoCustomAudio || 'Aucun fichier';
+}
+
+function applyCustomAudioFile(file) {
+ if (!file) return;
+ if (customAudioUrl && String(customAudioUrl).startsWith('blob:')) {
+  try { URL.revokeObjectURL(customAudioUrl); } catch (_) {}
+ }
+ customAudioUrl = URL.createObjectURL(file);
+ customAudioName = file.name || 'audio personnalisé';
+ setMainTrackSource(currentAudioStyle);
+ updateCustomAudioUI();
+ updateAudioStyleUI();
+ saveSettings();
+ if (soundEnabled && Number(ambienceVolume) > 0) startAmbience();
 }
 
 function toggleCasinoLayer() {
@@ -204,17 +235,12 @@ function startAmbience() {
  fadeAmbienceToTargets(2200);
 }
 
-const EFFECT_AUDIO_FALLBACKS = {
- sndDeal: ["/external-audio/snd_deal.mp3", "/audio/snd_deal.mp3"],
- sndCard: ["/external-audio/snd_card.mp3", "/audio/snd_card.mp3"]
-};
-
 function ensureEffectAudioSource(a) {
  if (!a) return;
- const sources = EFFECT_AUDIO_FALLBACKS[a.id];
+ const sources = EFFECT_AUDIO_SOURCES[a.id];
  if (!sources || !sources.length) return;
  const currentSrc = a.getAttribute("src") || "";
- if (!currentSrc || currentSrc === "/audio/snd_deal.mp3" || currentSrc === "/audio/snd_card.mp3") {
+ if (!currentSrc) {
   a.setAttribute("src", sources[0]);
   try { a.load(); } catch (_) {}
  }
@@ -239,7 +265,7 @@ function playSound(a) {
   else if (a === sndCard) a.volume = 0.22;
   else a.volume = 0.25;
   a.play().catch(() => {
-   const sources = EFFECT_AUDIO_FALLBACKS[a.id];
+   const sources = EFFECT_AUDIO_SOURCES[a.id];
    if (!sources || sources.length < 2) return;
    const src = a.getAttribute("src") || "";
    const idx = sources.indexOf(src);

@@ -158,13 +158,27 @@
     <button type="button" class="pill settings-audio-btn" data-audio-style="2">Beats</button>
     <button type="button" class="pill settings-audio-btn" data-audio-style="3">RnB</button>
     <button type="button" class="pill settings-audio-btn" data-audio-style="4">Relax</button>
-    <button type="button" class="pill settings-audio-btn" data-audio-style="5">Casino</button>
+    <button type="button" class="pill settings-audio-btn" data-audio-style="5">Ambiance casino</button>
+   </div>
+   <div class="settings-custom-row">
+    <label for="customAudioInput" id="settingsCustomAudioLabel" class="pill settings-file-btn">Son personnalisé</label>
+    <input type="file" id="customAudioInput" class="settings-file-input" accept="audio/*" />
+    <span id="customAudioName" class="settings-file-name">Aucun fichier</span>
    </div>
   </div>
 
   <div class="settings-section">
    <div id="settingsFeltLabel" class="settings-label">Couleur du tapis</div>
    <div id="feltColorOptions" class="felt-color-options"></div>
+   <div class="settings-custom-row">
+    <label for="customBgInput" id="settingsCustomBgLabel" class="pill settings-file-btn">Fond personnalisé</label>
+    <input type="file" id="customBgInput" class="settings-file-input" accept="image/*" />
+   </div>
+  </div>
+
+  <div class="settings-section settings-cardback-section">
+   <div id="settingsCardBackLabel" class="settings-label">Dos des cartes du board</div>
+   <div id="cardBackOptions" class="card-back-options"></div>
   </div>
 
   <div class="settings-section game-style-section">
@@ -182,6 +196,7 @@
 
  <main class="container log-hidden">
  <section class="table" id="gameTable">
+ <div id="roundEndBanner" class="round-end-banner" aria-live="polite"></div>
  <div class="board board-center">
  <div class="board-title" id="boardTitle"></div>
  <div class="board-cards" id="boardCards"></div>
@@ -274,8 +289,8 @@
  </div>
  </div>
 
- <audio id="sndDeal" preload="auto" src="/external-audio/snd_deal.mp3"></audio>
- <audio id="sndCard" preload="auto" src="/external-audio/snd_card.mp3"></audio>
+ <audio id="sndDeal" preload="auto" src="/audio/snd_deal.mp3"></audio>
+ <audio id="sndCard" preload="auto" src="/audio/snd_card.mp3"></audio>
  <audio id="sndAmbience" preload="auto" loop src="/audio/audio_1_jazz.mp3"></audio>
  <audio id="sndCasino" preload="auto" loop src="/audio/audio_6_casino.mp3"></audio>
 
