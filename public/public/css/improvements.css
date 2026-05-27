@@ -1,0 +1,403 @@
+.chip[data-amt] {
+  position: relative !important;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.14), transparent 38%),
+    linear-gradient(160deg, #2a2620 0%, #0e0c09 55%, #1a1710 100%) !important;
+  border: 2px solid rgba(212,175,55,.60) !important;
+  color: #f0c84a !important;
+  font-weight: 900 !important;
+  text-shadow: 0 0 8px rgba(246,211,107,.55), 0 1px 2px rgba(0,0,0,.80) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12),
+    0 0 0 1px rgba(0,0,0,.50), 0 6px 14px rgba(0,0,0,.40) !important;
+}
+.chip[data-amt]::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 4px !important;
+  border-radius: 50% !important;
+  border: 1px dashed rgba(212,175,55,.38) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+.chip.active[data-amt] {
+  background: linear-gradient(160deg, #ffe08a 0%, #d4a820 45%, #f0c040 100%) !important;
+  border: 2px solid rgba(255,255,255,.85) !important;
+  color: #1a1000 !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.25),
+    0 0 18px rgba(246,211,107,.65) !important;
+  transform: translateY(-3px) scale(1.12) !important;
+}
+@keyframes oddsFlash {
+  0%   { transform: scale(1.28); filter: brightness(1.75); }
+  45%  { transform: scale(1.10); filter: brightness(1.30); }
+  100% { transform: scale(1);    filter: brightness(1); }
+}
+.hand-odds.odds-updated {
+  animation: oddsFlash .65s ease forwards !important;
+}
+.board-title {
+  color: #f6d36b !important;
+  font-weight: 900 !important;
+  letter-spacing: .18em !important;
+  text-transform: uppercase !important;
+}
+
+/* FAVORI : clignotement rouge permanent sur le texte */
+@keyframes favoriBlink {
+  0%   { color: #ffffff; text-shadow: 0 0 18px rgba(255,60,40,.90), 0 0 30px rgba(255,40,20,.60); }
+  50%  { color: #ffffff; text-shadow: 0 0 4px rgba(200,40,20,.20); }
+  100% { color: #ffffff; text-shadow: 0 0 18px rgba(255,60,40,.90), 0 0 30px rgba(255,40,20,.60); }
+}
+
+.hand-odds.lowest-odds .odds-main {
+  animation: favoriBlink 1.2s ease-in-out infinite !important;
+  font-weight: 900 !important;
+}
+
+/* OUTSIDER EXTREME : reflet doré pour cotes > 100 */
+@keyframes goldShimmer {
+  0%   { color: #f6d36b; text-shadow: 0 0 16px rgba(246,211,107,.90), 0 0 30px rgba(246,180,50,.60); }
+  50%  { color: #c8a020; text-shadow: 0 0 6px rgba(200,160,40,.40); }
+  100% { color: #f6d36b; text-shadow: 0 0 16px rgba(246,211,107,.90), 0 0 30px rgba(246,180,50,.60); }
+}
+
+.hand-odds.extreme-odds .odds-main {
+  animation: goldShimmer 2s ease-in-out infinite !important;
+  font-weight: 900 !important;
+}
+
+/* ── JACKPOT WIN OVERLAY ─────────────────────────────────────── */
+
+@keyframes jpOverlayIn  { from{opacity:0;} to{opacity:1;} }
+@keyframes jpOverlayOut { from{opacity:1;transform:scale(1);} to{opacity:0;transform:scale(1.04);} }
+@keyframes jpSubIn      { from{transform:translateY(-20px);opacity:0;} to{transform:none;opacity:1;} }
+@keyframes jpCardIn     { from{transform:scale(.5) translateY(40px) rotate(-6deg);opacity:0;} to{transform:none;opacity:1;} }
+@keyframes jpNormalIn   { from{transform:translateY(16px);opacity:0;} to{transform:none;opacity:1;} }
+@keyframes jpBtnIn      { from{transform:translateY(22px) scale(.85);opacity:0;} to{transform:none;opacity:1;} }
+@keyframes jpGlow {
+  0%,100%{text-shadow:0 0 26px var(--jp-glow),0 0 52px var(--jp-glow),0 2px 0 rgba(0,0,0,.65);}
+  50%    {text-shadow:0 0 52px var(--jp-glow),0 0 100px var(--jp-glow),0 2px 0 rgba(0,0,0,.65);}
+}
+@keyframes jpBtnPulse {
+  0%,100%{box-shadow:0 0 0 0 var(--jp-glow),0 6px 20px rgba(0,0,0,.50);}
+  50%    {box-shadow:0 0 0 12px rgba(255,255,255,0),0 6px 20px rgba(0,0,0,.50);}
+}
+@keyframes jpIconFloat {
+  0%,100%{transform:translateY(0);}
+  50%    {transform:translateY(-8px);}
+}
+
+.jp-win-overlay { animation:jpOverlayIn .22s ease forwards; display:flex; align-items:center; justify-content:center; }
+.jp-win-overlay.jp-win-exit { animation:jpOverlayOut .60s ease forwards !important; }
+
+.jp-win-content { display:flex; flex-direction:column; align-items:center; gap:22px; padding:36px 52px; text-align:center; }
+
+.jp-win-sub {
+  font-size:clamp(16px,2.2vw,22px); font-weight:700; letter-spacing:.40em;
+  color:rgba(255,255,255,.65); text-transform:uppercase;
+  animation:jpSubIn .35s ease .10s both;
+}
+
+.jp-cards-row { display:flex; gap:28px; flex-wrap:wrap; justify-content:center; }
+
+.jp-card {
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  padding:24px 32px; border-radius:20px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(8px);
+  animation:jpCardIn .70s cubic-bezier(.22,.78,.20,1) both;
+}
+.jp-card:nth-child(1){animation-delay:.15s;}
+.jp-card:nth-child(2){animation-delay:.28s;}
+.jp-card:nth-child(3){animation-delay:.40s;}
+
+.jp-card-icon {
+  font-size:clamp(42px,7vw,72px); color:var(--jp-c1); line-height:1;
+  animation:jpGlow 2s ease-in-out .8s infinite, jpIconFloat 3s ease-in-out infinite;
+  filter:drop-shadow(0 0 18px var(--jp-glow));
+}
+.jp-card-label {
+  font-size:clamp(13px,2.2vw,22px); font-weight:900; letter-spacing:.20em;
+  text-transform:uppercase; color:var(--jp-c1);
+  animation:jpGlow 2s ease-in-out .5s infinite;
+}
+.jp-card-amount {
+  font-size:clamp(28px,5vw,62px); font-weight:900; color:var(--jp-c1);
+  letter-spacing:.04em;
+  animation:jpGlow 2s ease-in-out 1s infinite;
+}
+
+.jp-normal-win {
+  font-size:clamp(14px,2vw,22px); font-weight:700; color:#e8f0ff;
+  letter-spacing:.08em; padding:10px 28px;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;
+  animation:jpNormalIn .35s ease .90s both;
+}
+
+.jp-win-btn {
+  padding:14px 48px; font-size:clamp(13px,1.6vw,17px);
+  font-weight:900; letter-spacing:.12em; text-transform:uppercase;
+  color:#060606; background:var(--jp-c1); border:none; border-radius:999px;
+  cursor:pointer;
+  animation:jpBtnIn .40s ease 1.20s both, jpBtnPulse 2s ease-in-out 1.6s infinite;
+  transition:transform .10s ease, filter .10s ease;
+}
+.jp-win-btn:hover  {transform:scale(1.06);filter:brightness(1.14);}
+.jp-win-btn:active {transform:scale(.97);filter:brightness(.94);}
+
+.jp-total-gain {
+  font-size:clamp(13px,1.8vw,19px); font-weight:900; color:#ffffff;
+  letter-spacing:.10em; padding:10px 30px;
+  background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.22);
+  border-radius:999px;
+  animation:jpNormalIn .35s ease 1.05s both;
+  text-shadow:0 1px 4px rgba(0,0,0,.60);
+}
+
+
+/* ── END JACKPOT WIN OVERLAY ─────────────────────────────────── */
+
+/* ── ANIMATION GAINS NORMAUX ─────────────────────────────────── */
+@keyframes winsPop {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.55); color: #f6d36b; text-shadow: 0 0 18px rgba(246,211,107,.80); }
+  55%  { transform: scale(1.30); }
+  100% { transform: scale(1); }
+}
+#totalWins.wins-pop {
+  animation: winsPop .55s cubic-bezier(.22,.78,.20,1) forwards !important;
+  display: inline-block;
+}
+/* ── END ANIMATION GAINS NORMAUX ─────────────────────────────── */
+
+/* ── TUTORIEL ────────────────────────────────────────────────────────────── */
+
+/* Bouton tutoriel sur le splash */
+.splash-tutorial {
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .05em;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.18);
+  color: rgba(255,255,255,.65);
+  cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.splash-tutorial:hover {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.35);
+  color: rgba(255,255,255,.9);
+}
+
+/* Bandeau mode tutoriel */
+.tutorial-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #1a3a2a 0%, #14301f 100%);
+  border-top: 1px solid rgba(80,200,120,.25);
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+.tutorial-banner__label {
+  color: rgba(120,220,160,.85);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.tutorial-banner__exit {
+  background: rgba(80,200,120,.12);
+  border: 1px solid rgba(80,200,120,.3);
+  color: rgba(120,220,160,.9);
+  padding: 5px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  white-space: nowrap;
+}
+.tutorial-banner__exit:hover {
+  background: rgba(80,200,120,.22);
+  border-color: rgba(80,200,120,.55);
+  color: #fff;
+}
+
+/* Marge basse pour ne pas cacher le contenu par le bandeau en bas */
+body.tutorial-mode {
+  padding-bottom: 48px;
+}
+
+/* Le bandeau tutoriel passe au-dessus de advanceDock (10080) et abandonDock (10070) */
+.tutorial-banner {
+  z-index: 10100;
+}
+
+/* Les docks remontent pour ne pas chevaucher le bandeau (hauteur ~48px) */
+body.tutorial-mode #advanceDock,
+body.tutorial-mode #abandonDock {
+  bottom: 72px !important; /* 24px position d'origine + 48px bandeau */
+}
+
+/* Tooltip tutoriel — standard */
+.tutorial-tooltip {
+  position: fixed;
+  z-index: 11000;
+  max-width: 280px;
+  padding: 10px 14px;
+  background: rgba(10,20,15,.94);
+  border: 1px solid rgba(80,200,120,.3);
+  border-radius: 10px;
+  color: rgba(220,240,230,.9);
+  font-size: 12px;
+  line-height: 1.55;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,.45);
+  opacity: 0;
+  will-change: transform, opacity;
+  isolation: isolate;
+  transform: translateY(4px) translateZ(0);
+  transition: opacity .18s, transform .18s;
+}
+.tutorial-tooltip--visible {
+  opacity: 1;
+  transform: translateY(0) translateZ(0);
+}
+
+/* Tooltip centré — pour les éléments larges comme handsLayer */
+.tutorial-tooltip--center {
+  position: fixed;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%);
+  max-width: 360px;
+  padding: 16px 20px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  border: 1px solid rgba(80,200,120,.5);
+  box-shadow: 0 8px 40px rgba(0,0,0,.65);
+  text-align: center;
+}
+.tutorial-tooltip--center.tutorial-tooltip--visible {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+/* Mise en évidence des éléments au survol en mode tuto */
+body.tutorial-mode [id]:hover {
+  outline: none;
+}
+/* ── END TUTORIEL ─────────────────────────────────────────────────────────── */
+
+
+
+
+/* ═══════════════════════════════════════════════════════════
+   CORRECTIONS v24
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Bouton toggle tutoriel — dans le flux, à côté du brand ── */
+#btnToggleTutorial {
+  flex-shrink: 0 !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(100, 200, 120, 0.4) !important;
+  color: rgba(180, 240, 200, 0.9) !important;
+  background: rgba(40, 120, 60, 0.12) !important;
+  cursor: pointer !important;
+  transition: background .15s, border-color .15s, opacity .2s !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+#btnToggleTutorial:hover:not(:disabled) {
+  background: rgba(40, 120, 60, 0.25) !important;
+  border-color: rgba(100, 220, 130, 0.6) !important;
+}
+body:not(.tutorial-mode) #btnToggleTutorial::after { content: ' Tutoriel'; }
+body.tutorial-mode #btnToggleTutorial {
+  background: rgba(40, 120, 60, 0.28) !important;
+  border-color: rgba(100, 220, 130, 0.65) !important;
+  color: rgba(160, 255, 185, 0.95) !important;
+}
+body.tutorial-mode #btnToggleTutorial::after { content: ' Jeu réel'; }
+/* Responsive : sur petit écran, cacher le texte, garder l'emoji */
+@media (max-width: 980px) {
+  #btnToggleTutorial::after { content: '' !important; }
+  #btnToggleTutorial { min-width: 32px !important; padding: 0 6px !important; }
+}
+
+/* ── Badge "MODE TUTORIEL" pumpant ───────────────────────── */
+#tutorialModeBadge {
+  position: fixed !important;
+  top: 90px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 9000 !important;
+  padding: 10px 22px !important;
+  background: linear-gradient(135deg, rgba(40,120,60,0.95), rgba(60,180,90,0.95)) !important;
+  border: 2px solid rgba(160, 255, 185, 0.7) !important;
+  border-radius: 999px !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  font-size: 14px !important;
+  letter-spacing: 0.15em !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+  box-shadow:
+    0 4px 18px rgba(60, 180, 90, 0.45),
+    0 0 30px rgba(100, 220, 130, 0.4),
+    inset 0 1px 0 rgba(255,255,255,0.25) !important;
+  pointer-events: none !important;
+  animation: tutorialBadgePump 2s ease-in-out infinite !important;
+}
+@keyframes tutorialBadgePump {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 4px 18px rgba(60,180,90,.45), 0 0 30px rgba(100,220,130,.4);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.06);
+    box-shadow: 0 6px 24px rgba(60,180,90,.6), 0 0 50px rgba(100,220,130,.6);
+  }
+}
+
+/* ── Ombres cotes ───────────────────────────────────────── */
+.hand-odds .odds-main {
+  text-shadow:
+    0 1px 3px rgba(0,0,0,.95),
+    0 2px 8px rgba(0,0,0,.85),
+    0 0 14px rgba(0,0,0,.7) !important;
+}
+
+/* ── Gomme ──────────────────────────────────────────────── */
+.sq.hasBet,
+.tie-box .sq.hasBet,
+.hand .sq.hasBet {
+  overflow: visible !important;
+}
+.tie-box:has(.sq.hasBet) .tie-details,
+.tie-box:has(.sq.hasBet) {
+  overflow: visible !important;
+}
+.tie-box:hover .tie-details,
+.tie-box:hover {
+  overflow: visible !important;
+}
+
+/* ── Tooltip max-width ─────────────────────────────────── */
+#tutorialTooltip {
+  max-width: 340px !important;
+}
