@@ -249,12 +249,18 @@ function updateJackpotDisplays() {
 }
 
 
+// Verrou optimiste anti-double-clic (résout la race condition async)
+const _jackpotPending = new Set();
+
 async function placeJackpotBet(type, targetKind, targetIndex) {
  if (roundFinished || isCalculating || phase === "river") return;
  if (isJackpotTypeLockedForTarget(type, targetKind, targetIndex)) {
   log(`${jackpotPotLabel(type)} ${lang === 'fr' ? 'déjà misé pour cette manche' : 'already bet for this round'}`);
   return;
  }
+ const pendingKey = `${type}|${targetKind}|${targetIndex}`;
+ if (_jackpotPending.has(pendingKey)) return;
+ _jackpotPending.add(pendingKey);
 
  if (targetKind === "hand") {
   const hand = hands[targetIndex];
@@ -275,6 +281,7 @@ async function placeJackpotBet(type, targetKind, targetIndex) {
  const betResponse = await placeJackpotSnapshotOnServer(targetKind, targetIndex, phase, oddsValue);
  if (!betResponse?.snapshot) {
   log('Erreur serveur sur la mise jackpot');
+  _jackpotPending.delete(pendingKey);
   await syncJackpotDisplayFromServer();
   return;
  }
@@ -309,6 +316,7 @@ async function placeJackpotBet(type, targetKind, targetIndex) {
  }
  if (phase === "pre") advanceUnlockedForRound = true;
  log(`${jackpotPromptForType(type)}: 1`);
+ _jackpotPending.delete(pendingKey);
  refreshActionButtons();
 }
 

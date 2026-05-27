@@ -180,6 +180,8 @@ newRound = async function newRoundServerDriven() {
     board = [];
     deck = [];
 
+    if (typeof resetReplaySnapshots === 'function') resetReplaySnapshots();
+
     const data = await serverStartRound(currentHandsCount);
     setServerGameId(data.gameId);
     applyServerHands(data.hands || []);
@@ -425,6 +427,10 @@ recalcOdds = async function recalcOddsServerDriven() {
     applyOddsSnapshot(oddsSnapshot);
     evaluateJackpotSnapshot(oddsSnapshot);
 
+    if (typeof captureReplaySnapshot === 'function') {
+      captureReplaySnapshot(phase, board.slice(), hands.slice(), tieBet, []);
+    }
+
     renderHands();
 
     if (hasWinningHandLocked()) {
@@ -531,6 +537,11 @@ finalizeRiverFromServerResult = async function finalizeRiverFromServerResultServ
   log(`— ${t.roundSummary} —`);
   log(`${t.betsEngaged}: ${engagedTotal.toFixed(0)} (pre ${engagedPre.toFixed(0)} / flop ${engagedFlop.toFixed(0)} / turn ${engagedTurn.toFixed(0)})`);
   log(`${t.winningsPaid}: ${paid.toFixed(2)}`);
+
+   if (typeof captureReplaySnapshot === 'function') {
+     var replayWinners = isTie ? [] : (winners.length ? [winners[0]] : []);
+     captureReplaySnapshot('river', board.slice(), hands.slice(), tieBet, replayWinners);
+   }
 
    setRoundFinished(true, "server-sync/settle");
   computeTotalBets();

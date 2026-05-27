@@ -101,8 +101,19 @@ function applyFeltColor(index, options = {}) {
  document.documentElement.style.setProperty("--table2", palette.table2);
  document.documentElement.style.setProperty("--table-highlight", mixColors(palette.table,  "#ffffff", 0.32));
  document.documentElement.style.setProperty("--table-shadow",    mixColors(palette.table2, "#000000", 0.40));
- document.documentElement.style.setProperty("--felt-text", palette.text || "#F5FBFF");
- document.documentElement.style.setProperty("--felt-muted", palette.muted || "#D7E8F3");
+ // --felt-text doit toujours être lisible : blanc sur fond photo ou fond clair
+ const isBrightOrPhoto = palette.bg || relativeLuminance(palette.table) > 0.42;
+ const feltTextColor   = isBrightOrPhoto ? "#ffffff" : (palette.text  || "#F5FBFF");
+ const feltMutedColor  = isBrightOrPhoto ? "rgba(255,255,255,.75)" : (palette.muted || "#D7E8F3");
+ document.documentElement.style.setProperty("--felt-text",  feltTextColor);
+ document.documentElement.style.setProperty("--felt-muted", feltMutedColor);
+ // Les cotes sont toujours en blanc sur fond photo ou fond clair
+ const brightFeltOdds = palette.bg || relativeLuminance(palette.table) > 0.42;
+ const oddsColor = brightFeltOdds ? "#ffffff" : (palette.text || "#e8eef7");
+ const oddsColorMuted = brightFeltOdds ? "rgba(255,255,255,.75)" : (palette.muted || "#aab7c8");
+ document.documentElement.style.setProperty("--text",  oddsColor);
+ document.documentElement.style.setProperty("--muted", oddsColorMuted);
+ document.documentElement.style.setProperty("--ok",    oddsColor);
  document.documentElement.style.setProperty("--post-round-panel-bg", tones.panelBg);
  document.documentElement.style.setProperty("--post-round-panel-border", tones.panelBorder);
  document.documentElement.style.setProperty("--post-round-panel-glow", tones.panelGlow);

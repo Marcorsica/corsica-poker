@@ -303,6 +303,10 @@ function recalcOdds() {
  setCalcStatus(false);
  renderHands();
 
+ if (typeof captureReplaySnapshot === "function") {
+  captureReplaySnapshot(phase, board.slice(), hands.slice(), tieBet, []);
+ }
+
  if (hasWinningHandLocked()) {
  autoFinishTimer = clearTimeoutRef(autoFinishTimer);
  autoFinishTimer = setTimeout(() => {
@@ -335,6 +339,7 @@ function newRound() {
  applyPendingJackpotCredits();
  phase = "pre";
   setRoundFinished(false, "round-flow/start");
+  if (typeof resetReplaySnapshots === "function") resetReplaySnapshots();
  advanceUnlockedForRound = false;
  isAdvancingPhase = false;
  if (autoFinishTimer) {
@@ -661,6 +666,11 @@ function advanceToShowdown() {
  log(`— ${t.roundSummary} —`);
  log(`${t.betsEngaged}: ${engagedTotal.toFixed(0)} (pre ${engagedPre.toFixed(0)} / flop ${engagedFlop.toFixed(0)} / turn ${engagedTurn.toFixed(0)})`);
  log(`${t.winningsPaid}: ${paid.toFixed(2)}`);
+
+  if (typeof captureReplaySnapshot === "function") {
+    var rfWinners = isTie ? [] : (winners.length ? [winners[0]] : []);
+    captureReplaySnapshot("river", board.slice(), hands.slice(), tieBet, rfWinners);
+  }
 
   setRoundFinished(true, "round-flow/end");
  computeTotalBets();

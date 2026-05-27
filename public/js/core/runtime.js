@@ -99,7 +99,23 @@ function showWinPopup(amount){
  div.textContent = "+" + amount.toFixed(2);
  document.body.appendChild(div);
 
- setTimeout(()=>div.remove(), amount >= 120 ? 6500 : 5500);
+ // Calcul de la destination vers la case Gains
+ const duration = amount >= 120 ? 6200 : 5200;
+ const winsBox = document.querySelector(".stat.total-wins") || document.getElementById("totalWins");
+ if (winsBox) {
+  const boxRect  = winsBox.getBoundingClientRect();
+  const divRect  = div.getBoundingClientRect();
+  // Centre de la case Gains, relatif au centre actuel du popup
+  const targetX  = (boxRect.left + boxRect.width  / 2) - (divRect.left + divRect.width  / 2);
+  const targetY  = (boxRect.top  + boxRect.height / 2) - (divRect.top  + divRect.height / 2);
+  div.style.setProperty("--wp-tx", targetX + "px");
+  div.style.setProperty("--wp-ty", targetY + "px");
+ } else {
+  div.style.setProperty("--wp-tx", "-50%");
+  div.style.setProperty("--wp-ty", "-80%");
+ }
+
+ setTimeout(()=>div.remove(), duration + 400);
 }
 
 function triggerWinEffects(amount){
