@@ -7,11 +7,17 @@ function placeBetOnHand(index, ph) {
  const h = hands[index];
  if (!h) return;
 
- // Règle validée : si une mise jackpot de 1 est déjà posée sur cette case,
- // la case est verrouillée. Aucun jeton normal ne peut être ajouté dessus.
- if (hasAnyJackpotBetOnTarget("hand", index, ph)) {
+ // Règle : case verrouillée seulement si un jackpot de même niveau est déjà posé sur cette phase
+ const currentOddsVal = getTargetOddsValue("hand", index);
+ const currentJpType  = jackpotTypeForOddsValue(currentOddsVal);
+ if (currentJpType && hasJackpotTypeBetOnTargetAtPhase(currentJpType, "hand", index, ph)) {
   log(lang === 'fr' ? 'Case jackpot déjà verrouillée' : 'Jackpot square already locked');
   return;
+ }
+ // Mise normale bloquée si la cote est >= 200 (zone jackpot)
+ const isNormalBetPath = !currentJpType || jackpotTypeForOddsValue(currentOddsVal) === null;
+ if (Number(currentOddsVal) >= 200 && currentJpType) {
+  // sera géré par la branche jackpot ci-dessous
  }
 
  const jackpotType = jackpotTypeForOddsValue(getTargetOddsValue("hand", index));
@@ -63,9 +69,10 @@ function placeBetOnHand(index, ph) {
 function placeBetOnTie(ph) {
  if (!canBetOnPhase(ph)) return;
 
- // Règle validée : si une mise jackpot de 1 est déjà posée sur cette case,
- // la case égalité est verrouillée. Aucun jeton normal ne peut être ajouté dessus.
- if (hasAnyJackpotBetOnTarget("tie", -1, ph)) {
+ // Règle : case verrouillée seulement si un jackpot de même niveau est déjà posé sur cette phase
+ const tieOddsVal  = getTargetOddsValue("tie", -1);
+ const tieJpType   = jackpotTypeForOddsValue(tieOddsVal);
+ if (tieJpType && hasJackpotTypeBetOnTargetAtPhase(tieJpType, "tie", -1, ph)) {
   log(lang === 'fr' ? 'Case jackpot déjà verrouillée' : 'Jackpot square already locked');
   return;
  }

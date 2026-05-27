@@ -12,7 +12,10 @@ async function serverStartRound(players) {
     : null;
   log("Demande serveur : nouvelle manche", { event: "client.server.start.request", data: { players, extremeCaseId } });
   const query = new URLSearchParams({ players: String(players) });
-  if (extremeCaseId) query.set("testCaseId", String(extremeCaseId));
+  const discoveryMode = (typeof window.isTutorialMode === "function" && window.isTutorialMode())
+    || !!(document.body && document.body.classList.contains("tutorial-mode"));
+  if (discoveryMode) query.set("discovery", "1");
+  else if (extremeCaseId) query.set("testCaseId", String(extremeCaseId));
   const res = await fetch(`/start?${query.toString()}`);
   if (!res.ok) {
     log("Erreur serveur au démarrage", { level: "error", event: "client.server.start.error", data: { status: res.status } });
@@ -68,6 +71,7 @@ async function finalizeRiverFromServerResult() {
   const result = await serverGetResult();
   const winners = Array.isArray(result.winners) ? result.winners : [];
   const isTie = result.winnerType === "tie" || winners.length > 1;
+  window.lastFinalWinnerHands = winners.slice();
 
   for (const h of hands) {
     h.finalOddsStr = (h.oddsStr || "—") + " | pre " + (h.preflopOddsStr || "—");
@@ -87,10 +91,12 @@ async function finalizeRiverFromServerResult() {
   if (handsLayer) {
     handsLayer.querySelectorAll(".hand").forEach((node, i) => {
       if (!winners.includes(i)) {
-        node.style.opacity = "0.12";
+        node.style.opacity = "";
+        node.classList.add("hand-final-loser");
         node.classList.remove("winner");
       } else {
         node.style.opacity = "";
+        node.classList.remove("hand-final-loser");
         node.classList.add("winner");
       }
     });
@@ -173,6 +179,8 @@ newRound = async function newRoundServerDriven() {
     jackpotRoundStake = { argent: 0, or: 0, diamant: 0 };
     board = [];
     deck = [];
+
+    if (typeof resetReplaySnapshots === 'function') resetReplaySnapshots();
 
     const data = await serverStartRound(currentHandsCount);
     setServerGameId(data.gameId);
@@ -419,6 +427,10 @@ recalcOdds = async function recalcOddsServerDriven() {
     applyOddsSnapshot(oddsSnapshot);
     evaluateJackpotSnapshot(oddsSnapshot);
 
+    if (typeof captureReplaySnapshot === 'function') {
+      captureReplaySnapshot(phase, board.slice(), hands.slice(), tieBet, []);
+    }
+
     renderHands();
 
     if (hasWinningHandLocked()) {
@@ -441,6 +453,7 @@ finalizeRiverFromServerResult = async function finalizeRiverFromServerResultServ
   const settlement = await serverSettleRound();
   const winners = Array.isArray(settlement.winners) ? settlement.winners : [];
   const isTie = settlement.winnerType === "tie" || winners.length > 1;
+  window.lastFinalWinnerHands = winners.slice();
 
   for (const h of hands) {
     h.finalOddsStr = (h.oddsStr || "—") + " | pre " + (h.preflopOddsStr || "—");
@@ -460,10 +473,12 @@ finalizeRiverFromServerResult = async function finalizeRiverFromServerResultServ
   if (handsLayer) {
     handsLayer.querySelectorAll(".hand").forEach((node, i) => {
       if (!winners.includes(i)) {
-        node.style.opacity = "0.12";
+        node.style.opacity = "";
+        node.classList.add("hand-final-loser");
         node.classList.remove("winner");
       } else {
         node.style.opacity = "";
+        node.classList.remove("hand-final-loser");
         node.classList.add("winner");
       }
     });
@@ -522,6 +537,11 @@ finalizeRiverFromServerResult = async function finalizeRiverFromServerResultServ
   log(`— ${t.roundSummary} —`);
   log(`${t.betsEngaged}: ${engagedTotal.toFixed(0)} (pre ${engagedPre.toFixed(0)} / flop ${engagedFlop.toFixed(0)} / turn ${engagedTurn.toFixed(0)})`);
   log(`${t.winningsPaid}: ${paid.toFixed(2)}`);
+
+   if (typeof captureReplaySnapshot === 'function') {
+     var replayWinners = isTie ? [] : (winners.length ? [winners[0]] : []);
+     captureReplaySnapshot('river', board.slice(), hands.slice(), tieBet, replayWinners);
+   }
 
    setRoundFinished(true, "server-sync/settle");
   computeTotalBets();

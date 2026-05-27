@@ -51,6 +51,31 @@ function applyExtremeCaseOddsOverride(game, phase, odds) {
   return odds;
 }
 
+
+// ── Configuration fixe du mode découverte ───────────────────────────────────
+// Objectif : cartes joueurs fixes et crédibles, issues de la capture validée,
+// board tiré normalement, cotes calculées réellement par le moteur.
+// Ordre des mains : haut-centre puis sens horaire.
+const DISCOVERY_FIXED_CASE = {
+  id: 'discovery-fixed-user-screen-v2',
+  playerCount: 9,
+  hands: [
+    ['AD', '6H'], // haut centre
+    ['8C', '7S'], // haut droite
+    ['8S', '6C'], // milieu droite
+    ['3D', 'QC'], // bas droite - éligible jackpot diamant
+    ['QH', '3C'], // bas droit / centre
+    ['6D', '6S'], // bas centre
+    ['JD', '4H'], // bas gauche
+    ['AC', '8H'], // milieu gauche
+    ['2D', '2H'], // haut gauche
+  ],
+};
+
+function isDiscoveryStartRequest(req) {
+  return String(req.query.discovery || '').trim() === '1';
+}
+
 // ── Fairness ──────────────────────────────────────────────────────────────────
 
 function buildFairnessReveal(game) {
@@ -104,9 +129,14 @@ router.get('/start', (req, res) => {
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const requestedPlayers = Math.max(4, Math.min(10, Number(req.query.players) || 10));
+  const discoveryMode    = isDiscoveryStartRequest(req);
   const requestedCaseId  = String(req.query.testCaseId || '').trim();
-  const extremeCase      = requestedCaseId ? getExtremeCaseById(requestedCaseId) : null;
-  const playerCount      = extremeCase ? Number(extremeCase.playerCount || requestedPlayers) : requestedPlayers;
+  const extremeCase      = discoveryMode
+    ? DISCOVERY_FIXED_CASE
+    : (requestedCaseId ? getExtremeCaseById(requestedCaseId) : null);
+  const playerCount      = discoveryMode
+    ? DISCOVERY_FIXED_CASE.playerCount
+    : (extremeCase ? Number(extremeCase.playerCount || requestedPlayers) : requestedPlayers);
 
   const serverSeed     = crypto.randomBytes(32).toString('hex');
   const serverSeedHash = sha256Hex(serverSeed);
@@ -115,7 +145,15 @@ router.get('/start', (req, res) => {
 
   let fullDeck, deck, hands;
 
-  if (extremeCase) {
+  if (discoveryMode) {
+    // En découverte, seules les cartes des joueurs sont figées.
+    // Le board reste tiré depuis un paquet mélangé, sans les cartes déjà utilisées.
+    hands = DISCOVERY_FIXED_CASE.hands.map(h => h.map(codeToCard));
+    const used = new Set();
+    for (const hand of hands) for (const card of hand) used.add(cardCode(card));
+    fullDeck = deterministicShuffle(require('../utils/cards').createDeck(), { serverSeed, clientSeed, nonce, gameId });
+    deck = fullDeck.filter(c => !used.has(cardCode(c)));
+  } else if (extremeCase) {
     fullDeck = buildFullDeckForExtremeCase(extremeCase);
     const forcedBoard = (extremeCase.board || []).map(codeToCard);
     const usedBoard   = new Set(forcedBoard.map(cardCode));
@@ -136,22 +174,24 @@ router.get('/start', (req, res) => {
     fullDeck, deck, hands, board: [], oddsHistory: {}, jackpotSnapshots: [],
     createdAt: new Date().toISOString(), fairnessRevealedAt: null,
     extremeCaseId: extremeCase ? String(extremeCase.id) : null,
+    discoveryMode,
     // ── SÉCURITÉ : mises enregistrées côté serveur ──────────────────────────
     serverBets: initServerBets(playerCount),
   };
 
   audit.startHand({ gameId, playerCount, initialBalance: null, serverSeedHash, createdAt: games[gameId].createdAt });
   audit.setRNG(gameId, {
-    algorithm: extremeCase ? 'preloaded-extreme-case-v1' : 'sha256 deterministic shuffle',
+    algorithm: discoveryMode ? 'discovery-fixed-real-odds-v1' : (extremeCase ? 'preloaded-extreme-case-v1' : 'sha256 deterministic shuffle'),
     serverSeedHash, clientSeed, nonce, deckCommitment,
     dealtHands: hands.map(h => h.map(cardCode)),
   });
-  logServer('round.start', 'Nouvelle manche démarrée', { gameId, playerCount, extremeCaseId: extremeCase?.id || null });
+  logServer('round.start', 'Nouvelle manche démarrée', { gameId, playerCount, extremeCaseId: extremeCase?.id || null, discoveryMode });
   audit.logAction(gameId, { type: 'hand_start', playerCount });
 
   res.json({
     gameId, hands, board: [],
     extremeCaseId: extremeCase?.id || null,
+    discoveryMode,
     fairness: { serverSeedHash, clientSeed, nonce, deckCommitment },
   });
 });

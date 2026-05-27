@@ -303,6 +303,10 @@ function recalcOdds() {
  setCalcStatus(false);
  renderHands();
 
+ if (typeof captureReplaySnapshot === "function") {
+  captureReplaySnapshot(phase, board.slice(), hands.slice(), tieBet, []);
+ }
+
  if (hasWinningHandLocked()) {
  autoFinishTimer = clearTimeoutRef(autoFinishTimer);
  autoFinishTimer = setTimeout(() => {
@@ -335,6 +339,7 @@ function newRound() {
  applyPendingJackpotCredits();
  phase = "pre";
   setRoundFinished(false, "round-flow/start");
+  if (typeof resetReplaySnapshots === "function") resetReplaySnapshots();
  advanceUnlockedForRound = false;
  isAdvancingPhase = false;
  if (autoFinishTimer) {
@@ -431,9 +436,14 @@ function playTensionBeforeRiver(callback) {
  }
 
  stopSuspenseAudio();
- suspenseAudio = new Audio("/external-audio/suspense.mp3");
+ suspenseAudio = new Audio("/audio/suspense.mp3");
  suspenseAudio.volume = 0.18;
- suspenseAudio.play().catch(() => {});
+ suspenseAudio.addEventListener('error', function() {
+  suspenseAudio = new Audio("/external-audio/suspense.mp3");
+  suspenseAudio.volume = 0.18;
+  suspenseAudio.play().catch(function() {});
+ });
+ suspenseAudio.play().catch(function() {});
 
  const start = performance.now();
 
@@ -577,6 +587,7 @@ function advanceToShowdown() {
 
  const winners = settleWinners();
  const isTie = winners.length >= 2;
+ window.lastFinalWinnerHands = winners.slice();
  lastWinningTargets = isTie ? [{ targetKind: "tie", targetIndex: -1 }] : winners.map((w) => ({ targetKind: "hand", targetIndex: w }));
 
  const tieBox = document.getElementById("tieBox");
@@ -588,10 +599,12 @@ function advanceToShowdown() {
  if (handsLayer) {
  handsLayer.querySelectorAll(".hand").forEach((node, i) => {
  if (!winners.includes(i)) {
- node.style.opacity = "0.12";
+ node.style.opacity = "";
+ node.classList.add("hand-final-loser");
  node.classList.remove("winner");
  } else {
  node.style.opacity = "";
+ node.classList.remove("hand-final-loser");
  node.classList.add("winner");
  }
  });
@@ -654,14 +667,19 @@ function advanceToShowdown() {
  log(`${t.betsEngaged}: ${engagedTotal.toFixed(0)} (pre ${engagedPre.toFixed(0)} / flop ${engagedFlop.toFixed(0)} / turn ${engagedTurn.toFixed(0)})`);
  log(`${t.winningsPaid}: ${paid.toFixed(2)}`);
 
+  if (typeof captureReplaySnapshot === "function") {
+    var rfWinners = isTie ? [] : (winners.length ? [winners[0]] : []);
+    captureReplaySnapshot("river", board.slice(), hands.slice(), tieBet, rfWinners);
+  }
+
   setRoundFinished(true, "round-flow/end");
  computeTotalBets();
  refreshActionButtons();
  renderHands();
  };
 
- if (hasCertainWinnerBeforeRiver()) revealRiver();
- else playTensionBeforeRiver(revealRiver);
+ // Son suspense toujours joué avant la river
+ playTensionBeforeRiver(revealRiver);
  return;
  }
 }

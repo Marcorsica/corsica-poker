@@ -6,8 +6,8 @@
  <title>Corsica Poker – Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="css/style.css?v=18.15-pulse-reflets-bougent" />
-  <link rel="stylesheet" href="css/improvements.css" />
+ <link rel="stylesheet" href="css/style.css?v=18.16-landscape-bg" />
+  <link rel="stylesheet" href="css/improvements.css?v=59" />
 
  <script>
   // Bloque le menu navigateur avant même le chargement des modules du jeu.
@@ -36,6 +36,11 @@
       <div class="splash-ornament-line r"></div>
     </div>
 
+    <div class="splash-lang-selector" id="splashLangSelector">
+      <button type="button" class="splash-lang-btn" data-lang="fr">🇫🇷 FR</button>
+      <button type="button" class="splash-lang-btn" data-lang="en">🇬🇧 EN</button>
+    </div>
+
     <div class="splash-logo-wrap">
       <div class="logo-main">♠</div>
     </div>
@@ -47,24 +52,27 @@
 
     <div class="splash-jackpots stats">
       <div class="stat jackpot argent-jackpot jackpot-visual-v1815" id="splashArgentBox">
-        <div class="label jackpot-label"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>ARGENT</span></span><span class="jackpot-diamond right">◆</span></div>
-        <div class="value jackpot-value"><span id="splashJpArgent">250</span></div>
+        <div class="label jackpot-label" id="splashLblArgent"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>ARGENT</span></span><span class="jackpot-diamond right">◆</span></div>
+        <div class="value jackpot-value"><span id="splashJpArgent">250.00</span></div>
         <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="splashArgentFill" style="--heat-progress:18%"></div></div>
       </div>
       <div class="stat jackpot or-jackpot jackpot-visual-v1815" id="splashOrBox">
-        <div class="label jackpot-label"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>OR</span></span><span class="jackpot-diamond right">◆</span></div>
-        <div class="value jackpot-value"><span id="splashJpOr">850</span></div>
+        <div class="label jackpot-label" id="splashLblOr"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>OR</span></span><span class="jackpot-diamond right">◆</span></div>
+        <div class="value jackpot-value"><span id="splashJpOr">850.00</span></div>
         <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="splashOrFill" style="--heat-progress:32%"></div></div>
       </div>
       <div class="stat jackpot diamant-jackpot jackpot-visual-v1815" id="splashDiamantBox">
-        <div class="label jackpot-label"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>DIAMANT</span></span><span class="jackpot-diamond right">◆</span></div>
-        <div class="value jackpot-value"><span id="splashJpDiamant">8 000</span></div>
+        <div class="label jackpot-label" id="splashLblDiamant"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>DIAMANT</span></span><span class="jackpot-diamond right">◆</span></div>
+        <div class="value jackpot-value"><span id="splashJpDiamant">8000.00</span></div>
         <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="splashDiamantFill" style="--heat-progress:12%"></div></div>
       </div>
     </div>
 
     <button type="button" id="btnStart" class="btn primary splash-start">Jouer</button>
-    <button type="button" id="btnTutorial" class="btn splash-tutorial">🎓 Mode tutoriel</button>
+
+    <div style="height:12px"></div>
+
+    <button type="button" id="btnDiscovery" class="btn splash-discovery">🎓 Première visite — Découverte</button>
     <div class="splash-demo-label" id="splashDemoLabel">Démo — Pas d'argent réel</div>
 
   </div>
@@ -101,17 +109,17 @@
  </div>
  <div class="stat jackpot argent-jackpot jackpot-visual-v1815" id="argentJackpotBox">
  <div class="label jackpot-label" id="lblArgentJackpot"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>ARGENT</span></span><span class="jackpot-diamond right">◆</span></div>
- <div class="value jackpot-value"><span id="argentJackpotValue">250</span></div>
+ <div class="value jackpot-value"><span id="argentJackpotValue">250.00</span></div>
  <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="argentHeatFill"></div></div>
  </div>
  <div class="stat jackpot or-jackpot jackpot-visual-v1815" id="orJackpotBox">
  <div class="label jackpot-label" id="lblOrJackpot"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>OR</span></span><span class="jackpot-diamond right">◆</span></div>
- <div class="value jackpot-value"><span id="orJackpotValue">850</span></div>
+ <div class="value jackpot-value"><span id="orJackpotValue">850.00</span></div>
  <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="orHeatFill"></div></div>
  </div>
  <div class="stat jackpot diamant-jackpot jackpot-visual-v1815" id="diamantJackpotBox">
  <div class="label jackpot-label" id="lblDiamantJackpot"><span class="jackpot-diamond left">◆</span><span class="jackpot-name"><span>JACKPOT</span><span>DIAMANT</span></span><span class="jackpot-diamond right">◆</span></div>
- <div class="value jackpot-value"><span id="diamantJackpotValue">8000</span></div>
+ <div class="value jackpot-value"><span id="diamantJackpotValue">8000.00</span></div>
  <div class="jackpot-heat-bar"><div class="jackpot-heat-fill" id="diamantHeatFill"></div></div>
  </div>
  </div>
@@ -120,6 +128,7 @@
 
  
  <button type="button" id="toggleLogBtn" class="pill toggle-log-btn" aria-pressed="false">Journal</button>
+ <button type="button" id="btnToggleTutorial" class="pill" aria-label="Mode tutoriel">🎓</button>
  <button type="button" id="settingsBtn" class="settings-btn pill" aria-label="Paramètres">⚙️</button>
 
  <div id="settingsPanel" class="settings-panel hidden" aria-label="Paramètres">
@@ -149,16 +158,27 @@
     <button type="button" class="pill settings-audio-btn" data-audio-style="2">Beats</button>
     <button type="button" class="pill settings-audio-btn" data-audio-style="3">RnB</button>
     <button type="button" class="pill settings-audio-btn" data-audio-style="4">Relax</button>
-    <button type="button" class="pill settings-audio-btn" data-audio-style="5">Casino</button>
+    <button type="button" class="pill settings-audio-btn" data-audio-style="5">Ambiance casino</button>
+   </div>
+   <div class="settings-custom-row">
+    <label for="customAudioInput" id="settingsCustomAudioLabel" class="pill settings-file-btn">Son personnalisé</label>
+    <input type="file" id="customAudioInput" class="settings-file-input" accept="audio/*" />
+    <span id="customAudioName" class="settings-file-name">Aucun fichier</span>
    </div>
   </div>
 
   <div class="settings-section">
    <div id="settingsFeltLabel" class="settings-label">Couleur du tapis</div>
    <div id="feltColorOptions" class="felt-color-options"></div>
+   <div class="settings-custom-row">
+    <label for="customBgInput" id="settingsCustomBgLabel" class="pill settings-file-btn">Fond personnalisé</label>
+    <input type="file" id="customBgInput" class="settings-file-input" accept="image/*" />
+   </div>
   </div>
-  <div class="settings-section settings-access-section">
-   <button type="button" id="settingsLockBtn" class="pill settings-lock-btn">🔒 Verrouiller l'accès</button>
+
+  <div class="settings-section settings-cardback-section">
+   <div id="settingsCardBackLabel" class="settings-label">Dos des cartes du board</div>
+   <div id="cardBackOptions" class="card-back-options"></div>
   </div>
 
   <div class="settings-section game-style-section">
@@ -175,7 +195,8 @@
  </header>
 
  <main class="container log-hidden">
- <section class="table">
+ <section class="table" id="gameTable">
+ <div id="roundEndBanner" class="round-end-banner" aria-live="polite"></div>
  <div class="board board-center">
  <div class="board-title" id="boardTitle"></div>
  <div class="board-cards" id="boardCards"></div>
@@ -268,8 +289,8 @@
  </div>
  </div>
 
- <audio id="sndDeal" preload="auto" src="/external-audio/snd_deal.mp3"></audio>
- <audio id="sndCard" preload="auto" src="/external-audio/snd_card.mp3"></audio>
+ <audio id="sndDeal" preload="auto" src="/audio/snd_deal.mp3"></audio>
+ <audio id="sndCard" preload="auto" src="/audio/snd_card.mp3"></audio>
  <audio id="sndAmbience" preload="auto" loop src="/audio/audio_1_jazz.mp3"></audio>
  <audio id="sndCasino" preload="auto" loop src="/audio/audio_6_casino.mp3"></audio>
 
@@ -407,8 +428,8 @@
 
   function syncSplashJackpots() {
     var map = [
-      { src: 'argentJackpotValue',  dst: 'splashJpArgent',  fill: 'splashArgentFill',  reset: 250,  max: 2000  },
-      { src: 'orJackpotValue',      dst: 'splashJpOr',      fill: 'splashOrFill',       reset: 850,  max: 5000  },
+      { src: 'argentJackpotValue',  dst: 'splashJpArgent',  fill: 'splashArgentFill',  reset: 250.00,  max: 2000  },
+      { src: 'orJackpotValue',      dst: 'splashJpOr',      fill: 'splashOrFill',       reset: 850.00,  max: 5000  },
       { src: 'diamantJackpotValue', dst: 'splashJpDiamant', fill: 'splashDiamantFill',  reset: 8000, max: 50000 }
     ];
     var anyUpdated = false;
@@ -455,6 +476,7 @@
 </script>
 
 <script src="js/ui/slot-animation.js"></script>
+<script src="js/replay.js"></script>
 <script src="js/tutorial.js"></script>
 </body>
 </html>

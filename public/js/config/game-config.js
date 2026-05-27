@@ -274,6 +274,8 @@ const I18N = {
  totalBets: "Mises en cours",
  totalWins: "Gains",
  board: "Board",
+ roundEnded: "Manche terminée",
+ reviewRound: "Revoir la partie",
  sameTable: "Même table",
  changeTable: "Changer de table",
  abandon: "Abandonner",
@@ -326,10 +328,15 @@ const I18N = {
  settingsAudio3: "Beats",
  settingsAudio4: "RNB",
  settingsAudio5: "Relax",
- settingsAudio6: "Casino",
+ settingsAudio6: "Ambiance casino",
+ settingsCustomAudio: "Son personnalisé",
+ settingsNoCustomAudio: "Aucun fichier",
+ settingsCustomBg: "Fond personnalisé",
+ settingsCardBack: "Dos des cartes du board",
  styleClassic: "Classique",
  styleMetal: "Métal",
  stylePremium: "Premium",
+ styleNuit: "Nuit",
  validateBets: "Valider les mises",
  clearBetsTitle: "Effacer les mises",
  rulesTitle: "Règles du jeu",
@@ -346,6 +353,8 @@ const I18N = {
  totalBets: "Current bets",
  totalWins: "Winnings",
  board: "Board",
+ roundEnded: "Round over",
+ reviewRound: "Review round",
  sameTable: "Same table",
  changeTable: "Change table",
  abandon: "Abandon",
@@ -373,6 +382,7 @@ const I18N = {
  winners: "Winners",
  actions: "",
  betPanel: "Bet",
+ betSquare: "Bet",
  tiePanel: "Tie",
  "Supprimer les mises": "Clear phase bet",
  insufficient: "Insufficient balance",
@@ -398,10 +408,15 @@ const I18N = {
  settingsAudio3: "Beats",
  settingsAudio4: "RNB",
  settingsAudio5: "Relax",
- settingsAudio6: "Casino",
+ settingsAudio6: "Casino ambience",
+ settingsCustomAudio: "Custom sound",
+ settingsNoCustomAudio: "No file",
+ settingsCustomBg: "Custom background",
+ settingsCardBack: "Board card backs",
  styleClassic: "Classic",
  styleMetal: "Metal",
  stylePremium: "Premium",
+ styleNuit: "Night",
  validateBets: "Confirm my bets",
  clearBetsTitle: "Clear bets",
  rulesTitle: "Game rules",
@@ -472,6 +487,49 @@ const settingsBtn = el("settingsBtn");
 const settingsPanel = el("settingsPanel");
 const feltColorOptions = el("feltColorOptions");
 
+
+const BOARD_CARD_BACK_STYLES = [
+ { name: "Classique",        legacy: true },
+ { name: "Art Nouveau",      img: "/img/back_art_nouveau.jpg" },
+ { name: "Artisan",          img: "/img/back_artisan.jpg" },
+ { name: "Floral victorien", img: "/img/back_victorian.jpg" },
+ { name: "Carte céleste",    img: "/img/back_celeste.jpg" },
+ { name: "Héraldique",       img: "/img/back_heraldique.jpg" },
+ { name: "Papillon",         img: "/img/back_papillon.jpg" },
+ { name: "Nautique",         img: "/img/back_nautique.jpg" },
+ { name: "Art Déco",         img: "/img/back_artdeco.jpg" },
+ { name: "Paon",             img: "/img/back_paon.jpg" },
+ { name: "Cristaux",         img: "/img/back_cristaux.jpg" },
+ { name: "Cœur doré",        legacy: true, symbol: "♥" },
+];
+
+function clampBoardCardBackStyle(styleIndex) {
+ const max = Math.max(0, (typeof BOARD_CARD_BACK_STYLES !== "undefined" ? BOARD_CARD_BACK_STYLES.length : 1) - 1);
+ return Math.max(0, Math.min(max, Number(styleIndex) || 0));
+}
+
+function cardBackSvg(styleIndex) {
+ const idx = clampBoardCardBackStyle(styleIndex);
+ const style = BOARD_CARD_BACK_STYLES[idx] || BOARD_CARD_BACK_STYLES[0];
+ if (style.legacy && !style.symbol) return CARD_BACK_URL;
+ if (style.img) return style.img;
+ if (style.legacy && style.symbol) {
+  return "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3OCAxMDkiIHdpZHRoPSI3OCIgaGVpZ2h0PSIxMDkiPgogIDxkZWZzPgogICAgPHBhdHRlcm4gaWQ9ImRpYW1vbmRzIiB4PSIwIiB5PSIwIiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8cG9seWdvbiBwb2ludHM9IjYsMCAxMiw2IDYsMTIgMCw2IiBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoMjEyLDE3NSw1NSwwLjI4KSIgc3Ryb2tlLXdpZHRoPSIwLjgiLz4KICAgIDwvcGF0dGVybj4KICAgIDxwYXR0ZXJuIGlkPSJkb3RzIiB4PSIwIiB5PSIwIiB3aWR0aD0iNiIgaGVpZ2h0PSI2IiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPGNpcmNsZSBjeD0iMyIgY3k9IjMiIHI9IjAuNiIgZmlsbD0icmdiYSgyMTIsMTc1LDU1LDAuMTgpIi8+CiAgICA8L3BhdHRlcm4+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzBkMTgyOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3R5bGU9InN0b3AtY29sb3I6IzA4MGUxYSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMxMDFlMzAiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI3OCIgaGVpZ2h0PSIxMDkiIHJ4PSI4IiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxyZWN0IHdpZHRoPSI3OCIgaGVpZ2h0PSIxMDkiIHJ4PSI4IiBmaWxsPSJ1cmwoI2RvdHMpIi8+CiAgPHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjcwIiBoZWlnaHQ9IjEwMSIgcng9IjUiIGZpbGw9InVybCgjZGlhbW9uZHMpIi8+CiAgPHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjcwIiBoZWlnaHQ9IjEwMSIgcng9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyMTIsMTc1LDU1LDAuNDUpIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8cmVjdCB4PSIxLjUiIHk9IjEuNSIgd2lkdGg9Ijc1IiBoZWlnaHQ9IjEwNiIgcng9IjciIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyMTIsMTc1LDU1LDAuMjApIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzOSw1NC41KSI+CiAgICA8cGF0aCBkPSJNMCwxNCBDLTIsMTAgLTE0LDQgLTE0LC00IEMtMTQsLTExIC04LC0xNiAwLC0xMCBDOCwtMTYgMTQsLTExIDE0LC00IEMxNCw0IDIsMTAgMCwxNCBaIiBmaWxsPSJyZ2JhKDIxMiwxNzUsNTUsMC44NSkiLz4KICA8L2c+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAsMTApIHNjYWxlKDAuNDUpIj4KICAgIDxwYXRoIGQ9Ik0wLDEwIEMtMiw3IC0xMCwzIC0xMCwtMyBDLTEwLC04IC02LC0xMiAwLC03IEM2LC0xMiAxMCwtOCAxMCwtMyBDMTAsMyAyLDcgMCwxMCBaIiBmaWxsPSJyZ2JhKDIxMiwxNzUsNTUsMC41NSkiLz4KICA8L2c+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjgsOTkpIHNjYWxlKDAuNDUpIHJvdGF0ZSgxODApIj4KICAgIDxwYXRoIGQ9Ik0wLDEwIEMtMiw3IC0xMCwzIC0xMCwtMyBDLTEwLC04IC02LC0xMiAwLC03IEM2LC0xMiAxMCwtOCAxMCwtMyBDMTAsMyAyLDcgMCwxMCBaIiBmaWxsPSJyZ2JhKDIxMiwxNzUsNTUsMC41NSkiLz4KICA8L2c+Cjwvc3ZnPg==";
+  const sym = style.symbol;
+  const fillColor  = "rgba(212,175,55,0.90)";
+  const accentColor = "rgba(212,175,55,0.28)";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 109" width="78" height="109"><defs><pattern id="diamonds" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse"><polygon points="6,0 12,6 6,12 0,6" fill="none" stroke="${accentColor}" stroke-width="0.8"/></pattern><pattern id="dots" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="0.6" fill="${accentColor}" opacity="0.7"/></pattern><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0d1828"/><stop offset="50%" style="stop-color:#080e1a"/><stop offset="100%" style="stop-color:#101e30"/></linearGradient></defs><rect width="78" height="109" rx="8" fill="url(#bg)"/><rect width="78" height="109" rx="8" fill="url(#dots)"/><rect x="4" y="4" width="70" height="101" rx="5" fill="url(#diamonds)" stroke="${accentColor}" stroke-width="1"/><rect x="1.5" y="1.5" width="75" height="106" rx="7" fill="none" stroke="${accentColor}" opacity="0.5" stroke-width="1"/><text x="39" y="61" text-anchor="middle" font-size="34" fill="${fillColor}">${sym}</text></svg>`;
+  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+ }
+ const symbol = style.pattern === "clubs" ? "♣" : style.pattern === "spades" ? "♠" : style.pattern === "stars" ? "★" : style.pattern === "waves" ? "≈" : style.pattern === "grid" ? "◆" : "♦";
+ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 109" width="78" height="109"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${style.bg}"/><stop offset="1" stop-color="#05070b"/></linearGradient><pattern id="p" width="16" height="16" patternUnits="userSpaceOnUse"><text x="8" y="12" text-anchor="middle" font-size="10" fill="${style.accent}" opacity=".32">${symbol}</text></pattern></defs><rect width="78" height="109" rx="9" fill="url(#g)"/><rect x="4" y="4" width="70" height="101" rx="6" fill="url(#p)" stroke="${style.accent}" stroke-width="1.4" opacity=".95"/><rect x="10" y="10" width="58" height="89" rx="5" fill="none" stroke="${style.accent}" stroke-width="1" opacity=".5"/><text x="39" y="61" text-anchor="middle" font-size="32" fill="${style.accent}" opacity=".9">${symbol}</text></svg>`;
+ return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+}
+
+function getBoardCardBackUrl() {
+ return cardBackSvg(typeof boardBackStyle !== "undefined" ? boardBackStyle : 0);
+}
+
 const FELT_COLORS = [
   // ── Couleurs unies ───────────────────────────────────────────────────────────
   { table: "#2b2b2b", table2: "#161616", text: "#fafafa", muted: "#cfcfcf" },  // 0  Gris anthracite
@@ -483,7 +541,7 @@ const FELT_COLORS = [
   { table: "#4a2c2a", table2: "#321d1b", text: "#fff8f4", muted: "#e7d6d1" },  // 6  Marron cuir
   { table: "#7a1c1c", table2: "#541212", text: "#fff7f7", muted: "#f0d2d2" },  // 7  Rouge profond
   { table: "#f5e6ca", table2: "#dcc8a3", text: "#3c2f1d", muted: "#655845" },  // 8  Beige sable
-  { table: "#9d4edd", table2: "#6f2dbd", text: "#fcf7ff", muted: "#ead7fb" },  // 9  Violet
+  { table: "#0b4a52", table2: "#062e35", text: "#f0fbfc", muted: "#b8dde2" },  // 9  Teal sombre
 
   // ── Paysages (dégradés atmosphériques discrets) ──────────────────────────────
   {                                                                              // 10 Madagascar (plage)

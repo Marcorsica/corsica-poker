@@ -10,7 +10,10 @@ function saveSettings() {
    soundEnabled,
    lang,
    currentAudioStyle,
-   casinoLayerEnabled
+   casinoLayerEnabled,
+   customAudioName,
+   customBackgroundDataUrl,
+   boardBackStyle
   };
   localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(payload));
  } catch(_){ console.warn("[runtime] erreur silencieuse:", _); }
@@ -96,7 +99,23 @@ function showWinPopup(amount){
  div.textContent = "+" + amount.toFixed(2);
  document.body.appendChild(div);
 
- setTimeout(()=>div.remove(), amount >= 120 ? 2400 : 2000);
+ // Calcul de la destination vers la case Gains
+ const duration = amount >= 120 ? 6200 : 5200;
+ const winsBox = document.querySelector(".stat.total-wins") || document.getElementById("totalWins");
+ if (winsBox) {
+  const boxRect  = winsBox.getBoundingClientRect();
+  const divRect  = div.getBoundingClientRect();
+  // Centre de la case Gains, relatif au centre actuel du popup
+  const targetX  = (boxRect.left + boxRect.width  / 2) - (divRect.left + divRect.width  / 2);
+  const targetY  = (boxRect.top  + boxRect.height / 2) - (divRect.top  + divRect.height / 2);
+  div.style.setProperty("--wp-tx", targetX + "px");
+  div.style.setProperty("--wp-ty", targetY + "px");
+ } else {
+  div.style.setProperty("--wp-tx", "-50%");
+  div.style.setProperty("--wp-ty", "-80%");
+ }
+
+ setTimeout(()=>div.remove(), duration + 400);
 }
 
 function triggerWinEffects(amount){
@@ -227,6 +246,8 @@ function hasCommittedBet() {
 }
 
 function canUseAbandon() {
+ // En mode découverte/tutoriel, Abandonner doit rester non cliquable.
+ if (document.body && document.body.classList.contains("tutorial-mode")) return false;
  const splashVisible = !!(splashScreen && !splashScreen.classList.contains("hidden"));
  const setupVisible = !!(roundSetupOverlay && !roundSetupOverlay.classList.contains("hidden"));
  return !splashVisible && !setupVisible && !roundFinished && phase === "pre" && !hasCommittedBet() && !isCalculating && !isAdvancingPhase;
@@ -247,8 +268,10 @@ function refreshActionButtons() {
  }
 
  if (btnAbandon) {
-  const visible = canUseAbandon();
-  btnAbandon.disabled = !visible;
+  const tutorialActive = !!(document.body && document.body.classList.contains("tutorial-mode"));
+  const forcedTutorialVisible = !!(document.body && document.body.classList.contains("tuto-show-abandon"));
+  const visible = canUseAbandon() || forcedTutorialVisible;
+  btnAbandon.disabled = tutorialActive ? true : !visible;
   btnAbandon.classList.toggle("show-abandon", visible);
  }
  updateJackpotDisplays();

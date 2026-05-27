@@ -158,9 +158,23 @@ html,body{
   height:100%;
   min-height:0;
   border-radius:20px;
-  background:radial-gradient(1200px 700px at 50% 40%, var(--table), var(--table2));
+  background:
+    radial-gradient(
+      ellipse 120% 100% at 50% 22%,
+      var(--table-highlight, var(--table)) 0%,
+      var(--table) 28%,
+      var(--table2) 62%,
+      var(--table-shadow, var(--table2)) 100%
+    );
+}
+.table{
   border:1px solid rgba(255,255,255,.10);
   overflow:hidden;
+}
+#gameTable.has-landscape{
+  background-image:var(--table-landscape-img) !important;
+  background-size:cover !important;
+  background-position:center !important;
 }
 
 .board-center{
@@ -422,7 +436,7 @@ html,body{
   font-size:18px;
   font-weight:900;
   color:var(--ok);
-  text-shadow:0 1px 0 rgba(0,0,0,.18);
+  text-shadow:0 1px 3px rgba(0,0,0,.7), 0 0 8px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.6);
   margin-bottom:5px;
   min-height:16px;
   position:relative;
@@ -545,6 +559,7 @@ html,body{
 
 .sq.hasBet{
   animation:betPulse 850ms ease infinite;
+  overflow:visible;
 }
 
 .bet-in-square{
@@ -4255,6 +4270,43 @@ body.setup-screen #advanceDock #btnAdvance{
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+
+
+/* === Bandeau fin de manche === */
+.round-end-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,0,0,.72) 18%,
+    rgba(0,0,0,.82) 50%,
+    rgba(0,0,0,.72) 82%,
+    transparent 100%
+  );
+  color: #f6d36b;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(246,211,107,.55), 0 1px 3px rgba(0,0,0,.8);
+  pointer-events: none;
+  transition: opacity .35s ease, height .35s ease;
+}
+
+.round-end-banner.visible {
+  height: 36px;
+  opacity: 1;
+  pointer-events: none;
 }
 
 body.round-ended .table-choice-controls{
@@ -9960,4 +10012,96 @@ body.theme-fast .hand.details-open .hand-details-panel {
   display: block !important;
   pointer-events: auto !important;
   cursor: pointer !important;
+}
+
+/* === PATCH : grisé persistant des cartes perdantes au résultat === */
+.hand.hand-final-loser .hand-inner,
+.hand.hand-final-loser .hand-main,
+.hand.hand-final-loser .hand-cards,
+.hand.hand-final-loser .card{
+  opacity:.28 !important;
+  filter:grayscale(1) saturate(.25) brightness(.70) !important;
+}
+.hand.hand-final-loser .squares,
+.hand.hand-final-loser .hand-odds,
+.hand.hand-final-loser .hand-sub{
+  opacity:.38 !important;
+  filter:grayscale(1) saturate(.35) !important;
+}
+.hand.winner,
+.hand.winner .hand-inner,
+.hand.winner .hand-main,
+.hand.winner .hand-cards,
+.hand.winner .card{
+  opacity:1 !important;
+  filter:none !important;
+}
+
+/* === PATCH paramètres personnalisables : son, fond, dos board === */
+.settings-custom-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+#customAudioName{
+  display:none;
+}
+.settings-file-input{
+  position:absolute;
+  width:1px;
+  height:1px;
+  opacity:0;
+  pointer-events:none;
+}
+.settings-file-btn,
+.settings-small-btn{
+  min-height:30px;
+  padding:0 10px!important;
+  font-size:12px!important;
+  cursor:pointer;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  line-height:1.1!important;
+}
+.settings-file-name{
+  max-width:170px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:rgba(255,255,255,.72);
+  font-size:12px;
+}
+.card-back-options{
+  display:grid;
+  grid-template-columns:repeat(6, minmax(32px, 1fr));
+  gap:8px;
+  margin-top:8px;
+}
+.card-back-btn{
+  width:100%;
+  aspect-ratio:78/109;
+  min-height:52px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.18);
+  background-size:cover;
+  background-position:center;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,.28);
+  transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+.card-back-btn:hover{
+  transform:translateY(-1px);
+  border-color:rgba(246,211,107,.55);
+}
+.card-back-btn.active{
+  border-color:rgba(246,211,107,.95);
+  box-shadow:0 0 0 2px rgba(246,211,107,.18),0 6px 16px rgba(0,0,0,.38);
+}
+@media (max-width: 700px){
+  .card-back-options{grid-template-columns:repeat(3, minmax(32px, 1fr));}
 }
