@@ -120,7 +120,7 @@ const RULES_HTML = {
  fr: `
       <section class="rules-section">
         <h3>Concept</h3>
-        <p>Corsica Poker est une expérience inspirée du Texas Hold'em, avec une approche unique : vous ne jouez pas une main — vous pariez sur celles des autres.</p>
+        <p>Jet Poker est une expérience inspirée du Texas Hold'em, avec une approche unique : vous ne jouez pas une main — vous pariez sur celles des autres.</p>
         <p>Vous observez une table de joueurs virtuels et votre objectif est d'anticiper l'issue de la manche pour placer vos mises au moment le plus opportun.</p>
         <p>Plus vous prenez de risques, plus les cotes sont élevées — et plus les gains peuvent être importants.</p>
         <p><em>Important : une main est déclarée victorieuse uniquement si elle gagne seule. La case <strong>Égalité</strong> permet de couvrir les situations de partage.</em></p>
@@ -192,7 +192,7 @@ const RULES_HTML = {
  en: `
       <section class="rules-section">
         <h3>Concept</h3>
-        <p>Corsica Poker is inspired by Texas Hold'em, with a distinctive twist: you do not play a hand yourself — you bet on the hands of the players at the table.</p>
+        <p>Jet Poker is inspired by Texas Hold'em, with a distinctive twist: you do not play a hand yourself — you bet on the hands of the players at the table.</p>
         <p>You observe a table of virtual players and your objective is to anticipate the outcome of the round in order to place bets at the most opportune moment.</p>
         <p>The more risk you take, the higher the odds — and the larger the potential payout.</p>
         <p><em>Important: a hand is considered victorious only if it wins outright. The <strong>Tie</strong> box lets you cover split outcomes.</em></p>
@@ -381,7 +381,7 @@ const I18N = {
  winner: "Winner",
  winners: "Winners",
  actions: "",
- betPanel: "Bet",
+ betPanel: "",
  betSquare: "Bet",
  tiePanel: "Tie",
  "Supprimer les mises": "Clear phase bet",

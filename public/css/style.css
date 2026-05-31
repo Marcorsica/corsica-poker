@@ -317,6 +317,7 @@ html,body{
   color:var(--muted);
   font-size:11px;
   margin-bottom:6px;
+  text-align:center;
 }
 
 .bet-buttons{
@@ -10016,14 +10017,14 @@ body.theme-fast .hand.details-open .hand-details-panel {
 .hand.hand-final-loser .hand-main,
 .hand.hand-final-loser .hand-cards,
 .hand.hand-final-loser .card{
-  opacity:.28 !important;
-  filter:grayscale(1) saturate(.25) brightness(.70) !important;
+  opacity:.75 !important;
+  filter:grayscale(.6) saturate(.50) brightness(.90) !important;
 }
 .hand.hand-final-loser .squares,
 .hand.hand-final-loser .hand-odds,
 .hand.hand-final-loser .hand-sub{
-  opacity:.38 !important;
-  filter:grayscale(1) saturate(.35) !important;
+  opacity:.78 !important;
+  filter:grayscale(.6) saturate(.55) !important;
 }
 .hand.winner,
 .hand.winner .hand-inner,

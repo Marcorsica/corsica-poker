@@ -66,7 +66,7 @@ var T={
     s11t:'💎 Les Jackpots Progressifs',s11:'Trois jackpots (<strong>Argent, Or, Diamant</strong>) grossissent à chaque manche. Quand <strong>« Tente le Jackpot »</strong> apparaît, misez <strong>1 jeton</strong> pour tenter de remporter toute la cagnotte !',
     s12t:'⚙️ Paramètres',s12:'Changez le <strong>thème visuel</strong>, la <strong>couleur du tapis</strong>, l\'<strong>ambiance sonore</strong>, la <strong>langue</strong>… Tout est personnalisable !',
     s13t:'🔄 Rejouez !',s13:'« <strong>Même table</strong> » relance avec le même nombre de joueurs. « <strong>Changer de table</strong> » vous permet d\'en choisir un autre.',
-    s14t:'🎉 Tutoriel terminé !',s14:'Vous connaissez maintenant toutes les bases de <strong>Corsica Poker</strong>. Misez sur les cotes, tentez les jackpots… Bonne chance !',
+    s14t:'🎉 Tutoriel terminé !',s14:'Vous connaissez maintenant toutes les bases de <strong>Jet Poker</strong>. Misez sur les cotes, tentez les jackpots… Bonne chance !',
     ok:'J\'ai compris ➜',finish:'🎉 Commencer à jouer',wait:'⏳ Faites l\'action indiquée…',drag:'☰ Déplacez cette bulle',loading:'🔍 Préparation…',badge:'🎓 MODE DÉCOUVERTE'
   },
   en:{
@@ -85,7 +85,7 @@ var T={
     s11t:'💎 Progressive Jackpots',s11:'Three jackpots (<strong>Silver, Gold, Diamond</strong>) grow each round. When <strong>"Try the Jackpot"</strong> appears, bet <strong>1 chip</strong> to try to win the entire pot!',
     s12t:'⚙️ Settings',s12:'Change the <strong>visual theme</strong>, <strong>table color</strong>, <strong>background music</strong>, <strong>language</strong>… Everything is customizable!',
     s13t:'🔄 Play again!',s13:'<strong>"Same table"</strong> restarts with the same number of players. <strong>"Change table"</strong> lets you pick a different number.',
-    s14t:'🎉 Tutorial complete!',s14:'You now know all the basics of <strong>Corsica Poker</strong>. Play the odds, try the jackpots… Good luck!',
+    s14t:'🎉 Tutorial complete!',s14:'You now know all the basics of <strong>Jet Poker</strong>. Play the odds, try the jackpots… Good luck!',
     ok:'Got it ➜',finish:'🎉 Start playing',wait:'⏳ Perform the action…',drag:'☰ Drag this bubble',loading:'🔍 Preparing…',badge:'🎓 DISCOVERY MODE'
   }
 };
