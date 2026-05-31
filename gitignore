@@ -1,0 +1,14 @@
+# Dépendances
+node_modules/
+
+# Médias lourds — à conserver en local uniquement
+public/audio/
+public/video/
+
+# Logs
+logs/
+*.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db

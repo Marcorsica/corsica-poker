@@ -1,0 +1,15 @@
+{
+  "name": "corsica-poker-structured-base",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node ./server/server.js",
+    "simulate": "node simulate.js",
+    "simulate:jackpots": "node simulate-jackpots.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.18.0"
+  },
+  "description": "Base Corsica Poker restructurée pour maintenance et évolution."
+}

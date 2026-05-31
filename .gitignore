@@ -1,0 +1,11 @@
+node_modules/
+logs/
+Logs/
+bûches/
+buches/
+docs/
+Docs/
+*.log
+*.tmp
+.DS_Store
+server/audit/exports/
