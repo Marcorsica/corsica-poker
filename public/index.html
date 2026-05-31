@@ -606,10 +606,15 @@
     // Lance la musique après la vidéo
     if (typeof resumeAudioContext === 'function') resumeAudioContext();
     if (typeof startAmbience === 'function') {
-      // Forcer le reset même si l'état sauvegardé dit "déjà démarré"
       window.ambienceStarted = false;
       if (window._state) window._state.ambienceStarted = false;
       setTimeout(startAmbience, 300);
+    }
+    // Resync les jackpots du splash maintenant qu'il est visible
+    if (typeof startSplashJackpotSync === 'function') {
+      setTimeout(startSplashJackpotSync, 100);
+    } else if (typeof syncSplashJackpots === 'function') {
+      setTimeout(syncSplashJackpots, 100);
     }
   }
 
