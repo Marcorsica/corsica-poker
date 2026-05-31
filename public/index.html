@@ -610,9 +610,12 @@
       if (window._state) window._state.ambienceStarted = false;
       setTimeout(startAmbience, 300);
     }
-    // Resync les jackpots du splash maintenant qu'il est visible
-    if (typeof startSplashJackpotSync === 'function') {
-      setTimeout(startSplashJackpotSync, 100);
+    // Resync les jackpots depuis le serveur puis affiche sur le splash
+    if (typeof syncJackpotDisplayFromServer === 'function') {
+      syncJackpotDisplayFromServer().then(function() {
+        if (typeof syncSplashJackpots === 'function') syncSplashJackpots();
+        if (typeof startSplashJackpotSync === 'function') startSplashJackpotSync();
+      });
     } else if (typeof syncSplashJackpots === 'function') {
       setTimeout(syncSplashJackpots, 100);
     }
