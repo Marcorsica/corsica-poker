@@ -108,7 +108,9 @@ app.get('/', requireAuth, (req, res) => {
   });
 });
 
-app.use(['/start','/next','/settle','/result','/odds','/fairness','/rtp','/test','/jackpots'], requireAuth);
+app.use(['/start','/next','/settle','/result','/odds','/fairness','/rtp','/test'], requireAuth);
+// /jackpots GET est public pour afficher les valeurs sur le splash
+app.use(['/jackpots/bet','/jackpots/refund','/jackpots/contribute','/jackpots/claim'], requireAuth);
 app.use(gameRoutes);
 app.use('/jackpots', jackpotRoutes);
 

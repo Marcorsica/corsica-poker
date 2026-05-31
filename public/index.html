@@ -620,7 +620,7 @@
         { key: 'diamant', dst: 'splashJpDiamant',  fill: 'splashDiamantFill', reset: 8000,  max: 50000 }
       ];
       map.forEach(function(m) {
-        var val = jp[m.key] && jp[m.key].value ? jp[m.key].value : m.reset;
+        var val = (jp[m.key] !== undefined && jp[m.key] !== null) ? Number(jp[m.key]) : m.reset;
         var dstEl = document.getElementById(m.dst);
         var fillEl = document.getElementById(m.fill);
         if (dstEl) dstEl.textContent = val.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
