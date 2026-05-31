@@ -25,11 +25,16 @@
 <body class="pregame-screen">
 
 <!-- Bouclier noir — masque tout flash avant la vidéo -->
-<div id="blackShield" style="position:fixed;inset:0;z-index:99999;background:#000"></div>
+<div id="blackShield" style="position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;">
+  <button id="startBtn" style="background:transparent;border:2px solid rgba(255,215,0,0.6);color:rgba(255,215,0,0.9);padding:16px 40px;font-size:1.1rem;letter-spacing:0.15em;cursor:pointer;border-radius:6px;font-family:Georgia,serif;">
+    ▶ &nbsp; ENTRER
+  </button>
+</div>
 
 <!-- ===== INTRO VIDÉO (avant splash) ===== -->
 <div id="videoIntro" class="video-intro">
   <video id="introVideo" class="video-intro-player" autoplay playsinline preload="auto">
+    <source src="https://pub-7260763902be429fb5fcf30ab334c664.r2.dev/intro_sequence.mp4" type="video/mp4" />
     <source src="video/intro_sequence.mp4" type="video/mp4" />
   </video>
 
@@ -614,16 +619,17 @@
     }
   });
 
-  // Retire le bouclier noir dès que la vidéo joue
-  video.addEventListener('playing', function() {
-    var shield = document.getElementById('blackShield');
-    if (shield) shield.style.display = 'none';
-  }, { once: true });
-
-  // Autoplay
-  var playPromise = video.play();
-  if (playPromise !== undefined) {
-    playPromise.catch(function() { showSplash(); });
+  // Bouton ENTRER — retire le shield et lance la vidéo
+  var startBtn = document.getElementById('startBtn');
+  if (startBtn) {
+    startBtn.addEventListener('click', function() {
+      var shield = document.getElementById('blackShield');
+      if (shield) shield.style.display = 'none';
+      var playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(function() { showSplash(); });
+      }
+    });
   }
 
   // Fin de séquence → 2s de pause → splash
