@@ -13,7 +13,10 @@
     <div class="logo">♠</div>
     <h1>Corsica Poker</h1>
     <p>Entrez le code d’accès pour ouvrir le jeu.</p>
-    <input id="code" type="password" inputmode="numeric" autocomplete="off" placeholder="Code d'accès" />
+    <input style="display:none" type="password" name="fakepassword" />
+    <input id="code" type="text" inputmode="numeric" autocomplete="off" placeholder="Code d'accès" readonly
+      onfocus="this.removeAttribute('readonly')" 
+      style="background:#f5f7f8;color:#111;margin-bottom:12px;-webkit-text-security:disc" />
     <button id="submitBtn" type="button">Entrer</button>
     <div id="error" class="error"></div>
     <div class="hint">Accès protégé</div>
