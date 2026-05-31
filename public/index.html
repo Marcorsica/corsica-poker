@@ -610,15 +610,26 @@
       if (window._state) window._state.ambienceStarted = false;
       setTimeout(startAmbience, 300);
     }
-    // Resync les jackpots depuis le serveur puis affiche sur le splash
-    if (typeof syncJackpotDisplayFromServer === 'function') {
-      syncJackpotDisplayFromServer().then(function() {
-        if (typeof syncSplashJackpots === 'function') syncSplashJackpots();
-        if (typeof startSplashJackpotSync === 'function') startSplashJackpotSync();
+    // Fetch jackpots directement depuis le serveur et écrit dans le splash
+    fetch('/jackpots').then(function(r){ return r.json(); }).then(function(data) {
+      if (!data || !data.jackpots) return;
+      var jp = data.jackpots;
+      var map = [
+        { key: 'argent',  dst: 'splashJpArgent',  fill: 'splashArgentFill',  reset: 250,   max: 2000  },
+        { key: 'or',      dst: 'splashJpOr',       fill: 'splashOrFill',      reset: 850,   max: 5000  },
+        { key: 'diamant', dst: 'splashJpDiamant',  fill: 'splashDiamantFill', reset: 8000,  max: 50000 }
+      ];
+      map.forEach(function(m) {
+        var val = jp[m.key] && jp[m.key].value ? jp[m.key].value : m.reset;
+        var dstEl = document.getElementById(m.dst);
+        var fillEl = document.getElementById(m.fill);
+        if (dstEl) dstEl.textContent = val.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (fillEl) {
+          var pct = Math.min(100, Math.max(0, Math.round(((val - m.reset) / (m.max - m.reset)) * 100)));
+          fillEl.style.setProperty('--heat-progress', pct + '%');
+        }
       });
-    } else if (typeof syncSplashJackpots === 'function') {
-      setTimeout(syncSplashJackpots, 100);
-    }
+    }).catch(function(){});
   }
 
   // Déclenche le titre au début de la 3e vidéo
