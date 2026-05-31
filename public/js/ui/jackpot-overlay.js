@@ -1,4 +1,16 @@
 /* ── JACKPOT WIN OVERLAY ─────────────────────────────────────── */
+// Préchargement jackpot au chargement DOM
+window.addEventListener('DOMContentLoaded', function() {
+  var v = document.createElement('video');
+  v.src = 'https://pub-7260763902be429fb5fcf30ab334c664.r2.dev/jackpot.mp4';
+  v.preload = 'auto'; v.muted = true; v.style.display = 'none';
+  document.body.appendChild(v); v.load();
+  window._jpVideoCache = v;
+
+  var a = new Audio('https://pub-7260763902be429fb5fcf30ab334c664.r2.dev/jackpot_win.mp3');
+  a.preload = 'auto'; a.load();
+  window._jpAudioCache = a;
+});
 (function() {
 
   const JP_THEME = {
@@ -170,7 +182,7 @@
       jpAudioCtx = (window.AudioContext||window.webkitAudioContext)
         ? new (window.AudioContext||window.webkitAudioContext)() : null;
     } catch(e){ console.warn('[jackpot] audio:', e); }
-    if (jpAudioCtx) {
+    if (false && jpAudioCtx) {
       playEntryBoom(jpAudioCtx, 0.6+jackpots.length*0.25);
       const bigType = [...jackpots].sort((a,b)=>(JP_THEME[b.type]||JP_THEME.or).duration-(JP_THEME[a.type]||JP_THEME.or).duration)[0].type;
       setTimeout(()=>playFanfare(jpAudioCtx, bigType), 180);
@@ -185,8 +197,25 @@
       overlay.style.background = (JP_THEME[jackpots[0].type]||JP_THEME.or).bg;
     }
 
+    // Vidéo de fond jackpot
+    const jpVideo = document.createElement('video');
+    jpVideo.src = 'https://pub-7260763902be429fb5fcf30ab334c664.r2.dev/jackpot.mp4';
+    jpVideo.autoplay = true;
+    jpVideo.loop = true;
+    jpVideo.muted = true;
+    jpVideo.playsInline = true;
+    jpVideo.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0.85;';
+    overlay.appendChild(jpVideo);
+    jpVideo.play().catch(()=>{});
+
+    // Son jackpot via audio séparé
+    const jpAudio = new Audio('https://pub-7260763902be429fb5fcf30ab334c664.r2.dev/jackpot_win.mp3');
+    jpAudio.loop = true;
+    jpAudio.volume = 0.9;
+    jpAudio.play().catch(()=>{});
+
     const canvas = document.createElement('canvas');
-    canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;';
+    canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;';
     overlay.appendChild(canvas);
 
     const cardsHtml = jackpots.map(j=>{
@@ -244,9 +273,11 @@
     overlay.appendChild(content);
 
     document.body.appendChild(overlay);
-    const stopFW = launchFireworks(canvas, 0, jpAudioCtx);
+    const stopFW = function() {}; // animation remplacée par vidéo
     content.querySelector('.jp-win-btn').addEventListener('click', function() {
       stopFW();
+      jpVideo.pause();
+      jpAudio.pause(); jpAudio.currentTime = 0;
       if (cardLayer) cardLayer.remove();
       overlay.classList.add('jp-win-exit');
       setTimeout(()=>overlay.remove(), 650);
