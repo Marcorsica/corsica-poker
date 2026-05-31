@@ -640,10 +640,14 @@
   });
 
   // Retire le bouclier noir dès que la vidéo joue
-  video.addEventListener('playing', function() {
+  function removeShield() {
     var shield = document.getElementById('blackShield');
     if (shield) shield.style.display = 'none';
-  }, { once: true });
+  }
+  video.addEventListener('playing', removeShield, { once: true });
+  video.addEventListener('canplay', removeShield, { once: true });
+  // Fallback : retire le bouclier après 1.5s quoi qu'il arrive
+  setTimeout(removeShield, 1500);
 
   // Autoplay — le login précédent a déjà créé une interaction utilisateur
   var playPromise = video.play();
