@@ -25,11 +25,7 @@
 <body class="pregame-screen">
 
 <!-- Bouclier noir — masque tout flash avant la vidéo -->
-<div id="blackShield" style="position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;">
-  <button id="startBtn" style="background:transparent;border:2px solid rgba(255,215,0,0.6);color:rgba(255,215,0,0.9);padding:16px 40px;font-size:1.1rem;letter-spacing:0.15em;cursor:pointer;border-radius:6px;font-family:Georgia,serif;">
-    ▶ &nbsp; ENTRER
-  </button>
-</div>
+<div id="blackShield" style="position:fixed;inset:0;z-index:99999;background:#000"></div>
 
 <!-- ===== INTRO VIDÉO (avant splash) ===== -->
 <div id="videoIntro" class="video-intro">
@@ -607,9 +603,14 @@
     splash.style.display = '';
     splash.classList.remove('hidden');
     setTimeout(function() { intro.style.display = 'none'; }, 850);
-    // Lance la musique d'ambiance dès l'arrivée sur le splash
-    if (typeof startAmbience === 'function') startAmbience();
+    // Lance la musique après la vidéo
     if (typeof resumeAudioContext === 'function') resumeAudioContext();
+    if (typeof startAmbience === 'function') {
+      // Forcer le reset même si l'état sauvegardé dit "déjà démarré"
+      window.ambienceStarted = false;
+      if (window._state) window._state.ambienceStarted = false;
+      setTimeout(startAmbience, 300);
+    }
   }
 
   // Déclenche le titre au début de la 3e vidéo
@@ -619,17 +620,16 @@
     }
   });
 
-  // Bouton ENTRER — retire le shield et lance la vidéo
-  var startBtn = document.getElementById('startBtn');
-  if (startBtn) {
-    startBtn.addEventListener('click', function() {
-      var shield = document.getElementById('blackShield');
-      if (shield) shield.style.display = 'none';
-      var playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(function() { showSplash(); });
-      }
-    });
+  // Retire le bouclier noir dès que la vidéo joue
+  video.addEventListener('playing', function() {
+    var shield = document.getElementById('blackShield');
+    if (shield) shield.style.display = 'none';
+  }, { once: true });
+
+  // Autoplay — le login précédent a déjà créé une interaction utilisateur
+  var playPromise = video.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(function() { showSplash(); });
   }
 
   // Fin de séquence → 2s de pause → splash
